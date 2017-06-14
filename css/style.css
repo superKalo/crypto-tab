@@ -10,9 +10,22 @@ body {
 
 /** Components */
 .time {
-    margin-top: 50px;
     font-size: 168px;
     font-weight: 500;
+}
+
+
+.btn {
+    cursor: pointer;
+    background: none;
+    border: 0;
+    font-size: 80%;
+}
+.btn:hover {
+    text-decoration: underline;
+}
+.btn.active {
+    background: #d0d0d0;
 }
 
 
@@ -24,3 +37,11 @@ body {
     margin-left: auto !important;
     margin-right: auto !important;
 }
+
+.mb { margin-bottom: 15px; }
+.mb\+ { margin-bottom: 30px; }
+.mb\+\+ { margin-bottom: 50px; }
+
+.mt { margin-top: 15px; }
+.mt\+ { margin-top: 30px; }
+.mt\+\+ { margin-top: 50px; }
