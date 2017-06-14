@@ -1,53 +1,45 @@
 $(function(){
-
-    const labels = [
-        '2012-03-23',
-        '2010-10-14',
-        '2012-05-18',
-        '2013-12-06',
-        '2010-06-21',
-        '2010-05-12',
-        '2013-01-22',
-        '2012-11-19',
-        '2014-02-12',
-        '2016-09-11',
-        '2017-10-01',
-        '2015-11-11',
-        '2017-08-21',
-        '2010-06-23',
-        '2013-06-23',
-        '2016-01-05'
-    ];
-
-    const data = [
-        76,
-        50,
-        66,
-        10,
-        76,
-        33,
-        97,
-        49,
-        20,
-        73,
-        31,
-        34,
-        40,
-        30,
-        12,
-        64
-    ];
-
     const el = document.getElementById('chart');
+    const mainChart = new AppChart(el);
 
-    const mainChart = new AppChart();
-    mainChart.init(el, labels, data);
+    $dataPeriods = $('.js-period');
 
-    $('#monthly').on('click', function(){
-        mainChart.update(
-            ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
-            [1,31,18,32,26,81,54,41,75,80,49,40]
-        );
+    $dataPeriods.on('click', function() {
+        $('#periods').find('.active').removeClass('active');
+        $(this).addClass('active');
     });
+
+    $dataPeriods.on('click', function(){
+        const period = $(this).data('period');
+        let data;
+
+        switch(period) {
+            case 'ALL':
+                data = Api.getBitcoinRatesForAll();
+                break;
+            case 'ONE_YEAR':
+                data = Api.getBitcoinRatesForOneYear();
+                break;
+            case 'ONE_MONTH':
+                data = Api.getBitcoinRatesForOneMonth();
+                break;
+            case 'ONE_WEEK':
+                data = Api.getBitcoinRatesForOneWeek();
+                break;
+            case 'ONE_DAY':
+                data = Api.getBitcoinRatesForOneDay();
+                break;
+            case 'ONE_HOUR':
+                data = Api.getBitcoinRatesForOneHour()
+        }
+
+        if (mainChart.isInitiated()) {
+            mainChart.update(data.labels, data.values);
+        } else {
+            mainChart.init(data.labels, data.values);
+        }
+    });
+
+    $dataPeriods.first().trigger('click');
 
 });

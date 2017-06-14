@@ -1,13 +1,14 @@
-window.AppChart = function(_labels, _data) {
+window.AppChart = function(el) {
+    this.el = el;
 
     this.config = {
         type: 'line',
         data: {
-            labels: _labels,
+            labels: [],
             datasets: [{
                 backgroundColor: '#666',
                 borderColor: '#000',
-                data: _data,
+                data: [],
                 fill: false
             }]
         },
@@ -40,6 +41,10 @@ window.AppChart = function(_labels, _data) {
     };
 }
 
+AppChart.prototype.isInitiated = function() {
+    return !! this.chartInstance;
+}
+
 AppChart.prototype.update = function(_labels, _data) {
     this.chartInstance.data.labels = _labels;
     this.chartInstance.data.datasets[0].data = _data;
@@ -47,10 +52,10 @@ AppChart.prototype.update = function(_labels, _data) {
     this.chartInstance.update();
 }
 
-AppChart.prototype.init = function(el, _labels, _data) {
+AppChart.prototype.init = function(_labels, _data) {
     this.config.data.labels = _labels;
     this.config.data.datasets[0].data = _data;
 
-    var ctx = el.getContext('2d');
+    var ctx = this.el.getContext('2d');
     this.chartInstance = new Chart(ctx, this.config);
 }
