@@ -17,15 +17,17 @@
 
         <h2 class="chart-period mb text-center">
             Bitcoin price for
-            <button type="button" class="btn">1H</button>
-            <button type="button" class="btn">1D</button>
-            <button type="button" class="btn">1W</button>
-            <button type="button" class="btn active">1M</button>
-            <button type="button" class="btn">1Y</button>
-            <button type="button" class="btn">ALL</button>
+            <span id="periods">
+                <button data-period="ONE_HOUR" type="button" class="btn js-period">1H</button>
+                <button data-period="ONE_DAY" type="button" class="btn js-period">1D</button>
+                <button data-period="ONE_WEEK" type="button" class="btn js-period">1W</button>
+                <button data-period="ONE_MONTH" type="button" class="btn js-period active">1M</button>
+                <button data-period="ONE_YEAR" type="button" class="btn js-period">1Y</button>
+                <button data-period="ALL" type="button" class="btn js-period">ALL</button>
+            </span>
         </h2>
 
-        <canvas id="chart"></canvas>
+        <canvas id="chart" height="100"></canvas>
 
         <footer>
             <p class="mt++">
@@ -38,6 +40,8 @@
 
     <script src="//ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/Chart.js/2.6.0/Chart.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/chart.js"></script>
     <script src="js/script.js"></script>
 
 </body>
