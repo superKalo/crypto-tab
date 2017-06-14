@@ -1,0 +1,26 @@
+body {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+.wrapper {
+    width: 960px;
+    padding: 0 20px;
+}
+
+
+/** Components */
+.time {
+    margin-top: 50px;
+    font-size: 168px;
+    font-weight: 500;
+}
+
+
+/* Utilities */
+.text-center {
+    text-align: center !important;
+}
+.center-block {
+    margin-left: auto !important;
+    margin-right: auto !important;
+}
