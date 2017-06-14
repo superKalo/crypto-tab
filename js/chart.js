@@ -41,9 +41,10 @@ window.AppChart = function(_labels, _data) {
 }
 
 AppChart.prototype.update = function(_labels, _data) {
-    // this.chartInstance.config.data.labels = _labels;
-    // this.chartInstance.config.data.datasets.data = _data;
-    // this.chartInstance.update();
+    this.chartInstance.data.labels = _labels;
+    this.chartInstance.data.datasets[0].data = _data;
+
+    this.chartInstance.update();
 }
 
 AppChart.prototype.init = function(el, _labels, _data) {

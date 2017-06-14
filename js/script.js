@@ -44,12 +44,10 @@ $(function(){
     mainChart.init(el, labels, data);
 
     $('#monthly').on('click', function(){
-        // duration is the time for the animation of the redraw in milliseconds
-        // lazy is a boolean. if true, the animation can be interrupted by other animations
-        //mainChart.update(
-        //     ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
-        //     [1,31,18,32,26,81,54,41,75,80,49,40]
-        // );
+        mainChart.update(
+            ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+            [1,31,18,32,26,81,54,41,75,80,49,40]
+        );
     });
 
 });
