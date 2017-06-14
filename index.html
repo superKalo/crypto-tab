@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>New Tab</title>
+
+    <link rel="stylesheet" href="css/reset.css" />
+    <link rel="stylesheet" href="css/style.css" />
+</head>
+
+<body>
+
+    <div class="wrapper center-block">
+
+        <h1 class="time mt++ mb++ text-center">15:30</h1>
+
+        <h2 class="chart-period mb text-center">
+            Bitcoin price for
+            <button type="button" class="btn">1H</button>
+            <button type="button" class="btn">1D</button>
+            <button type="button" class="btn">1W</button>
+            <button type="button" class="btn active">1M</button>
+            <button type="button" class="btn">1Y</button>
+            <button type="button" class="btn">ALL</button>
+        </h2>
+
+        <canvas id="chart"></canvas>
+
+        <footer>
+            <p class="mt++">
+                <small>Last updated a minute ago. Rates are updated on every 15min.</small>
+            </p>
+        </footer>
+
+    </div>
+
+
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/Chart.js/2.6.0/Chart.js"></script>
+    <script src="js/script.js"></script>
+
+</body>
+</html>

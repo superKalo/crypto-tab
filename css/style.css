@@ -1,0 +1,47 @@
+body {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+.wrapper {
+    width: 960px;
+    padding: 0 20px;
+}
+
+
+/** Components */
+.time {
+    font-size: 168px;
+    font-weight: 500;
+}
+
+
+.btn {
+    cursor: pointer;
+    background: none;
+    border: 0;
+    font-size: 80%;
+}
+.btn:hover {
+    text-decoration: underline;
+}
+.btn.active {
+    background: #d0d0d0;
+}
+
+
+/* Utilities */
+.text-center {
+    text-align: center !important;
+}
+.center-block {
+    margin-left: auto !important;
+    margin-right: auto !important;
+}
+
+.mb { margin-bottom: 15px; }
+.mb\+ { margin-bottom: 30px; }
+.mb\+\+ { margin-bottom: 50px; }
+
+.mt { margin-top: 15px; }
+.mt\+ { margin-top: 30px; }
+.mt\+\+ { margin-top: 50px; }
