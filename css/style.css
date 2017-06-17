@@ -2,8 +2,12 @@ body {
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
+strong {
+    font-weight: bold;
+}
+
 .wrapper {
-    width: 960px;
+    width: 700px;
     padding: 0 20px;
 }
 
@@ -14,18 +18,28 @@ body {
     font-weight: 500;
 }
 
-
 .btn {
     cursor: pointer;
     background: none;
     border: 0;
     font-size: 80%;
+    padding: 2px 5px;
+    border-radius: 3px;
+    outline: none;
 }
 .btn:hover {
     text-decoration: underline;
 }
 .btn.active {
-    background: #d0d0d0;
+    color: #fff;
+    background: #4F78E2;
+}
+
+.positive {
+    color: #61CA00;
+}
+.negative {
+    color: #FF4949;
 }
 
 
@@ -37,6 +51,7 @@ body {
     margin-left: auto !important;
     margin-right: auto !important;
 }
+
 
 .mb { margin-bottom: 15px; }
 .mb\+ { margin-bottom: 30px; }

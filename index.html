@@ -13,19 +13,19 @@
 
     <div class="wrapper center-block">
 
-        <h1 class="time mt++ mb++ text-center">15:30</h1>
+        <h1 class="time mt++ mb+ text-center">15:30</h1>
 
         <h2 class="chart-period mb text-center">
-            Bitcoin price for
-            <span id="periods">
-                <button data-period="ONE_HOUR" type="button" class="btn js-period">1H</button>
-                <button data-period="ONE_DAY" type="button" class="btn js-period">1D</button>
-                <button data-period="ONE_WEEK" type="button" class="btn js-period">1W</button>
-                <button data-period="ONE_MONTH" type="button" class="btn js-period">1M</button>
-                <button data-period="ONE_YEAR" type="button" class="btn js-period">1Y</button>
-                <button data-period="ALL" type="button" class="btn js-period">ALL</button>
-            </span>
+            Bitcoin price is $2,500 (<span class="positive">+5.87%</span> since yesterday).
         </h2>
+        <p id="periods" class="text-center mb">
+            <button data-period="ONE_HOUR" type="button" class="btn js-period">1H</button>
+            <button data-period="ONE_DAY" type="button" class="btn js-period">1D</button>
+            <button data-period="ONE_WEEK" type="button" class="btn js-period">1W</button>
+            <button data-period="ONE_MONTH" type="button" class="btn js-period">1M</button>
+            <button data-period="ONE_YEAR" type="button" class="btn js-period">1Y</button>
+            <button data-period="ALL" type="button" class="btn js-period">ALL</button>
+        </p>
 
         <canvas id="chart" height="100"></canvas>
 

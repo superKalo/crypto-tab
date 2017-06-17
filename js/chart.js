@@ -3,13 +3,21 @@ window.AppChart = function(el) {
 
     this.config = {
         type: 'line',
+
         data: {
             labels: [],
             datasets: [{
-                backgroundColor: '#666',
-                borderColor: '#000',
+                backgroundColor: '#fff',
+                borderColor: '#B0C4F6',
+                pointBorderColor: '#4F78E2',
+                pointHoverBackgroundColor: '#4F78E2',
+                pointBorderWidth: 3,
+                pointRadius: 5,
                 data: [],
-                fill: false
+                borderWidth: 2,
+                fill: false,
+                // Bezier curve tension of the line
+                lineTension: 0
             }]
         },
         options: {
