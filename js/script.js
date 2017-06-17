@@ -40,6 +40,6 @@ $(function(){
         }
     });
 
-    $dataPeriods.eq(3).trigger('click');
+    $dataPeriods.eq(1).trigger('click');
 
 });
