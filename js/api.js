@@ -16,8 +16,8 @@ Api.getBitcoinRatesForOneYear = function() {
 
 Api.getBitcoinRatesForOneMonth = function() {
     return {
-        labels: ['1st', '2nd', '3rd', '4th', '5th', '6th', '7th', '8th', '10th', '11th', '12th', '13th'],
-        values: [92,23,21,31,18,32,26,81,54,41,75,80]
+        labels: ['1st', '2nd', '3rd', '4th', '5th', '6th', '7th', '8th', '10th', '11th', '12th', '13th', '14th', '15th', '16th', '17th', '18th', '19th', '20th', '21st', '22nd', '23rd', '24th', '25th', '27th', '28th', '29th', '30th', '31th'],
+        values: [50, 55, 54, 57, 60, 65, 66, 68, 65, 66, 67, 70, 72, 74, 70, 80, 77, 76, 75, 72, 74, 71, 70, 69, 71, 73, 74, 76, 80, 90, 88]
     }
 }
 
