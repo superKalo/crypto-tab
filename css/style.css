@@ -5,6 +5,9 @@ body {
 strong {
     font-weight: bold;
 }
+small {
+    font-size: 80%;
+}
 
 .wrapper {
     width: 700px;
