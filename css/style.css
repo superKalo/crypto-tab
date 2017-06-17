@@ -1,10 +1,24 @@
 body {
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+}
+html,
+body {
+    height: 100%;
+}
+
+strong {
+    font-weight: bold;
+}
+small {
+    font-size: 80%;
 }
 
 .wrapper {
-    width: 960px;
-    padding: 0 20px;
+    width: 700px;
+    padding: 0 20px 10px;
 }
 
 
@@ -14,18 +28,28 @@ body {
     font-weight: 500;
 }
 
-
 .btn {
     cursor: pointer;
     background: none;
     border: 0;
     font-size: 80%;
+    padding: 2px 5px;
+    border-radius: 3px;
+    outline: none;
 }
 .btn:hover {
     text-decoration: underline;
 }
 .btn.active {
-    background: #d0d0d0;
+    color: #fff;
+    background: #4F78E2;
+}
+
+.positive {
+    color: #61CA00;
+}
+.negative {
+    color: #FF4949;
 }
 
 
@@ -33,6 +57,7 @@ body {
 .text-center {
     text-align: center !important;
 }
+
 .center-block {
     margin-left: auto !important;
     margin-right: auto !important;

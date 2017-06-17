@@ -13,25 +13,27 @@
 
     <div class="wrapper center-block">
 
-        <h1 class="time mt++ mb++ text-center">15:30</h1>
+        <h1 class="time mb+ text-center">15:30</h1>
 
         <h2 class="chart-period mb text-center">
-            Bitcoin price for
-            <span id="periods">
-                <button data-period="ONE_HOUR" type="button" class="btn js-period">1H</button>
-                <button data-period="ONE_DAY" type="button" class="btn js-period">1D</button>
-                <button data-period="ONE_WEEK" type="button" class="btn js-period">1W</button>
-                <button data-period="ONE_MONTH" type="button" class="btn js-period active">1M</button>
-                <button data-period="ONE_YEAR" type="button" class="btn js-period">1Y</button>
-                <button data-period="ALL" type="button" class="btn js-period">ALL</button>
-            </span>
+            Bitcoin price is $2,500 (<span class="positive">+5.87%</span> since yesterday).
         </h2>
+        <p id="periods" class="text-center mb">
+            <button data-period="ONE_HOUR" type="button" class="btn js-period">1H</button>
+            <button data-period="ONE_DAY" type="button" class="btn js-period">1D</button>
+            <button data-period="ONE_WEEK" type="button" class="btn js-period">1W</button>
+            <button data-period="ONE_MONTH" type="button" class="btn js-period">1M</button>
+            <button data-period="ONE_YEAR" type="button" class="btn js-period">1Y</button>
+            <button data-period="ALL" type="button" class="btn js-period">ALL</button>
+        </p>
 
-        <canvas id="chart" height="100"></canvas>
+        <canvas id="chart" height="100" class="mb"></canvas>
 
-        <footer>
-            <p class="mt++">
-                <small>Last updated a minute ago. Rates are updated on every 15min.</small>
+        <footer class="text-center">
+            <p>
+                <small>
+                    Last updated a moment ago. Manage updates frequency.
+                </small>
             </p>
         </footer>
 

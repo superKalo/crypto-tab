@@ -3,20 +3,46 @@ window.AppChart = function(el) {
 
     this.config = {
         type: 'line',
+
         data: {
             labels: [],
             datasets: [{
-                backgroundColor: '#666',
-                borderColor: '#000',
+                backgroundColor: '#fff',
+                pointHoverBackgroundColor: '#fff',
+                borderColor: '#B0C4F6',
+                pointBorderColor: '#4F78E2',
+                pointBorderWidth: 3,
+                pointRadius: 5,
                 data: [],
-                fill: false
+                borderWidth: 2,
+                fill: false,
+                // Bezier curve tension of the line
+                lineTension: 0
             }]
         },
         options: {
+            layout: {
+                padding: {
+                    left: 0,
+                    right: 0,
+                    top: 10,
+                    bottom: 0
+                }
+            },
             responsive: true,
             tooltips: {
                 mode: 'index',
                 intersect: false,
+                backgroundColor: '#B0C4F6',
+                titleFontStyle: 'normal',
+                titleFontColor: '#000',
+                bodyFontColor: '#4F78E2',
+                bodyFontStyle: 'bold',
+                borderColor: '#4F78E2',
+                borderWidth: 2,
+                cornerRadius: 3,
+                caretPadding: 5,
+                displayColors: false
             },
             legend: {
                 display: false
@@ -27,10 +53,16 @@ window.AppChart = function(el) {
             },
             scales: {
                 xAxes: [{
-                    display: true
+                    display: true,
+                    gridLines: {
+                        display: false
+                    }
                 }],
                 yAxes: [{
-                    display: true,
+                    display: false,
+                    gridLines: {
+                        display: false
+                    },
                     ticks: {
                         // Include a dollar sign in the ticks
                         callback: (value) => `$${value}`
