@@ -1,5 +1,12 @@
 body {
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+}
+html,
+body {
+    height: 100%;
 }
 
 strong {
@@ -11,7 +18,7 @@ small {
 
 .wrapper {
     width: 700px;
-    padding: 0 20px;
+    padding: 0 20px 10px;
 }
 
 
@@ -50,11 +57,11 @@ small {
 .text-center {
     text-align: center !important;
 }
+
 .center-block {
     margin-left: auto !important;
     margin-right: auto !important;
 }
-
 
 .mb { margin-bottom: 15px; }
 .mb\+ { margin-bottom: 30px; }
