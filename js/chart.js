@@ -35,10 +35,16 @@ window.AppChart = function(el) {
             },
             scales: {
                 xAxes: [{
-                    display: true
+                    display: true,
+                    gridLines: {
+                        display: false
+                    }
                 }],
                 yAxes: [{
                     display: true,
+                    gridLines: {
+                        display: false
+                    },
                     ticks: {
                         // Include a dollar sign in the ticks
                         callback: (value) => `$${value}`
