@@ -13,31 +13,38 @@ $(function(){
         const period = $(this).data('period');
         let data;
 
-        switch(period) {
-            case 'ALL':
-                data = Api.getBitcoinRatesForAll();
-                break;
-            case 'ONE_YEAR':
-                data = Api.getBitcoinRatesForOneYear();
-                break;
-            case 'ONE_MONTH':
-                data = Api.getBitcoinRatesForOneMonth();
-                break;
-            case 'ONE_WEEK':
-                data = Api.getBitcoinRatesForOneWeek();
-                break;
-            case 'ONE_DAY':
-                data = Api.getBitcoinRatesForOneDay();
-                break;
-            case 'ONE_HOUR':
-                data = Api.getBitcoinRatesForOneHour()
-        }
+        // switch(period) {
+        //     case 'ALL':
+        //         data = App.API.getBitcoinRatesForAll();
+        //         break;
+        //     case 'ONE_YEAR':
+        //         data = App.API.getBitcoinRatesForOneYear();
+        //         break;
+        //     case 'ONE_MONTH':
+        //         data = App.API.getBitcoinRatesForOneMonth();
+        //         break;
+        //     case 'ONE_WEEK':
+        //         data = App.API.getBitcoinRatesForOneWeek();
+        //         break;
+        //     case 'ONE_DAY':
+        //         data = App.API.getBitcoinRatesForOneDay();
+        //         break;
+        //     case 'ONE_HOUR':
+                
+        // }
+        //
+        
+        App.API.getBitcoinRatesForOneHour().done( response => {
+            debugger;
+            data = response;
 
-        if (mainChart.isInitiated()) {
-            mainChart.update(data.labels, data.values);
-        } else {
-            mainChart.init(data.labels, data.values);
-        }
+
+            if (mainChart.isInitiated()) {
+                mainChart.update(data.labels, data.values);
+            } else {
+                mainChart.init(data.labels, data.values);
+            }
+        })
     });
 
     $dataPeriods.eq(1).trigger('click');

@@ -1,0 +1,34 @@
+{
+    "data": [
+        {
+            "id": 1224,
+            "value": 2500,
+            "currency": "USD",
+            "timestamp": 1498204800000
+        },
+        {
+            "id": 1225,
+            "value": 2600,
+            "currency": "USD",
+            "timestamp": 1498205700000
+        },
+        {
+            "id": 1225,
+            "value": 2700,
+            "currency": "USD",
+            "timestamp": 1498206600000
+        },
+        {
+            "id": 1225,
+            "value": 2800,
+            "currency": "USD",
+            "timestamp": 1498207500000
+        }
+        {
+            "id": 1225,
+            "value": 2700,
+            "currency": "USD",
+            "timestamp": 1498208400000
+        }
+    ]
+}
