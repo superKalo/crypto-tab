@@ -9,42 +9,64 @@ $(function(){
         $(this).addClass('active');
     });
 
+    function triggerChart(_response) {
+        let { data } = _response;
+        let labels = [];
+        let values = [];
+
+        data.forEach( dataPoint => {
+            labels.push(dataPoint.timestamp.toString());
+            values.push(dataPoint.value);
+        });
+
+        if (mainChart.isInitiated()) {
+            mainChart.update(labels, values);
+        } else {
+            mainChart.init(labels, values);
+        }
+    }
+
     $dataPeriods.on('click', function(){
         const period = $(this).data('period');
-        let data;
 
-        // switch(period) {
-        //     case 'ALL':
-        //         data = App.API.getBitcoinRatesForAll();
-        //         break;
-        //     case 'ONE_YEAR':
-        //         data = App.API.getBitcoinRatesForOneYear();
-        //         break;
-        //     case 'ONE_MONTH':
-        //         data = App.API.getBitcoinRatesForOneMonth();
-        //         break;
-        //     case 'ONE_WEEK':
-        //         data = App.API.getBitcoinRatesForOneWeek();
-        //         break;
-        //     case 'ONE_DAY':
-        //         data = App.API.getBitcoinRatesForOneDay();
-        //         break;
-        //     case 'ONE_HOUR':
-                
-        // }
-        //
-        
-        App.API.getBitcoinRatesForOneHour().done( response => {
-            debugger;
-            data = response;
-
-
-            if (mainChart.isInitiated()) {
-                mainChart.update(data.labels, data.values);
-            } else {
-                mainChart.init(data.labels, data.values);
-            }
-        })
+        switch(period) {
+            case 'ALL':
+                App.API.getBitcoinRatesForAll()
+                    .done( response => triggerChart(response))
+                    .fail( (jqXHR, textStatus, errorThrown) =>
+                        console.log(jqXHR, textStatus, errorThrown));
+                break;
+            case 'ONE_YEAR':
+                App.API.getBitcoinRatesForOneYear()
+                    .done( response => triggerChart(response))
+                    .fail( (jqXHR, textStatus, errorThrown) =>
+                        console.log(jqXHR, textStatus, errorThrown));
+                break;
+            case 'ONE_MONTH':
+                App.API.getBitcoinRatesForOneMonth()
+                    .done( response => triggerChart(response))
+                    .fail( (jqXHR, textStatus, errorThrown) =>
+                        console.log(jqXHR, textStatus, errorThrown));
+                break;
+            case 'ONE_WEEK':
+                App.API.getBitcoinRatesForOneWeek()
+                    .done( response => triggerChart(response))
+                    .fail( (jqXHR, textStatus, errorThrown) =>
+                        console.log(jqXHR, textStatus, errorThrown));
+                break;
+            case 'ONE_DAY':
+                App.API.getBitcoinRatesForOneDay()
+                    .done( response => triggerChart(response))
+                    .fail( (jqXHR, textStatus, errorThrown) =>
+                        console.log(jqXHR, textStatus, errorThrown));
+                break;
+            case 'ONE_HOUR':
+                App.API.getBitcoinRatesForOneHour()
+                    .done( response => triggerChart(response))
+                    .fail( (jqXHR, textStatus, errorThrown) =>
+                        console.log(jqXHR, textStatus, errorThrown));
+                break;
+        }
     });
 
     $dataPeriods.eq(1).trigger('click');
