@@ -1,0 +1,19 @@
+{
+  "name": "crypto-chart-new-tab-extension",
+  "version": "1.0.0",
+  "description": "Override the new tab page with a chart",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/superKalo/crypto-chart-new-tab-extension.git"
+  },
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/superKalo/crypto-chart-new-tab-extension/issues"
+  },
+  "homepage": "https://github.com/superKalo/crypto-chart-new-tab-extension#readme",
+  "dependencies": {
+    "chart.js": "^2.6.0",
+    "jquery": "^3.2.1",
+    "momentjs": "^2.0.0"
+  }
+}
