@@ -85,6 +85,12 @@ AppChart.prototype.update = function(_labels, _data) {
 }
 
 AppChart.prototype.init = function(_labels, _data) {
+    if (this.isInitiated()) {
+        this.update(_labels, _data);
+
+        return;
+    }
+
     this.config.data.labels = _labels;
     this.config.data.datasets[0].data = _data;
 
