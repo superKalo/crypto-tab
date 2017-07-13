@@ -29,6 +29,24 @@
             "value": 2700,
             "currency": "USD",
             "timestamp": 1498208400000
+        },
+        {
+            "id": 1225,
+            "value": 2700,
+            "currency": "USD",
+            "timestamp": 1498208300000
+        },
+        {
+            "id": 1225,
+            "value": 2700,
+            "currency": "USD",
+            "timestamp": 1498208200000
+        },
+        {
+            "id": 1225,
+            "value": 2700,
+            "currency": "USD",
+            "timestamp": 1498208100000
         }
     ]
 }
