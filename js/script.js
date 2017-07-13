@@ -1,6 +1,6 @@
 $(function(){
     const el = document.getElementById('chart');
-    const mainChart = new AppChart(el);
+    const chart = new App.Chart(el);
 
     $dataPeriods = $('.js-period');
 
@@ -61,7 +61,7 @@ $(function(){
             .done( response => {
                 const data = normalizeData(response, dateFormat);
 
-                mainChart.init(data.labels, data.values);
+                chart.init(data.labels, data.values);
             })
             .fail( (jqXHR, textStatus, errorThrown) =>
                 console.log(jqXHR, textStatus, errorThrown));

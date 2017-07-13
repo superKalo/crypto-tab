@@ -1,4 +1,11 @@
-window.AppChart = function(el) {
+window.App = window.App || {};
+
+/**
+ * Yes, that's a Chart!
+ *
+ * {@link: https://github.com/chartjs/Chart.js}
+ */
+window.App.Chart = function(el) {
     this.el = el;
 
     this.config = {
@@ -65,7 +72,7 @@ window.AppChart = function(el) {
                     },
                     ticks: {
                         // Include a dollar sign in the ticks
-                        callback: (value) => `$${value}`
+                        callback: value => `$${value}`
                     }
                 }]
             }
@@ -73,18 +80,19 @@ window.AppChart = function(el) {
     };
 }
 
-AppChart.prototype.isInitiated = function() {
+window.App.Chart.prototype.isInitiated = function() {
     return !! this.chartInstance;
 }
 
-AppChart.prototype.update = function(_labels, _data) {
+window.App.Chart.prototype.update = function(_labels, _data) {
     this.chartInstance.data.labels = _labels;
     this.chartInstance.data.datasets[0].data = _data;
 
     this.chartInstance.update();
 }
 
-AppChart.prototype.init = function(_labels, _data) {
+window.App.Chart.prototype.init = function(_labels, _data) {
+    // If already initiated - do not init twice! Update data only.
     if (this.isInitiated()) {
         this.update(_labels, _data);
 
