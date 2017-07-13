@@ -1,6 +1,6 @@
 $(function(){
     const el = document.getElementById('chart');
-    const mainChart = new AppChart(el);
+    const chart = new App.Chart(el);
 
     $dataPeriods = $('.js-period');
 
@@ -9,35 +9,62 @@ $(function(){
         $(this).addClass('active');
     });
 
-    $dataPeriods.on('click', function(){
-        const period = $(this).data('period');
-        let data;
+    function normalizeData(_response, _dateFormat) {
+        let { data } = _response;
+        let labels = [];
+        let values = [];
 
+        data.forEach( dataPoint => {
+            labels.push(moment(dataPoint.timestamp).format(_dateFormat));
+            values.push(dataPoint.value);
+        });
+
+        return {
+            values,
+            labels
+        };
+    }
+
+    function getBitcoinData(period) {
         switch(period) {
             case 'ALL':
-                data = Api.getBitcoinRatesForAll();
-                break;
+                return App.API.getBitcoinRatesForAll();
             case 'ONE_YEAR':
-                data = Api.getBitcoinRatesForOneYear();
-                break;
+                return App.API.getBitcoinRatesForOneYear();
             case 'ONE_MONTH':
-                data = Api.getBitcoinRatesForOneMonth();
-                break;
+                return App.API.getBitcoinRatesForOneMonth();
             case 'ONE_WEEK':
-                data = Api.getBitcoinRatesForOneWeek();
-                break;
+                return App.API.getBitcoinRatesForOneWeek();
             case 'ONE_DAY':
-                data = Api.getBitcoinRatesForOneDay();
-                break;
+                return App.API.getBitcoinRatesForOneDay();
             case 'ONE_HOUR':
-                data = Api.getBitcoinRatesForOneHour()
+                return App.API.getBitcoinRatesForOneHour();
         }
+    }
 
-        if (mainChart.isInitiated()) {
-            mainChart.update(data.labels, data.values);
-        } else {
-            mainChart.init(data.labels, data.values);
+    function getLabelFormat(period) {
+        switch(period) {
+            case 'ALL': return 'MMM YYYY';
+            case 'ONE_YEAR': return 'MMM YYYY';
+            case 'ONE_MONTH': return 'do MMM';
+            case 'ONE_WEEK': return 'dddd';
+            case 'ONE_DAY': return 'HH:mm';
+            case 'ONE_HOUR': return 'HH:mm';
         }
+    }
+
+    $dataPeriods.on('click', function(){
+        const period = $(this).data('period');
+        const dateFormat = getLabelFormat(period);
+
+        getBitcoinData(period)
+            .done( response => {
+                const data = normalizeData(response, dateFormat);
+
+                chart.init(data.labels, data.values);
+            })
+            .fail( (jqXHR, textStatus, errorThrown) =>
+                console.log(jqXHR, textStatus, errorThrown));
     });
 
     $dataPeriods.eq(1).trigger('click');
