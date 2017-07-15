@@ -12,8 +12,8 @@
   },
   "homepage": "https://github.com/superKalo/crypto-chart-new-tab-extension#readme",
   "dependencies": {
-    "chart.js": "^2.6.0",
-    "jquery": "^3.2.1",
-    "momentjs": "^2.0.0"
+    "chart.js": "2.6.0",
+    "jquery": "3.2.1",
+    "moment": "2.18.1"
   }
 }
