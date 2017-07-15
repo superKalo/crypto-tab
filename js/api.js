@@ -4,7 +4,8 @@ window.App.API = {
     baseURL: 'fake-api/',
 
     fetch: function(_endpoint) {
-        return $.ajax({ url: this.baseURL + _endpoint + '.json' });
+        return $.ajax({ url: this.baseURL + _endpoint + '.json' })
+            .then( _response => JSON.parse(_response) );
     },
 
     getBitcoinRatesForAll: function() {
