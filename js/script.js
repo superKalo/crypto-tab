@@ -1,6 +1,10 @@
 $(function(){
+    // Init Chart
     const el = document.getElementById('chart');
     const chart = new App.Chart(el);
+
+    // Init Clock
+    const clock = new App.Clock();
 
     $dataPeriods = $('.js-period');
 
