@@ -4,6 +4,9 @@ window.App = window.App || {};
  * Yes, that's the most simple clock in the world.
  */
 App.Clock = function(){
+    // String that holds the current time (hours and minutes)
+    this.time;
+
     this.setTime();
 
     setInterval(this.setTime, 1000);
@@ -19,5 +22,11 @@ App.Clock.prototype.setTime = function() {
     // Add zero in front of numbers < 10
     const m = ('0' + today.getMinutes()).slice(-2);
 
-    document.getElementById('clock').innerText = h + ':' + m;
+    const currentTime = h + ':' + m;
+
+    if (currentTime !== this.time) {
+        this.time = currentTime;
+
+        document.getElementById('clock').innerText = currentTime;
+    }
 }
