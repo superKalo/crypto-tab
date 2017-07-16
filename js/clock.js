@@ -16,11 +16,8 @@ App.Clock.prototype.setTime = function() {
     const today = new Date();
 
     const h = today.getHours();
-
     // Add zero in front of numbers < 10
     const m = ('0' + today.getMinutes()).slice(-2);
-    const s = ('0' + today.getSeconds()).slice(-2);
-
 
     document.getElementById('clock').innerText = h + ':' + m;
 }
