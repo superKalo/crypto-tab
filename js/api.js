@@ -5,7 +5,9 @@ window.App.API = {
 
     fetch: function(_endpoint) {
         return $.ajax({ url: this.baseURL + _endpoint + '.json' })
-            .then( _response => JSON.parse(_response) );
+            .then( _response => JSON.parse(_response) )
+            .fail( (jqXHR, textStatus, errorThrown) =>
+               console.log(jqXHR, textStatus, errorThrown));
     },
 
     getBitcoinRatesForAll: function() {

@@ -91,16 +91,33 @@ window.App.Chart.prototype.update = function(_labels, _data) {
     this.chartInstance.update();
 }
 
-window.App.Chart.prototype.init = function(_labels, _data) {
+window.App.Chart.prototype.prepareData = function(_data) {
+    let labels = [];
+    let values = [];
+
+    _data.forEach( dataPoint => {
+        labels.push(dataPoint.timestamp);
+        values.push(dataPoint.value);
+    });
+
+    return {
+        values,
+        labels
+    };
+}
+
+window.App.Chart.prototype.init = function(_data) {
+    const { labels, values } = this.prepareData(_data);
+
     // If already initiated - do not init twice! Update data only.
     if (this.isInitiated()) {
-        this.update(_labels, _data);
+        this.update(labels, values);
 
         return;
     }
 
-    this.config.data.labels = _labels;
-    this.config.data.datasets[0].data = _data;
+    this.config.data.labels = labels;
+    this.config.data.datasets[0].data = values;
 
     var ctx = this.el.getContext('2d');
     this.chartInstance = new Chart(ctx, this.config);
