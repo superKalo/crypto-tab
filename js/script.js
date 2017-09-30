@@ -13,21 +13,6 @@ $(function(){
         $(this).addClass('active');
     });
 
-    function normalizeData(_data, _dateFormat) {
-        let labels = [];
-        let values = [];
-
-        _data.forEach( dataPoint => {
-            labels.push(moment(dataPoint.timestamp).format(_dateFormat));
-            values.push(dataPoint.value);
-        });
-
-        return {
-            values,
-            labels
-        };
-    }
-
     function getBitcoinData(period) {
         switch(period) {
             case 'ALL':
@@ -62,24 +47,21 @@ $(function(){
         const period = $(this).data('period');
         const dateFormat = getLabelFormat(period);
 
-        if (BitcoinRepository) {
-            BitcoinRepository.clearData();
-        }
-
         BitcoinRepository = new SuperRepo({
             storage: 'BROWSER_STORAGE',
             name: 'bitcoin',
             outOfDateAfter: 15 * 1000,
-            mapData: r => r.data,
+            mapData: r => r.data.map( _rec => ({
+                value: _rec.value,
+                timestamp: moment(_rec.timestamp).format(dateFormat)
+            })),
             request: () => getBitcoinData(period)
         });
 
-        BitcoinRepository.getData()
-            .then(response => {
-                const data = normalizeData(response, dateFormat);
-
-                chart.init(data.labels, data.values);
-            });
+        BitcoinRepository.clearData().then( () => {
+            BitcoinRepository.getData()
+                .then(_data => chart.init(_data));
+        });
     });
 
     $dataPeriods.eq(1).trigger('click');
