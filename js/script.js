@@ -56,10 +56,7 @@ $(function(){
             storage: 'BROWSER_STORAGE',
             name: 'bitcoin-' + period,
             outOfDateAfter: 15 * 60 * 1000,
-            mapData: r => r.map( _rec => ({
-                value: _rec.average,
-                timestamp: moment(_rec.time).format(getLabelFormat(period))
-            })),
+            mapData: r => App.API.mapData(r, getLabelFormat(period)),
             request: () => getBitcoinData(period)
         })
     );
