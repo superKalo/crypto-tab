@@ -43,7 +43,7 @@ $(function(){
         switch(period) {
             case 'ALL': return 'MMM YYYY';
             case 'ONE_YEAR': return 'MMM YYYY';
-            case 'ONE_MONTH': return 'do MMM';
+            case 'ONE_MONTH': return 'Do MMM';
             case 'ONE_WEEK': return 'dddd';
             case 'ONE_DAY': return 'HH:mm';
             case 'ONE_HOUR': return 'HH:mm';

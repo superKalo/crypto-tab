@@ -88,7 +88,7 @@ window.App.apiGoranAdapter = {
           return result.map( rec => ({
             average: parseInt(rec.average.reduce((a,b) => a + b) / rec.average.length),
             time: rec.time
-          }));
+          })).reverse();
         });
     },
 
