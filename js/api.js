@@ -38,10 +38,10 @@ window.App.API = {
             const hour = date.getHours();
 
             if (nextData[hour]) {
-              nextData[hour].average = (nextData[hour].average + rec.average) / 2;
+              nextData[hour].average.push(rec.average);
             } else {
                 nextData[hour] = {
-                  average: rec.average,
+                  average: [rec.average],
                   time: rec.time
                 };
             }
@@ -52,7 +52,10 @@ window.App.API = {
             result.push(nextData[key]);
           }
 
-          return result;
+          return result.map( rec => ({
+            average: parseInt(rec.average.reduce((a,b) => a + b) / rec.average.length),
+            time: rec.time
+          }));
         });
     },
 
