@@ -41,4 +41,5 @@ class API {
     }
 };
 
-window.App.API = new API(App.apiFakeAdapter);
+// window.App.API = new API(App.apiFakeAdapter);
+window.App.API = new API(App.apiGoranAdapter);
