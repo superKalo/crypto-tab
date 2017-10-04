@@ -4,9 +4,9 @@ window.App.API = {
     baseURL: 'fake-api/',
 
     fetch: function(_endpoint) {
-        return $.ajax({ url: this.baseURL + _endpoint + '.json' })
-            .then( _response => JSON.parse(_response) )
-            .fail( (jqXHR, textStatus, errorThrown) =>
+        return axios.get(this.baseURL + _endpoint + '.json')
+            .then( r => r.data )
+            .catch( (jqXHR, textStatus, errorThrown) =>
                console.log(jqXHR, textStatus, errorThrown));
     },
 
