@@ -38,13 +38,14 @@ window.App.apiGoranAdapter = {
             const date = new Date(rec.time);
 
             const hour = date.getHours();
+            date.setMinutes(0);
 
             if (nextData[hour]) {
               nextData[hour].average.push(rec.average);
             } else {
                 nextData[hour] = {
                   average: [rec.average],
-                  time: rec.time
+                  time: date.valueOf()
                 };
             }
           });
