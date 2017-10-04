@@ -1,3 +1,12 @@
+const PERIODS = {
+    ALL: 'ALL',
+    ONE_YEAR: 'ONE_YEAR',
+    ONE_MONTH: 'ONE_MONTH',
+    ONE_WEEK: 'ONE_WEEK',
+    ONE_DAY: 'ONE_DAY',
+    ONE_HOUR: 'ONE_HOUR'
+};
+
 $(function(){
     // Init Chart
     const el = document.getElementById('chart');
@@ -41,27 +50,25 @@ $(function(){
         }
     }
 
-    let BitcoinRepository;
+    const BitcoinRepository = {};
+    Object.keys(PERIODS).forEach( period =>
+        BitcoinRepository[period] = new SuperRepo({
+            storage: 'BROWSER_STORAGE',
+            name: 'bitcoin-' + period,
+            outOfDateAfter: 15 * 60 * 1000,
+            mapData: r => r.map( _rec => ({
+                value: _rec.average,
+                timestamp: moment(_rec.time).format(getLabelFormat(period))
+            })),
+            request: () => getBitcoinData(period)
+        })
+    );
 
     $dataPeriods.on('click', function(){
         const period = $(this).data('period');
-        const dateFormat = getLabelFormat(period);
 
-        BitcoinRepository = new SuperRepo({
-            storage: 'BROWSER_STORAGE',
-            name: 'bitcoin',
-            outOfDateAfter: 15 * 1000,
-            mapData: r => r.map( _rec => ({
-                value: _rec.average,
-                timestamp: moment(_rec.time).format(dateFormat)
-            })),
-            request: () => getBitcoinData(period)
-        });
-
-        BitcoinRepository.clearData().then( () => {
-            BitcoinRepository.getData()
-                .then(_data => chart.init(_data));
-        });
+        BitcoinRepository[period].getData()
+            .then(_data => chart.init(_data));
     });
 
     $dataPeriods.eq(1).trigger('click');
