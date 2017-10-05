@@ -14,6 +14,10 @@ window.App.apiGoranAdapter = {
         }));
     },
 
+    _createDateAsUTC: function(date) {
+      return new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate(), date.getHours(), date.getMinutes(), date.getSeconds()));
+    },
+
     getBitcoinRatesForAll: function() {
         return this.get('all');
     },
@@ -27,17 +31,18 @@ window.App.apiGoranAdapter = {
             const nextData = {};
 
             data.forEach( rec => {
-                const date = new Date(rec.time);
-
-                const dayOfTheMonth = date.getDate();
+                const date = this._createDateAsUTC(new Date(rec.time));
                 date.setMinutes(0);
-                date.setHours(1);
+                date.setHours(0);
                 date.setSeconds(0);
 
-                if (nextData[dayOfTheMonth]) {
-                  nextData[dayOfTheMonth].average.push(rec.average);
+                const dayOfTheMonth = date.getDate();
+                const month = date.getMonth();
+                const key = `${month}-${dayOfTheMonth}`;
+                if (nextData[key]) {
+                  nextData[key].average.push(rec.average);
                 } else {
-                    nextData[dayOfTheMonth] = {
+                    nextData[key] = {
                       average: [rec.average],
                       time: date.valueOf()
                     };
@@ -52,7 +57,7 @@ window.App.apiGoranAdapter = {
             return result.map( rec => ({
                 average: parseInt(rec.average.reduce((a,b) => a + b) / rec.average.length),
                 time: rec.time
-            }));
+            })).reverse();
         });
     },
 
@@ -64,12 +69,8 @@ window.App.apiGoranAdapter = {
         return this.get('indices/global/history/BTCUSD?period=daily&?format=json').then(data => {
           const nextData = {};
 
-          function createDateAsUTC(date) {
-            return new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate(), date.getHours(), date.getMinutes(), date.getSeconds()));
-          }
-
           data.forEach( rec => {
-            const date = createDateAsUTC(new Date(rec.time));
+            const date = this._createDateAsUTC(new Date(rec.time));
             date.setMinutes(0);
 
             const hour = date.getHours();
