@@ -62,7 +62,38 @@ window.App.apiGoranAdapter = {
     },
 
     getBitcoinRatesForOneWeek: function() {
-        return this.get('week');
+        return this.get('indices/global/history/BTCUSD?period=monthly&?format=json').then(data => {
+            const nextData = {};
+
+            data.forEach( rec => {
+                const date = this._createDateAsUTC(new Date(rec.time));
+                date.setMinutes(0);
+                date.setHours(0);
+                date.setSeconds(0);
+
+                const dayOfTheMonth = date.getDate();
+                const month = date.getMonth();
+                const key = `${month}-${dayOfTheMonth}`;
+                if (nextData[key]) {
+                  nextData[key].average.push(rec.average);
+                } else {
+                    nextData[key] = {
+                      average: [rec.average],
+                      time: date.valueOf()
+                    };
+                }
+            });
+
+            const result = [];
+            for (let key of Object.keys(nextData)) {
+                result.push(nextData[key]);
+            }
+
+            return result.map( rec => ({
+                average: parseInt(rec.average.reduce((a,b) => a + b) / rec.average.length),
+                time: rec.time
+            })).slice(0, 7).reverse();
+        });
     },
 
     getBitcoinRatesForOneDay: function() {
