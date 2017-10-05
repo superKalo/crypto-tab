@@ -100,6 +100,25 @@ window.App.apiGoranAdapter = {
     },
 
     getBitcoinRatesForOneHour: function() {
-        return this.get('hour');
+      return this.get('indices/global/history/BTCUSD?period=daily&?format=json').then(data => {
+        const nextData = [];
+
+        data.forEach( rec => {
+          const date = this._createDateAsUTC(new Date(rec.time));
+          const today = new Date();
+
+          const isTheSameDay = today.getDate() === date.getDate();
+          const isTheSameHour = today.getHours() === date.getHours();
+
+          if (isTheSameDay && isTheSameHour) {
+            nextData.push({
+                average: rec.average,
+                time: date.valueOf()
+            });
+          }
+        });
+
+        return nextData.reverse();
+      });
     }
 };
