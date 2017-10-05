@@ -41,7 +41,7 @@ $(function(){
 
     function getLabelFormat(period) {
         switch(period) {
-            case 'ALL': return 'MMM YYYY';
+            case 'ALL': return 'YYYY';
             case 'ONE_YEAR': return 'MMM YYYY';
             case 'ONE_MONTH': return 'Do MMM';
             case 'ONE_WEEK': return 'dddd';
