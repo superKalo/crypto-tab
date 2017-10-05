@@ -67,35 +67,35 @@ window.App.apiGoranAdapter = {
 
     getBitcoinRatesForOneDay: function() {
         return this.get('indices/global/history/BTCUSD?period=daily&?format=json').then(data => {
-          const nextData = {};
+            const nextData = {};
 
-          data.forEach( rec => {
-            const date = this._createDateAsUTC(new Date(rec.time));
-            date.setMinutes(0);
+            data.forEach( rec => {
+                const date = this._createDateAsUTC(new Date(rec.time));
+                date.setMinutes(0);
 
-            const hour = date.getHours();
-            const dayOfTheMonth = date.getDate();
-            const key = `${dayOfTheMonth}-${hour}`;
+                const hour = date.getHours();
+                const dayOfTheMonth = date.getDate();
+                const key = `${dayOfTheMonth}-${hour}`;
 
-            if (nextData[key]) {
-              nextData[key].average.push(rec.average);
-            } else {
-                nextData[key] = {
-                  average: [rec.average],
-                  time: date.valueOf()
-                };
+                if (nextData[key]) {
+                    nextData[key].average.push(rec.average);
+                } else {
+                    nextData[key] = {
+                        average: [rec.average],
+                        time: date.valueOf()
+                    };
+                }
+            });
+
+            const result = [];
+            for (let key of Object.keys(nextData)) {
+                result.push(nextData[key]);
             }
-          });
 
-          const result = [];
-          for (let key of Object.keys(nextData)) {
-            result.push(nextData[key]);
-          }
-
-          return result.map( rec => ({
-            average: parseInt(rec.average.reduce((a,b) => a + b) / rec.average.length),
-            time: rec.time
-          })).reverse();
+            return result.map( rec => ({
+                average: parseInt(rec.average.reduce((a,b) => a + b) / rec.average.length),
+                time: rec.time
+            })).reverse();
         });
     },
 
@@ -104,18 +104,18 @@ window.App.apiGoranAdapter = {
         const nextData = [];
 
         data.forEach( rec => {
-          const date = this._createDateAsUTC(new Date(rec.time));
-          const today = new Date();
+            const date = this._createDateAsUTC(new Date(rec.time));
+            const today = new Date();
 
-          const isTheSameDay = today.getDate() === date.getDate();
-          const isTheSameHour = today.getHours() === date.getHours();
+            const isTheSameDay = today.getDate() === date.getDate();
+            const isTheSameHour = today.getHours() === date.getHours();
 
-          if (isTheSameDay && isTheSameHour) {
-            nextData.push({
-                average: rec.average,
-                time: date.valueOf()
-            });
-          }
+            if (isTheSameDay && isTheSameHour) {
+                nextData.push({
+                    average: rec.average,
+                    time: date.valueOf()
+                });
+            }
         });
 
         return nextData.reverse();
