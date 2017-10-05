@@ -198,9 +198,9 @@ window.App.apiGoranAdapter = {
             const today = new Date();
 
             const isTheSameDay = today.getDate() === date.getDate();
-            const isTheSameHour = today.getHours() === date.getHours();
+            const isWithingAnHour = (today.valueOf() - date.valueOf()) < (60 * 60 * 1000);
 
-            if (isTheSameDay && isTheSameHour) {
+            if (isTheSameDay && isWithingAnHour) {
                 nextData.push({
                     average: rec.average,
                     time: date.valueOf()
