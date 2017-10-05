@@ -50,7 +50,39 @@ window.App.apiGoranAdapter = {
     },
 
     getBitcoinRatesForOneYear: function() {
+        return this.get('indices/global/history/BTCUSD?period=alltime&?format=json').then(data => {
+            const nextData = {};
 
+            data.forEach( rec => {
+                const date = this._createDateAsUTC(new Date(rec.time));
+                const today = new Date();
+
+                if (today.getFullYear() !== date.getFullYear()) {
+                    return;
+                }
+
+                const month = date.getMonth();
+                const key = `${month}`;
+                if (nextData[key]) {
+                  nextData[key].average.push(rec.average);
+                } else {
+                    nextData[key] = {
+                      average: [rec.average],
+                      time: date.valueOf()
+                    };
+                }
+            });
+
+            const result = [];
+            for (let key of Object.keys(nextData)) {
+                result.push(nextData[key]);
+            }
+
+            return result.map( rec => ({
+                average: parseInt(rec.average.reduce((a,b) => a + b) / rec.average.length),
+                time: rec.time
+            }));
+        });
     },
 
     getBitcoinRatesForOneMonth: function() {
