@@ -10,7 +10,7 @@ window.App.apiGoranAdapter = {
     mapData: function(response, dateLabelFormat) {
         return response.map( _rec => ({
             value: _rec.average,
-            timestamp: moment(_rec.time).format(dateLabelFormat)
+            timestamp: moment(moment.utc(_rec.time)).local().format(dateLabelFormat)
         }));
     },
 
@@ -64,16 +64,22 @@ window.App.apiGoranAdapter = {
         return this.get('indices/global/history/BTCUSD?period=daily&?format=json').then(data => {
           const nextData = {};
 
-          data.forEach( rec => {
-            const date = new Date(rec.time);
+          function createDateAsUTC(date) {
+            return new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate(), date.getHours(), date.getMinutes(), date.getSeconds()));
+          }
 
-            const hour = date.getHours();
+          data.forEach( rec => {
+            const date = createDateAsUTC(new Date(rec.time));
             date.setMinutes(0);
 
-            if (nextData[hour]) {
-              nextData[hour].average.push(rec.average);
+            const hour = date.getHours();
+            const dayOfTheMonth = date.getDate();
+            const key = `${dayOfTheMonth}-${hour}`;
+
+            if (nextData[key]) {
+              nextData[key].average.push(rec.average);
             } else {
-                nextData[hour] = {
+                nextData[key] = {
                   average: [rec.average],
                   time: date.valueOf()
                 };
