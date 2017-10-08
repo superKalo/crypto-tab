@@ -55,10 +55,92 @@ small {
     color: #FF4949;
 }
 
+.chart-container {
+    position: relative;
+    height: 200px;
+    width: 100%;
+}
+
+
+/**
+ * Cool fancy loading animation. Credits:
+ * {@link https://codepen.io/slyka85/pen/QvBQPb}
+ */
+.loader {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-left: -50px;
+    margin-top: -15px;
+    transition: all 1s;
+    opacity: 0;
+}
+@-webkit-keyframes dominos {
+    50% { opacity: 0.7; }
+    75% { -webkit-transform: rotate(90deg); transform: rotate(90deg); }
+    80% { opacity: 1; }
+}
+@keyframes dominos {
+    50% { opacity: 0.7; }
+    75% { -webkit-transform: rotate(90deg); transform: rotate(90deg); }
+    80% { opacity: 1; }
+}
+.loader .css-square {
+    position: absolute;
+    top: 50%;
+    width: 25px; height: 7px;
+    background: #eee;
+    -webkit-box-shadow: 2px 2px 3px 0px #ccc;
+            box-shadow: 2px 2px 3px 0px #ccc;
+}
+.loader .square1 {
+    left: 70px;
+    -webkit-animation: dominos 1s 0.125s ease infinite;
+    animation: dominos 1s 0.125s ease infinite;
+}
+.loader .square2 {
+    left: 60px;
+    -webkit-animation: dominos 1s 0.3s ease infinite;
+    animation: dominos 1s 0.3s ease infinite;
+}
+.loader .square3 {
+    left: 50px;
+    -webkit-animation: dominos 1s 0.425s ease infinite;
+    animation: dominos 1s 0.425s ease infinite;
+}
+.loader .square4 {
+    left: 40px;
+    -webkit-animation: dominos 1s 0.540s ease infinite;
+    animation: dominos 1s 0.540s ease infinite;
+}
+.loader .square5 {
+    left: 30px;
+    -webkit-animation: dominos 1s 0.665s ease infinite;
+    animation: dominos 1s 0.665s ease infinite;
+}
+.loader .square6 {
+    left: 20px;
+    -webkit-animation: dominos 1s 0.79s ease infinite;
+    animation: dominos 1s 0.79s ease infinite;
+}
+.loader .square7 {
+    left: 10px;
+    -webkit-animation: dominos 1s 0.9s ease infinite;
+    animation: dominos 1s 0.9s ease infinite;
+}
+.loader .square8 {
+    left: 0px;
+    -webkit-animation: dominos 1s 1s ease infinite;
+    animation: dominos 1s 1s ease infinite;
+}
 
 /* Utilities */
 .text-center {
     text-align: center !important;
+}
+
+.fade-in {
+    opacity: 1 !important;
 }
 
 .center-block {

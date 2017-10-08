@@ -27,7 +27,20 @@
             <button data-period="ALL" type="button" class="btn js-period">ALL</button>
         </p>
 
-        <canvas id="chart" width="700" height="200" class="mb"></canvas>
+        <div class="chart-container">
+            <canvas id="chart" width="700" height="200" class="mb"></canvas>
+
+            <div id="loader" class="loader">
+                <div class="css-square square1"></div>
+                <div class="css-square square2"></div>
+                <div class="css-square square3"></div>
+                <div class="css-square square4"></div>
+                <div class="css-square square5"></div>
+                <div class="css-square square6"></div>
+                <div class="css-square square7"></div>
+                <div class="css-square square8"></div>
+            </div>
+        </div>
 
         <footer class="text-center mb">
             <p>
@@ -47,6 +60,7 @@
     <script src="node_modules/super-repo/lib/index.js"></script>
 
     <script src="js/browser-extension-api.js"></script>
+    <script src="js/loader.js"></script>
     <script src="js/apiFakeAdapter.js"></script>
     <script src="js/apiGoranAdapter.js"></script>
     <script src="js/api.js"></script>
