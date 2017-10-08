@@ -8,8 +8,14 @@ class API {
     get(_endpoint) {
         return axios.get(this.apiAdapter.baseURL + _endpoint)
             .then( r => r.data )
+            .then (r => {
+                $('#message').text('');
+
+                return r;
+            })
             .catch( (jqXHR, textStatus, errorThrown) =>
-               console.log(jqXHR, textStatus, errorThrown));
+                $('#message').text('That\'s extremely sad. ' + jqXHR));
+
     }
 
     mapData(_r, _period) {
