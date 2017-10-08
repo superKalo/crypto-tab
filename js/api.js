@@ -1,36 +1,45 @@
 window.App = window.App || {};
 
-window.App.API = {
-    baseURL: 'fake-api/',
+class API {
+    constructor(apiAdapter) {
+        this.apiAdapter = apiAdapter;
+    }
 
-    fetch: function(_endpoint) {
-        return $.ajax({ url: this.baseURL + _endpoint + '.json' })
-            .then( _response => JSON.parse(_response) )
-            .fail( (jqXHR, textStatus, errorThrown) =>
+    get(_endpoint) {
+        return axios.get(this.apiAdapter.baseURL + _endpoint)
+            .then( r => r.data )
+            .catch( (jqXHR, textStatus, errorThrown) =>
                console.log(jqXHR, textStatus, errorThrown));
-    },
+    }
 
-    getBitcoinRatesForAll: function() {
-        return this.fetch('all');
-    },
+    mapData(_r, _period) {
+        return this.apiAdapter.mapData(_r, _period);
+    }
 
-    getBitcoinRatesForOneYear: function() {
-        return this.fetch('year');
-    },
+    getBitcoinRatesForAll() {
+        return this.apiAdapter.getBitcoinRatesForAll();
+    }
 
-    getBitcoinRatesForOneMonth: function() {
-        return this.fetch('month');
-    },
+    getBitcoinRatesForOneYear() {
+        return this.apiAdapter.getBitcoinRatesForOneYear();
+    }
 
-    getBitcoinRatesForOneWeek: function() {
-        return this.fetch('week');
-    },
+    getBitcoinRatesForOneMonth() {
+        return this.apiAdapter.getBitcoinRatesForOneMonth();
+    }
 
-    getBitcoinRatesForOneDay: function() {
-        return this.fetch('day');
-    },
+    getBitcoinRatesForOneWeek() {
+        return this.apiAdapter.getBitcoinRatesForOneWeek();
+    }
 
-    getBitcoinRatesForOneHour: function() {
-        return this.fetch('hour');
+    getBitcoinRatesForOneDay() {
+        return this.apiAdapter.getBitcoinRatesForOneDay();
+    }
+
+    getBitcoinRatesForOneHour() {
+        return this.apiAdapter.getBitcoinRatesForOneHour();
     }
 };
+
+// window.App.API = new API(App.apiFakeAdapter);
+window.App.API = new API(App.apiGoranAdapter);
