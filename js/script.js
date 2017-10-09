@@ -64,10 +64,8 @@ $(function(){
     $dataPeriods.on('click', function(){
         const period = $(this).data('period');
 
-        App.Loader.init();
         BitcoinRepository[period].getData()
-            .then(_data => chart.init(_data))
-            .then(() => App.Loader.destroy());
+            .then(_data => chart.init(_data));
     });
 
     $dataPeriods.eq(1).trigger('click');

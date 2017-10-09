@@ -6,16 +6,22 @@ class API {
     }
 
     get(_endpoint) {
+        App.Loader.init();
+
         return axios.get(this.apiAdapter.baseURL + _endpoint)
             .then( r => r.data )
             .then (r => {
-                $('#message').text('');
+                App.Message.clear();
+                App.Loader.destroy();
 
                 return r;
             })
-            .catch( (jqXHR, textStatus, errorThrown) =>
-                $('#message').text('That\'s extremely sad. ' + jqXHR));
+            .catch( (jqXHR, textStatus, errorThrown) => {
+                App.Loader.destroy();
+                App.Message.fireError('That\'s extremely sad. ' + jqXHR);
 
+                return Promise.reject();
+            });
     }
 
     mapData(_r, _period) {
