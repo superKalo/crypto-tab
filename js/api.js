@@ -6,10 +6,22 @@ class API {
     }
 
     get(_endpoint) {
+        App.Loader.init();
+
         return axios.get(this.apiAdapter.baseURL + _endpoint)
             .then( r => r.data )
-            .catch( (jqXHR, textStatus, errorThrown) =>
-               console.log(jqXHR, textStatus, errorThrown));
+            .then (r => {
+                App.Message.clear();
+                App.Loader.destroy();
+
+                return r;
+            })
+            .catch( (jqXHR, textStatus, errorThrown) => {
+                App.Loader.destroy();
+                App.Message.fireError('That\'s extremely sad. ' + jqXHR);
+
+                return Promise.reject();
+            });
     }
 
     mapData(_r, _period) {
