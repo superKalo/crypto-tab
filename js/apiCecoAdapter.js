@@ -40,5 +40,9 @@ window.App.apiCecoAdapter = {
 
     getBitcoinRatesForOneHour: function() {
       return this.get('bitcoin/hour');
+    },
+
+    getBitcoinRatesNow: function() {
+      return this.get('bitcoin/now');
     }
 };

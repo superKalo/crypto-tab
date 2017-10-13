@@ -70,4 +70,24 @@ $(function(){
 
     $dataPeriods.eq(1).trigger('click');
 
+    // Now
+    BitcoinRepository['NOW'] = new SuperRepo({
+        storage: 'BROWSER_STORAGE',
+        name: 'bitcoin-now',
+        outOfDateAfter: 15 * 60 * 1000,
+        dataModel: [{
+            value: 'value'
+        }],
+        mapData: data => data[0].value,
+        request: () => App.API.getBitcoinRatesNow()
+    })
+    .getData().then( priceNow => {
+        /**
+         * Beautify the price.
+         * https://stackoverflow.com/a/14467460/1333836
+         */
+        priceNow = Math.round(priceNow).toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,");
+        document.querySelector('#price-now').textContent = `$${priceNow}`;
+    });
+
 });
