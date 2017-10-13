@@ -10,7 +10,7 @@ window.App.apiCecoAdapter = {
     mapData: function(response, dateLabelFormat) {
         return response.map( _rec => ({
             value: _rec.value,
-            timestamp: moment(moment.utc(_rec.timestamp)).local().format(dateLabelFormat)
+            timestamp: moment(moment.utc(_rec.timestamp * 1000)).local().format(dateLabelFormat)
         })).reverse();
     },
 
