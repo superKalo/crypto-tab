@@ -74,14 +74,17 @@ $(function(){
     BitcoinRepository['NOW'] = new SuperRepo({
         storage: 'BROWSER_STORAGE',
         name: 'bitcoin-now',
-        outOfDateAfter: 15 * 60 * 1000,
+        outOfDateAfter: 3 * 60 * 1000,
         dataModel: [{
             value: 'value'
         }],
-        mapData: data => data[0].value,
+        mapData: data => ({ price: data[0].value }),
         request: () => App.API.getBitcoinRatesNow()
-    })
-    .getData().then( priceNow => {
+    });
+
+    BitcoinRepository['NOW'].getData().then( _data => {
+        let priceNow = _data.price;
+
         /**
          * Beautify the price.
          * https://stackoverflow.com/a/14467460/1333836
@@ -89,5 +92,16 @@ $(function(){
         priceNow = Math.round(priceNow).toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,");
         document.querySelector('#price-now').textContent = `$${priceNow}`;
     });
+
+    const lastUpdated = document.querySelector('#last-updated');
+
+    BitcoinRepository['NOW'].getDataUpToDateStatus().then(info => {
+        lastUpdated.textContent = moment(info.lastFetched).fromNow();
+    });
+    setInterval( () => {
+        BitcoinRepository['NOW'].getDataUpToDateStatus().then(info => {
+            lastUpdated.textContent = moment(info.lastFetched).fromNow();
+        });
+    }, 30 * 1000);
 
 });
