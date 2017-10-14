@@ -8,7 +8,7 @@
   },
   "manifest_version": 2,
   "permissions": [
-    "https://bitcoin-price-api.devlabs-projects.info/**/*"
+    "https://bitcoin-price-api.devlabs-projects.info/**/*",
     "storage"
   ]
 }
