@@ -118,5 +118,3 @@ window.App.Bitcoin = {
         this.initEvents();
     }
 };
-
-window.App.Bitcoin.init();
