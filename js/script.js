@@ -91,6 +91,10 @@ $(function(){
          */
         priceNow = Math.round(priceNow).toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,");
         document.querySelector('#price-now').textContent = `$${priceNow}`;
+
+        BitcoinRepository['NOW'].getDataUpToDateStatus().then(info => {
+            lastUpdated.textContent = moment(info.lastFetched).fromNow();
+        });
     });
 
     const lastUpdated = document.querySelector('#last-updated');
