@@ -51,7 +51,12 @@ class API {
     getBitcoinRatesForOneHour() {
         return this.apiAdapter.getBitcoinRatesForOneHour();
     }
+
+    getBitcoinRatesNow() {
+        return this.apiAdapter.getBitcoinRatesNow();
+    }
 };
 
 // window.App.API = new API(App.apiFakeAdapter);
-window.App.API = new API(App.apiGoranAdapter);
+//window.App.API = new API(App.apiGoranAdapter);
+window.App.API = new API(App.apiCecoAdapter);

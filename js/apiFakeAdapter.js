@@ -36,5 +36,9 @@ window.App.apiFakeAdapter = {
 
     getBitcoinRatesForOneHour: function() {
         return this.get('hour.json');
+    },
+
+    getBitcoinRatesNow: function() {
+        return this.get('hour.json');
     }
 };
