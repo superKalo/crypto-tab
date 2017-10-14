@@ -70,12 +70,50 @@ window.App.Bitcoin = {
                 request: () => this.getBitcoinData(period)
             })
         );
+
+        this.repositories['NOW'] = new SuperRepo({
+            storage: 'BROWSER_STORAGE',
+            name: 'bitcoin-NOW',
+            outOfDateAfter: 3 * 60 * 1000,
+            dataModel: [{
+                value: 'value'
+            }],
+            mapData: data => ({ price: data[0].value }),
+            request: () => App.API.getBitcoinRatesNow()
+        });
+    },
+
+    $priceNow: document.querySelector('#price-now'),
+    setPriceNow(_price) {
+        /**
+         * Beautify the price.
+         * https://stackoverflow.com/a/14467460/1333836
+         */
+        const price = Math.round(_price).toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,");
+        this.$priceNow.textContent = `$${price}`;
+    },
+
+    $lastUpdated: document.querySelector('#last-updated'),
+    setLastUpdated() {
+        this.repositories['NOW'].getDataUpToDateStatus().then(info => {
+            this.$lastUpdated.textContent = moment(info.lastFetched).fromNow();
+        });
+    },
+
+    displayPriceNow() {
+        this.repositories['NOW'].getData().then( _data => {
+            this.setPriceNow(_data.price);
+            this.setLastUpdated();
+        });
+
+        setInterval(this.setLastUpdated.bind(this), 30 * 1000);
     },
 
     init() {
         this.chart = new App.Chart(this.$chart);
-        this.initRepositories();
 
+        this.initRepositories();
+        this.displayPriceNow();
 
         this.initEvents();
     }
