@@ -30,3 +30,5 @@ App.Clock.prototype.setTime = function() {
         document.getElementById('clock').innerText = currentTime;
     }
 }
+
+new window.App.Clock();
