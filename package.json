@@ -1,6 +1,6 @@
 {
   "name": "crypto-chart-new-tab-extension",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Override the new tab page with a chart",
   "private": true,
   "repository": {

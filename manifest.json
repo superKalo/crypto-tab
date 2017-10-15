@@ -1,7 +1,7 @@
 {
   "name": "Crypto Chart New Tab Override",
   "description": "Override the new tab page with a chart",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "incognito": "split",
   "chrome_url_overrides": {
     "newtab": "index.html"
