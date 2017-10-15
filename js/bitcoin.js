@@ -2,12 +2,12 @@ window.App = window.App || {};
 
 window.App.Bitcoin = {
     PERIODS: {
-        ALL: 'ALL',
-        ONE_YEAR: 'ONE_YEAR',
-        ONE_MONTH: 'ONE_MONTH',
-        ONE_WEEK: 'ONE_WEEK',
+        ONE_HOUR: 'ONE_HOUR',
         ONE_DAY: 'ONE_DAY',
-        ONE_HOUR: 'ONE_HOUR'
+        ONE_WEEK: 'ONE_WEEK',
+        ONE_MONTH: 'ONE_MONTH',
+        ONE_YEAR: 'ONE_YEAR',
+        ALL: 'ALL',
     },
 
     $chart: document.getElementById('chart'),
@@ -25,10 +25,17 @@ window.App.Bitcoin = {
                 const period = this.dataset.period;
                 self.repositories[period].getData()
                     .then(_data => self.chart.init(_data));
-            });
-        })
 
-        self.$dataPeriods[0].click();
+                App.Settings.set('period', this.dataset.period);
+            });
+        });
+
+        App.Settings.get().then( ({ period }) => {
+            const selectedTab =
+                period ? Object.keys(this.PERIODS).indexOf(period) : 1;
+
+            self.$dataPeriods[selectedTab].click();
+        });
     },
 
     getBitcoinData(period) {
