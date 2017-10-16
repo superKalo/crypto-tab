@@ -162,7 +162,7 @@ window.App.Chart.prototype.alwaysVisibleTooltipsPlugin = function() {
                 const tooltipsLength = chart.pluginTooltips.length;
                 const displayTooltipsFilter = (i) => {
                     if (tooltipsLength <= 5) {
-                        return true;
+                        return i % 3 === 0;
                     } else if (tooltipsLength <= 7) {
                         return i % 3 === 0;
                     } else if (tooltipsLength <= 12) {
