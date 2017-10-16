@@ -55,9 +55,7 @@ window.App.Chart = function(el) {
                 displayColors: false,
                 callbacks: {
                     title: () => '',
-                    label: (tooltipItem, data) => {
-                        return `$${tooltipItem.yLabel}`;
-                    }
+                    label: tooltipItem => App.Utils.formatPrice(tooltipItem.yLabel)
                 }
             },
             legend: {

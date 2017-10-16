@@ -92,12 +92,7 @@ window.App.Bitcoin = {
 
     $priceNow: document.querySelector('#price-now'),
     setPriceNow(_price) {
-        /**
-         * Beautify the price.
-         * https://stackoverflow.com/a/14467460/1333836
-         */
-        const price = Math.round(_price).toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,");
-        this.$priceNow.textContent = `$${price}`;
+        this.$priceNow.textContent = App.Utils.formatPrice(Math.round(_price));
     },
 
     $lastUpdated: document.querySelector('#last-updated'),
