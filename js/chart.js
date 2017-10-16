@@ -31,8 +31,8 @@ window.App.Chart = function(el) {
             showAllTooltips: true,
             layout: {
                 padding: {
-                    left: 0,
-                    right: 0,
+                    left: 40,
+                    right: 40,
                     top: 10,
                     bottom: 0
                 }
