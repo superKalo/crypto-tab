@@ -125,6 +125,7 @@ window.App.Bitcoin = {
                 }
                 case this.PERIODS.ONE_YEAR:
                 case this.PERIODS.ALL: {
+                    this.$change.innerHTML = '';
                     return;
                 }
             }
@@ -151,7 +152,23 @@ window.App.Bitcoin = {
             this.setLastUpdated();
         });
 
+        // Track timeframe changes
         setInterval(this.setLastUpdated.bind(this), 30 * 1000);
+
+        // Track period changes
+        browser.storage.onChanged.addListener((changes, namespace) => {
+            Object.keys(changes).forEach( storageKey => {
+                if (storageKey !== 'settings') {
+                    return;
+                }
+
+                this.repositories['NOW'].getDataUpToDateStatus()
+                    .then( status =>
+                        status.localData &&
+                            this.setPriceChange(status.localData.changePercent)
+                    );
+            });
+        });
     },
 
     init() {
