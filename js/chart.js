@@ -49,9 +49,12 @@ window.App.Chart = function(el) {
                 bodyFontStyle: 'normal',
                 borderColor: 'rgba(0,0,0,0)',
                 borderWidth: 2,
-                cornerRadius: 3,
+                cornerRadius: 2,
                 caretPadding: 10,
+                xPadding: 5,
+                yPadding: 5,
                 caretSize: 10,
+                bodyFontSize: 12,
                 displayColors: false,
                 callbacks: {
                     title: () => '',
