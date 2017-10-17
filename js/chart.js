@@ -74,6 +74,9 @@ window.App.Chart = function(el) {
                     display: true,
                     gridLines: {
                         display: false
+                    },
+                    ticks: {
+                        fontColor: '#333'
                     }
                 }],
                 yAxes: [{
