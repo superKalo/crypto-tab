@@ -1,23 +1,28 @@
-# Crypto Chart New Tab Browser Extension
+# Crypto Tab
 
-A browser extension that overrides the New Tab page with a Bitcoin chart.
+A browser extension that replaces the New Tab page with Bitcoin price chart.
 
 ## Installation Instructions
 
 This guide assumes you already have the project pulled and NodeJS and NPM are installed.
 
 1. Install NPM dependencies:
-    ```
+    ```bash
     npm install
     ```
 
-2. Load the extension any of the browsers below:
+1. Build extension distribution files:
+    ```bash
+    npm run build:extension
+    ```
 
-    - Chrome:
-        - Open Chrome browser and navigate to chrome://extensions
+1. Load the extension:
+
+    - In Chrome:
+        - Navigate to chrome://extensions
         - Select "Developer Mode" and then click "Load unpacked extension..."
-        - From the file browser, choose the project folder
+        - From the file browser, choose the `dist/extension/` directory
 
-    - Firefox:
-        - Open Firefox browser and navigate to `about:debugging`
-        - Click "Load Temporary Add-on" and from the file browser, choose the `manifest.json` file in the project folder
+    - In Firefox:
+        - Navigate to `about:debugging`
+        - Click "Load Temporary Add-on" and from the file browser, choose the `manifest.json` file in the `dist/extension/` directory
