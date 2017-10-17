@@ -125,15 +125,37 @@ window.App.Chart.prototype.alwaysVisibleTooltipsPlugin = function() {
                 // we can't use the chart tooltip because there is only one tooltip per chart
                 chart.pluginTooltips = [];
                 chart.config.data.datasets.forEach(function (dataset, i) {
+                    /**
+                     * If too many tooltips appear - the chart becomes unreadable,
+                     * therefore - filter out the tooltips.
+                     */
+                    const tooltipsLength = chart.getDatasetMeta(i).data.length;
+                    const displayTooltipsFilter = (i) => {
+                        if (tooltipsLength <= 5) {
+                            return i % 3 === 0;
+                        } else if (tooltipsLength <= 7) {
+                            return i % 3 === 0;
+                        } else if (tooltipsLength <= 12) {
+                            return i % 4 === 0 || i+1 === tooltipsLength;
+                        } else if (tooltipsLength <= 24) {
+                            return i % 8 === 0 || i+1 === tooltipsLength;
+                        } else if (tooltipsLength <= 31) {
+                            return i % 10 === 0 || i+1 === tooltipsLength;
+                        }
+
+                        return (i) % 24 === 0 || i+1 === tooltipsLength;
+                    };
 
                     chart.getDatasetMeta(i).data.forEach(function (sector, j) {
-                        chart.pluginTooltips.push(new Chart.Tooltip({
-                            _chart: chart.chart,
-                            _chartInstance: chart,
-                            _data: chart.data,
-                            _options: chart.options.tooltips,
-                            _active: [sector]
-                        }, chart));
+                        if (displayTooltipsFilter(j)) {
+                            chart.pluginTooltips.push(new Chart.Tooltip({
+                                _chart: chart.chart,
+                                _chartInstance: chart,
+                                _data: chart.data,
+                                _options: chart.options.tooltips,
+                                _active: [sector]
+                            }, chart));
+                        }
                     });
                 });
 
@@ -153,35 +175,12 @@ window.App.Chart.prototype.alwaysVisibleTooltipsPlugin = function() {
                 // turn on tooltips
                 chart.options.tooltips.enabled = true;
 
-                /**
-                 * If too many tooltips appear - the chart becomes unreadable,
-                 * therefore - filter out the tooltips.
-                 */
-                const tooltipsLength = chart.pluginTooltips.length;
-                const displayTooltipsFilter = (i) => {
-                    if (tooltipsLength <= 5) {
-                        return i % 3 === 0;
-                    } else if (tooltipsLength <= 7) {
-                        return i % 3 === 0;
-                    } else if (tooltipsLength <= 12) {
-                        return i % 4 === 0 || i+1 === tooltipsLength;
-                    } else if (tooltipsLength <= 24) {
-                        return i % 8 === 0 || i+1 === tooltipsLength;
-                    } else if (tooltipsLength <= 31) {
-                        return i % 10 === 0 || i+1 === tooltipsLength;
-                    }
-
-                    return (i) % 24 === 0 || i+1 === tooltipsLength;
-                };
-
                 Chart.helpers.each(chart.pluginTooltips, function (tooltip, i) {
-                    if (displayTooltipsFilter(i)) {
-                        tooltip.initialize();
-                        tooltip.update();
-                        // we don't actually need this since we are not animating tooltips
-                        tooltip.pivot();
-                        tooltip.transition(easing).draw();
-                    }
+                    tooltip.initialize();
+                    tooltip.update();
+                    // we don't actually need this since we are not animating tooltips
+                    tooltip.pivot();
+                    tooltip.transition(easing).draw();
                 });
                 chart.options.tooltips.enabled = true;
             }
