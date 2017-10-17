@@ -68,9 +68,12 @@ window.App.Bitcoin = {
 
     repositories: {},
     initRepositories() {
+        const storageSetting =
+            App.ENV.platform === 'EXTENSION' ? 'BROWSER_STORAGE' : 'LOCAL_STORAGE';
+
         Object.keys(this.PERIODS).forEach( period =>
             this.repositories[period] = new SuperRepo({
-                storage: 'BROWSER_STORAGE',
+                storage: storageSetting,
                 name: 'bitcoin-' + period,
                 outOfDateAfter: 15 * 60 * 1000,
                 mapData: r => App.API.mapData(r, this.getLabelFormat(period)),
@@ -79,7 +82,7 @@ window.App.Bitcoin = {
         );
 
         this.repositories['NOW'] = new SuperRepo({
-            storage: 'BROWSER_STORAGE',
+            storage: storageSetting,
             name: 'bitcoin-NOW',
             outOfDateAfter: 3 * 60 * 1000,
             mapData: data => {
@@ -158,19 +161,21 @@ window.App.Bitcoin = {
         setInterval(this.setLastUpdated.bind(this), 30 * 1000);
 
         // Track period changes
-        browser.storage.onChanged.addListener((changes, namespace) => {
-            Object.keys(changes).forEach( storageKey => {
-                if (storageKey !== 'settings') {
-                    return;
-                }
+        if (App.ENV.platform === 'EXTENSION') {
+            browser.storage.onChanged.addListener((changes, namespace) => {
+                Object.keys(changes).forEach( storageKey => {
+                    if (storageKey !== 'settings') {
+                        return;
+                    }
 
-                this.repositories['NOW'].getDataUpToDateStatus()
-                    .then( status =>
-                        status.localData &&
-                            this.setPriceChange(status.localData.changePercent)
-                    );
+                    this.repositories['NOW'].getDataUpToDateStatus()
+                        .then( status =>
+                            status.localData &&
+                                this.setPriceChange(status.localData.changePercent)
+                        );
+                });
             });
-        });
+        }
     },
 
     init() {
