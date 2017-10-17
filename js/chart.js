@@ -18,6 +18,7 @@ window.App.Chart = function(el) {
                 pointHoverBackgroundColor: '#fff',
                 borderColor: '#B0C4F6',
                 pointBorderColor: '#4F78E2',
+                pointHoverBorderColor: '#4F78E2',
                 pointBorderWidth: 3,
                 pointRadius: 5,
                 pointHoverRadius: 5,
