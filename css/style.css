@@ -4,6 +4,7 @@ body {
 html,
 body {
     min-height: 100vh;
+    color: #333;
 }
 
 html {
