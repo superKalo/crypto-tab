@@ -28,9 +28,14 @@ gulp.task('set-env', function () {
         .pipe(gulp.dest(`${distPath}/env/`));
 });
 
-// Copy dependencies to build/node_modules/
+// Copy NPM dependencies
 gulp.task('copy-npm-dependencies', function() {
-    gulp.src(gnf(), {base:'./'}).pipe(gulp.dest(distPath));
+    gulp.src([
+        'node_modules/axios/dist/axios.min.js',
+        'node_modules/chart.js/dist/Chart.min.js',
+        'node_modules/moment/min/moment.min.js',
+        'node_modules/super-repo/lib/index.js'
+    ]).pipe(gulp.dest(`${distPath}/lib/`));
 });
 
 gulp.task('build', ['copy-files', 'copy-npm-dependencies', 'set-env']);
