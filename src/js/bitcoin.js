@@ -27,6 +27,8 @@ window.App.Bitcoin = {
                     .then(_data => self.chart.init(_data));
 
                 App.Settings.set('period', this.dataset.period);
+
+                self.setPriceChange();
             });
         });
 
@@ -104,43 +106,49 @@ window.App.Bitcoin = {
     },
 
     $change: document.querySelector('#change'),
-    setPriceChange(_change) {
-        App.Settings.get().then(settings => {
-            let changePercent;
-            let periodLabel;
-            switch(settings.period) {
-                case this.PERIODS.ONE_HOUR:
-                case this.PERIODS.ONE_DAY:
-                default: {
-                    changePercent = _change.dayAgo;
-                    periodLabel = 'since yesterday';
-                    break;
-                }
-                case this.PERIODS.ONE_WEEK: {
-                    changePercent = _change.weekAgo;
-                    periodLabel = 'since last week';
-                    break;
-                }
-                case this.PERIODS.ONE_MONTH: {
-                    changePercent = _change.monthAgo;
-                    periodLabel = 'since last month';
-                    break;
-                }
-                case this.PERIODS.ONE_YEAR:
-                case this.PERIODS.ALL: {
-                    this.$change.innerHTML = '';
-                    return;
-                }
-            }
+    async setPriceChange () {
+        let { localData } = await this.repositories['NOW'].getDataUpToDateStatus();
+        if (! localData) {
+            return;
+        }
 
-            const isChangePisitive = changePercent >= 0;
-            const isChangeZero = changePercent === 0;
-            const applyVisualClass =
-                isChangeZero ? '' : (isChangePisitive ? 'positive' : 'negative');
-            this.$change.innerHTML =
-                ` (<span class="${applyVisualClass}">${isChangePisitive && ! isChangeZero? '+' : ''}${changePercent}%</span>
-                ${periodLabel})`;
-        });
+        const change = localData.changePercent;
+        let settings = await App.Settings.get();
+
+        let changePercent;
+        let periodLabel;
+        switch(settings.period) {
+            case this.PERIODS.ONE_HOUR:
+            case this.PERIODS.ONE_DAY:
+            default: {
+                changePercent = change.dayAgo;
+                periodLabel = 'since yesterday';
+                break;
+            }
+            case this.PERIODS.ONE_WEEK: {
+                changePercent = change.weekAgo;
+                periodLabel = 'since last week';
+                break;
+            }
+            case this.PERIODS.ONE_MONTH: {
+                changePercent = change.monthAgo;
+                periodLabel = 'since last month';
+                break;
+            }
+            case this.PERIODS.ONE_YEAR:
+            case this.PERIODS.ALL: {
+                this.$change.innerHTML = '';
+                return;
+            }
+        }
+
+        const isChangePisitive = changePercent >= 0;
+        const isChangeZero = changePercent === 0;
+        const applyVisualClass =
+            isChangeZero ? '' : (isChangePisitive ? 'positive' : 'negative');
+        this.$change.innerHTML =
+            ` (<span class="${applyVisualClass}">${isChangePisitive && ! isChangeZero? '+' : ''}${changePercent}%</span>
+            ${periodLabel})`;
     },
 
     $lastUpdated: document.querySelector('#last-updated'),
@@ -153,29 +161,12 @@ window.App.Bitcoin = {
     displayPriceNow() {
         this.repositories['NOW'].getData().then( _data => {
             this.setPriceNow(_data.price);
-            this.setPriceChange(_data.changePercent);
+            this.setPriceChange();
             this.setLastUpdated();
         });
 
         // Track timeframe changes
         setInterval(this.setLastUpdated.bind(this), 30 * 1000);
-
-        // Track period changes
-        if (App.ENV.platform === 'EXTENSION') {
-            browser.storage.onChanged.addListener((changes, namespace) => {
-                Object.keys(changes).forEach( storageKey => {
-                    if (storageKey !== 'settings') {
-                        return;
-                    }
-
-                    this.repositories['NOW'].getDataUpToDateStatus()
-                        .then( status =>
-                            status.localData &&
-                                this.setPriceChange(status.localData.changePercent)
-                        );
-                });
-            });
-        }
     },
 
     init() {
