@@ -11,7 +11,7 @@ This guide assumes you already have the project pulled and NodeJS and NPM are in
     npm install
     ```
 
-1. Install NPM dependencies:
+1. Build extension distribution files:
     ```bash
     npm run build:extension
     ```
