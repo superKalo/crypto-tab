@@ -131,9 +131,11 @@ window.App.Bitcoin = {
             }
 
             const isChangePisitive = changePercent >= 0;
-            const isChangeNotZero = changePercent !== 0;
+            const isChangeZero = changePercent === 0;
+            const applyVisualClass =
+                isChangeZero ? '' : (isChangePisitive ? 'positive' : 'negative');
             this.$change.innerHTML =
-                ` (<span class="${isChangePisitive ? 'positive' : 'negative' }">${isChangePisitive && isChangeNotZero? '+' : ''}${changePercent}%</span>
+                ` (<span class="${applyVisualClass}">${isChangePisitive && ! isChangeZero? '+' : ''}${changePercent}%</span>
                 ${periodLabel})`;
         });
     },
