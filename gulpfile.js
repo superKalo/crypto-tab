@@ -1,5 +1,4 @@
 const gulp = require('gulp');
-const gnf = require('gulp-npm-files');
 const rename = require('gulp-rename');
 const notify = require('gulp-notify');
 
