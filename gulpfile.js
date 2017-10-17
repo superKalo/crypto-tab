@@ -2,26 +2,31 @@ const gulp = require('gulp');
 const gnf = require('gulp-npm-files');
 const rename = require('gulp-rename');
 
-gulp.task('copy-files:extension', function () {
-    gulp.src([
-        './src/index.html',
-        './src/manifest.json',
-        './src/js/**/*',
-        './src/css/**/*'
-    ], { base: './src' }).pipe(gulp.dest('./dist/extension/'));
+const { ENV } = process.env;
+const distPath = `./dist/${ENV}/`;
+
+const filesArr = [
+    './src/index.html',
+    './src/js/**/*',
+    './src/css/**/*'
+];
+if (ENV === 'EXTENSION') {
+    filesArr.push('./src/manifest.json');
+}
+
+gulp.task('copy-files', function () {
+    gulp.src(filesArr, { base: './src' }).pipe(gulp.dest(distPath));
 });
 
 gulp.task('set-env', function () {
-    gulp.src(`./src/env/${process.env.ENV}.env.js`)
+    gulp.src(`./src/env/${ENV}.env.js`)
         .pipe(rename('env.js'))
-        .pipe(gulp.dest('./dist/extension/env/'));
+        .pipe(gulp.dest(`${distPath}/env/`));
 });
-
-
 
 // Copy dependencies to build/node_modules/
-gulp.task('copy-npm-dependencies:extension', function() {
-    gulp.src(gnf(), {base:'./'}).pipe(gulp.dest('./dist/extension'));
+gulp.task('copy-npm-dependencies', function() {
+    gulp.src(gnf(), {base:'./'}).pipe(gulp.dest(distPath));
 });
 
-gulp.task('build:extension', ['copy-files:extension', 'copy-npm-dependencies:extension', 'set-env']);
+gulp.task('build', ['copy-files', 'copy-npm-dependencies', 'set-env']);
