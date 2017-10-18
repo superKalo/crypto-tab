@@ -127,6 +127,11 @@ window.App.Chart.prototype.prepareData = function(_data) {
 window.App.Chart.prototype.alwaysVisibleTooltipsPlugin = function() {
     Chart.pluginService.register({
         beforeRender: function (chart) {
+            // Bug fix: Do not re-render tooltips on tooltip :hover
+            if (chart.chartDrawnIdNastyJumpBugFix === chart.config.data.labels.join('')) {
+                return;
+            }
+
             if (chart.config.options.showAllTooltips) {
                 // create an array of tooltips
                 // we can't use the chart tooltip because there is only one tooltip per chart
@@ -164,6 +169,8 @@ window.App.Chart.prototype.alwaysVisibleTooltipsPlugin = function() {
                             }, chart));
                         }
                     });
+
+                    chart.chartDrawnIdNastyJumpBugFix = chart.config.data.labels.join('');
                 });
 
                 // turn off normal tooltips
