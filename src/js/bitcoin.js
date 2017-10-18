@@ -112,7 +112,7 @@ window.App.Bitcoin = {
             return;
         }
 
-        const change = localData.changePercent;
+        const { dayAgo, weekAgo, monthAgo } = localData.changePercent;
         let settings = await App.Settings.get();
 
         let changePercent;
@@ -121,17 +121,17 @@ window.App.Bitcoin = {
             case this.PERIODS.ONE_HOUR:
             case this.PERIODS.ONE_DAY:
             default: {
-                changePercent = change.dayAgo;
+                changePercent = dayAgo;
                 periodLabel = 'since yesterday';
                 break;
             }
             case this.PERIODS.ONE_WEEK: {
-                changePercent = change.weekAgo;
+                changePercent = weekAgo;
                 periodLabel = 'since last week';
                 break;
             }
             case this.PERIODS.ONE_MONTH: {
-                changePercent = change.monthAgo;
+                changePercent = monthAgo;
                 periodLabel = 'since last month';
                 break;
             }
@@ -142,12 +142,21 @@ window.App.Bitcoin = {
             }
         }
 
-        const isChangePisitive = changePercent >= 0;
-        const isChangeZero = changePercent === 0;
-        const applyVisualClass =
-            isChangeZero ? '' : (isChangePisitive ? 'positive' : 'negative');
+        const getSignedPercentage = (_number) => {
+            const isChangePisitive = _number >= 0;
+            const isChangeZero = _number === 0;
+
+            return isChangePisitive && ! isChangeZero ? `+${_number}%` : `${_number}%`;
+        };
+        const getVisualClass = (_number) => {
+            const isChangePisitive = _number >= 0;
+            const isChangeZero = _number === 0;
+
+            return isChangeZero ? '' : (isChangePisitive ? 'positive' : 'negative');
+        };
+
         this.$change.innerHTML =
-            ` (<span class="${applyVisualClass}">${isChangePisitive && ! isChangeZero? '+' : ''}${changePercent}%</span>
+            ` (<span class="${getVisualClass(changePercent)}">${getSignedPercentage(changePercent)}</span>
             ${periodLabel})`;
     },
 
@@ -155,6 +164,7 @@ window.App.Bitcoin = {
     setLastUpdated() {
         this.repositories['NOW'].getDataUpToDateStatus().then(info => {
             this.$lastUpdated.textContent = moment(info.lastFetched).fromNow();
+            this.$lastUpdated.setAttribute('data-tooltip', moment(info.lastFetched).calendar())
         });
     },
 

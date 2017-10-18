@@ -16,10 +16,10 @@
         <h1 id="clock" class="time mb+ text-center mt">-:-</h1>
 
         <h2 class="chart-period mb text-center">
-            Bitcoin price is <span id="price-now">...</span><span id="change"></span>.
+            Bitcoin price is <span id="price-now">...</span><span id="change"></span>
         </h2>
 
-        <p id="periods" class="text-center mb">
+        <p id="periods" class="text-center mb+">
             <button data-period="ONE_HOUR" type="button" class="btn js-period">1H</button>
             <button data-period="ONE_DAY" type="button" class="btn js-period">1D</button>
             <button data-period="ONE_WEEK" type="button" class="btn js-period">1W</button>
@@ -28,8 +28,8 @@
             <button data-period="ALL" type="button" class="btn js-period">ALL</button>
         </p>
 
-        <div class="chart-container">
-            <canvas id="chart" width="700" height="200" class="mb"></canvas>
+        <div class="chart-container mb+">
+            <canvas id="chart" width="700" height="200"></canvas>
 
             <div id="loader" class="la-ball-pulse-sync">
                 <div></div>
@@ -40,12 +40,19 @@
             <span id="message" class="message"></span>
         </div>
 
-        <footer class="text-center mb">
-            <p>
+        <footer class="footer text-center mb">
+            <p class="mb--">
                 <small>
-                    Last updated <span id="last-updated">...</span>.
+                    Last updated <span id="last-updated" class="tooltip-right" data-tooltip="">...</span>.
                     <!-- Manage updates frequency. -->
                 </small>
+            </p>
+            <p>
+                <small><small>
+                    <a href="javascript:;">About</a> |
+                    <a href="https://github.com/superKalo/crypto-tab">Open Source</a> |
+                    <a href="https://github.com/cmihaylov/bitcoin-price-api">API</a>
+                </small></small>
             </p>
         </footer>
 
