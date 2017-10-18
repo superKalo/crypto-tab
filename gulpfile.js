@@ -8,6 +8,7 @@ const distPath = `./dist/${ENV}/`;
 const filesArr = [
     './src/index.html',
     './src/js/**/*',
+    './src/img/**/*',
     './src/css/**/*'
 ];
 if (ENV === 'extension') {
