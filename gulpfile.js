@@ -22,13 +22,29 @@ gulp.task('copy-files', function () {
     }));
 });
 
+gulp.task('copy-favicons', function () {
+    gulp.src('./src/favicons/*').pipe(gulp.dest(distPath));
+});
+
 gulp.task('preprocess', function () {
     gulp.src('./src/index.html')
         .pipe(replace({
-            patterns: [{
-                match: 'title',
-                replacement: ENV === 'extension' ? 'New Tab' : 'Crypto Tab'
-            }]
+            patterns: [
+                {
+                    match: 'title',
+                    replacement: ENV === 'extension' ? 'New Tab' : 'Crypto Tab'
+                },
+                {
+                    match: 'favicons',
+                    replacement: ENV === 'extension' ? '' :
+                        `<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+                        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+                        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+                        <link rel="manifest" href="/manifest.json">
+                        <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+                        <meta name="theme-color" content="#ffffff">`
+                },
+            ]
         }))
         .pipe(gulp.dest(distPath));
 });
@@ -49,7 +65,12 @@ gulp.task('copy-npm-dependencies', function() {
     ]).pipe(gulp.dest(`${distPath}/lib/`));
 });
 
-gulp.task('build', ['copy-files', 'preprocess', 'copy-npm-dependencies', 'set-env']);
+const buildTasks = ['copy-files', 'preprocess', 'copy-npm-dependencies', 'set-env'];
+if (ENV === 'website') {
+    buildTasks.push('copy-favicons');
+}
+
+gulp.task('build', buildTasks);
 
 gulp.task('build:watch', function () {
     gulp.watch('./src/**/*', ['copy-files']);
