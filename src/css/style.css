@@ -74,8 +74,77 @@ small {
     transform: translate(-50%, -50%);
     top: 50%;
     left: 50%;
+    width: 280px;
 }
 
+.install {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translate(0, -10%);
+    z-index: 5;
+    width: 300px;
+    display: flex;
+    flex-direction: column;
+}
+.install__link {
+    align-self: flex-end;
+    width: 280px;
+    color: inherit;
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 6px;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border: 1px solid #e8e8e8;
+    box-shadow: 0 1px 2px 0 rgba(0,0,0,.05);
+    display: flex;
+    flex-flow: row;
+    height: 60px;
+    align-items: center;
+    transition: .2s linear;
+    font-size: 13px;
+    line-height: 20px;
+    text-decoration: none;
+    transition: .3s;
+    position: relative;
+    right: 0;
+}
+.install__link svg path {
+    transition: .3s;
+}
+.install__link:hover svg path {
+    fill: #000;
+}
+.install__link:hover {
+    width: 300px;
+}
+.install__icon {
+    height: 60px;
+    width: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.install_side {
+    height: 60px;
+    width: 60px;
+    display: flex;
+    flex: 1;
+    justify-content: center;
+    flex-flow: column;
+}
+.install_title {
+    color: #000;
+    font-weight: 600;
+}
+.install__descr {
+    display: block;
+    max-width: 210px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
 
  /*!
   * Load Awesome v1.1.0 (http://github.danielcardoso.net/load-awesome/)
@@ -251,6 +320,12 @@ small {
     margin-right: auto !important;
 }
 
+.hidden {
+    display: none !important;
+}
+
+.mb-- { margin-bottom: 5px; }
+.mb- { margin-bottom: 10px; }
 .mb { margin-bottom: 15px; }
 .mb\+ { margin-bottom: 30px; }
 .mb\+\+ { margin-bottom: 50px; }
