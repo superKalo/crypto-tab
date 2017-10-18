@@ -1,12 +1,12 @@
 const gulp = require('gulp');
 const rename = require('gulp-rename');
 const notify = require('gulp-notify');
+const replace = require('gulp-replace-task');
 
 const { ENV } = process.env;
 const distPath = `./dist/${ENV}/`;
 
 const filesArr = [
-    './src/index.html',
     './src/js/**/*',
     './src/img/**/*',
     './src/css/**/*'
@@ -20,6 +20,17 @@ gulp.task('copy-files', function () {
       message: 'Done!',
       onLast: true
     }));
+});
+
+gulp.task('preprocess', function () {
+    gulp.src('./src/index.html')
+        .pipe(replace({
+            patterns: [{
+                match: 'title',
+                replacement: ENV === 'extension' ? 'New Tab' : 'Crypto Tab'
+            }]
+        }))
+        .pipe(gulp.dest(distPath));
 });
 
 gulp.task('set-env', function () {
@@ -38,7 +49,7 @@ gulp.task('copy-npm-dependencies', function() {
     ]).pipe(gulp.dest(`${distPath}/lib/`));
 });
 
-gulp.task('build', ['copy-files', 'copy-npm-dependencies', 'set-env']);
+gulp.task('build', ['copy-files', 'preprocess', 'copy-npm-dependencies', 'set-env']);
 
 gulp.task('build:watch', function () {
     gulp.watch('./src/**/*', ['copy-files']);
