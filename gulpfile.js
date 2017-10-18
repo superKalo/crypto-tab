@@ -10,7 +10,7 @@ const filesArr = [
     './src/js/**/*',
     './src/css/**/*'
 ];
-if (ENV === 'EXTENSION') {
+if (ENV === 'extension') {
     filesArr.push('./src/manifest.json');
 }
 
