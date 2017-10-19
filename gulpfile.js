@@ -8,11 +8,10 @@ const distPath = `./dist/${ENV}/`;
 
 const filesArr = [
     './src/js/**/*',
-    './src/img/**/*',
     './src/css/**/*'
 ];
 if (ENV === 'extension') {
-    filesArr.push('./src/manifest.json');
+    filesArr.push('./src/manifest.json', './src/icons/**/*');
 }
 
 gulp.task('copy-files', function () {
