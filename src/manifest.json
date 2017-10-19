@@ -3,9 +3,9 @@
   "description": "Replace the New Tab page with Bitcoin price chart",
   "version": "1.0.0",
   "icons": {
-      "16": "img/icon16.png",
-      "48": "img/icon48.png",
-      "128": "img/icon128.png"
+      "16": "icons/icon16@3.png",
+      "48": "icons/icon48@3.png",
+      "128": "icons/icon128@3.png"
   },
   "chrome_url_overrides": {
     "newtab": "index.html"
