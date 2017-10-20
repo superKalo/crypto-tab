@@ -72,5 +72,5 @@ if (ENV === 'website') {
 gulp.task('build', buildTasks);
 
 gulp.task('build:watch', function () {
-    gulp.watch('./src/**/*', ['copy-files']);
+    gulp.watch('./src/**/*', ['copy-files', 'preprocess']);
 });
