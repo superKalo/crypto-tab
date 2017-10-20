@@ -78,14 +78,9 @@ small {
 }
 
 .install {
-    position: absolute;
-    right: 0;
-    top: 50%;
-    transform: translate(0, -10%);
-    z-index: 5;
-    width: 300px;
+    width: 500px;
     display: flex;
-    flex-direction: column;
+    margin-top: -15px;
 }
 .install__link {
     align-self: flex-end;
@@ -93,8 +88,6 @@ small {
     color: inherit;
     background: rgba(255, 255, 255, 0.8);
     border-radius: 6px;
-    border-top-right-radius: 0;
-    border-bottom-right-radius: 0;
     border: 1px solid #e8e8e8;
     box-shadow: 0 1px 2px 0 rgba(0,0,0,.05);
     display: flex;
@@ -109,14 +102,33 @@ small {
     position: relative;
     right: 0;
 }
+.install__link:hover{
+    background-color: #e8e8e8;
+    border-color: #999;
+}
+.install__link:nth-child(1) {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+.install__link:nth-child(1) .install_side {
+    align-items: flex-end;
+}
+.install__link:nth-child(2) {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
 .install__link svg path {
     transition: .3s;
 }
 .install__link:hover svg path {
     fill: #000;
 }
-.install__link:hover {
-    width: 300px;
+.install__link svg {
+    transition: ease-in all .3s;
+}
+.install__link:hover svg {
+    transform: rotate(90deg);
 }
 .install__icon {
     height: 60px;
@@ -137,10 +149,11 @@ small {
 .install_title {
     color: #000;
     font-weight: 600;
+    transition: all .3s;
 }
 .install__descr {
     display: block;
-    max-width: 210px;
+    max-width: 90%;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
