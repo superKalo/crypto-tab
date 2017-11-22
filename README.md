@@ -1,7 +1,4 @@
-<p align="center">
-    <img src="https://user-images.githubusercontent.com/2548061/31789747-cc1d44ae-b51b-11e7-81a0-0a4ef84244ff.png" height="80" width="80" alt="Crypto Tab Logo" />
-</p>
-<h1 align="center">Crypto Tab</h1>
+<h1 align="center"><img src="https://user-images.githubusercontent.com/2548061/31789747-cc1d44ae-b51b-11e7-81a0-0a4ef84244ff.png" height="40" width="40" alt="Crypto Tab Logo" /> Crypto Tab</h1>
 
 <p align="center">Browser extension that replaces your New Tab page with this Bitcoin price chart:</p>
 
