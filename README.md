@@ -6,8 +6,8 @@ A browser extension that replaces the New Tab page with this Bitcoin price chart
 
 ## 📦 Install
 
-- Google Chrome: [Available on Chrome Store](https://chrome.google.com/webstore/detail/crypto-tab/hmbkmkdhhlgemdgeefnhfaffdpddohpa).
-- Mozilla Firefox: [Available on Firefox Add-ons (AMO)](https://addons.mozilla.org/en-US/firefox/addon/crypto-tab/).
+- Google Chrome: [**Available on Chrome Store**](https://chrome.google.com/webstore/detail/crypto-tab/hmbkmkdhhlgemdgeefnhfaffdpddohpa).
+- Mozilla Firefox: [**Available on Firefox Add-ons (AMO)**](https://addons.mozilla.org/en-US/firefox/addon/crypto-tab/).
 
 ## 👍 Contributing
 
