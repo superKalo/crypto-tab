@@ -4,7 +4,12 @@ A browser extension that replaces the New Tab page with this Bitcoin price chart
 
 <img src="https://i.imgur.com/E0N5eM0.gif" alt="Crypto Tab preview" width="526" height="381" />
 
-## Contributing
+## 📦 Install
+
+- Google Chrome: [Available on Chrome Store](https://chrome.google.com/webstore/detail/crypto-tab/hmbkmkdhhlgemdgeefnhfaffdpddohpa).
+- Mozilla Firefox: [Available on Firefox Add-ons (AMO)](https://addons.mozilla.org/en-US/firefox/addon/crypto-tab/).
+
+## 👍 Contributing
 
 I'm open to ideas and suggestions! If you want to contribute or simply you've caught a bug - you can either open an issue or clone the repository, and fire a Pull Request.
 
