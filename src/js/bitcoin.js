@@ -118,7 +118,6 @@ window.App.Bitcoin = {
         let changePercent;
         let periodLabel;
         switch(settings.period) {
-            case this.PERIODS.ONE_HOUR:
             case this.PERIODS.ONE_DAY:
             default: {
                 changePercent = dayAgo;
@@ -135,6 +134,7 @@ window.App.Bitcoin = {
                 periodLabel = 'since last month';
                 break;
             }
+            case this.PERIODS.ONE_HOUR:
             case this.PERIODS.ONE_YEAR:
             case this.PERIODS.ALL: {
                 this.$change.innerHTML = '';
