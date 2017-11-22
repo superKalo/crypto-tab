@@ -4,27 +4,41 @@ A browser extension that replaces the New Tab page with this Bitcoin price chart
 
 <img src="https://i.imgur.com/E0N5eM0.gif" alt="Crypto Tab preview" width="526" height="381" />
 
-## Installation Instructions
+## Contributing
 
-This guide assumes you already have the project pulled and NodeJS and NPM are installed.
+I'm open to ideas and suggestions! If you want to contribute or simply you've caught a bug - you can either open an issue or clone the repository, and fire a Pull Request.
 
-1. Install NPM dependencies:
-    ```bash
-    npm install
-    ```
+Its a **single code base** website and new tab (cross-)browser extension.
 
-1. Build extension distribution files:
+To install the project, first make sure you have NodeJS and NPM installed. Preferably, the latest versions, but anything not extremely old should work too. Then, simply run `npm install`. Then:
+
+1. To build the extension distribution files, run:
     ```bash
     npm run build:extension
     ```
 
-1. Load the extension:
+1. To build the extension distribution files and re-build (watch) in case of changes, run:
+    ```bash
+    npm run build:extension:watch
+    ```
 
-    - In Chrome:
-        - Navigate to chrome://extensions
-        - Select "Developer Mode" and then click "Load unpacked extension..."
-        - From the file browser, choose the `dist/extension/` directory
+1. To build the website distribution files, run:
+    ```bash
+    npm run build:website
+    ```
 
-    - In Firefox:
-        - Navigate to `about:debugging`
-        - Click "Load Temporary Add-on" and from the file browser, choose the `manifest.json` file in the `dist/extension/` directory
+1. To build the website distribution files and re-build (watch) in case of changes, run:
+    ```bash
+    npm run build:extension:watch
+    ```
+
+Finally, load the extension:
+
+- In Chrome:
+    - Navigate to chrome://extensions
+    - Select "Developer Mode" and then click "Load unpacked extension..."
+    - From the file browser, choose the `dist/extension/` directory
+
+- In Firefox:
+    - Navigate to `about:debugging`
+    - Click "Load Temporary Add-on" and from the file browser, choose the `manifest.json` file in the `dist/extension/` directory
