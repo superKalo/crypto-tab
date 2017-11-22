@@ -1,6 +1,8 @@
 # <img src="https://user-images.githubusercontent.com/2548061/31789747-cc1d44ae-b51b-11e7-81a0-0a4ef84244ff.png" height="24" alt="Crypto Tab Logo" /> Crypto Tab
 
-A browser extension that replaces the New Tab page with Bitcoin price chart.
+A browser extension that replaces the New Tab page with this Bitcoin price chart:
+
+<img src="https://i.imgur.com/E0N5eM0.gif" alt="Crypto Tab preview" width="526" height="381" />
 
 ## Installation Instructions
 
