@@ -1,8 +1,15 @@
-# <img src="https://user-images.githubusercontent.com/2548061/31789747-cc1d44ae-b51b-11e7-81a0-0a4ef84244ff.png" height="24" alt="Crypto Tab Logo" /> Crypto Tab
+<p align="center">
+    <img src="https://user-images.githubusercontent.com/2548061/31789747-cc1d44ae-b51b-11e7-81a0-0a4ef84244ff.png" height="80" width="80" alt="Crypto Tab Logo" />
+</p>
+<h1 align="center">Crypto Tab</h1>
 
-A browser extension that replaces the New Tab page with this Bitcoin price chart:
+<p align="center">Browser extension that replaces your New Tab page with this Bitcoin price chart:</p>
 
-<img src="https://i.imgur.com/E0N5eM0.gif" alt="Crypto Tab preview" width="526" height="381" />
+<p align="center">
+    <a href="https://crypto-tab.com">
+        <img src="https://i.imgur.com/E0N5eM0.gif" alt="Crypto Tab preview" width="526" height="381" />
+    </a>
+</p>
 
 ## 📦 Install
 
