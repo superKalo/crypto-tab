@@ -47,3 +47,7 @@ Finally, load the extension:
 - In Firefox:
     - Navigate to `about:debugging`
     - Click "Load Temporary Add-on" and from the file browser, choose the `manifest.json` file in the `dist/extension/` directory
+
+# 🚔 License
+
+The code and the documentation are released under the [GPL-3.0 License](https://github.com/superKalo/crypto-tab/blob/master/LICENSE).
