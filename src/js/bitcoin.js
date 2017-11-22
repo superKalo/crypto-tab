@@ -9,6 +9,8 @@ window.App.Bitcoin = {
         ONE_YEAR: 'ONE_YEAR',
         ALL: 'ALL',
     },
+    isLocalChartDataOld: false,
+    isLocalNowDataOld: false,
 
     $chart: document.getElementById('chart'),
     chart: null,
@@ -80,6 +82,27 @@ window.App.Bitcoin = {
                 outOfDateAfter: 15 * 60 * 1000,
                 mapData: r => App.API.mapData(r, this.getLabelFormat(period)),
                 request: () => this.getBitcoinData(period)
+                    .then(res => {
+                        this.isLocalChartDataOld = false;
+                        return res;
+                    })
+                    .catch((jqXHR, textStatus, errorThrown) => {
+                        this.isLocalChartDataOld = true;
+
+                        this.repositories[period].getDataUpToDateStatus().then(_res => {
+                            App.Loader.destroy();
+
+                            if (_res.localData === null) {
+                                App.Message.fireError('That\'s extremely sad. ' + jqXHR);
+                                this.chart.destroy();
+                            } else if (_res.localData.length) {
+                                App.Message.clear();
+
+                                this.chart.init(_res.localData);
+                                this.setLastUpdated(true);
+                            }
+                        })
+                    })
             })
         );
 
@@ -96,7 +119,10 @@ window.App.Bitcoin = {
                     changePercent: { dayAgo, weekAgo, monthAgo }
                 };
             },
-            request: () => App.API.getBitcoinRatesNow()
+            request: () => App.API.getBitcoinRatesNow().then(res => {
+                this.isLocalNowDataOld = false;
+                return res;
+            }).catch(() => this.isLocalNowDataOld = true)
         });
     },
 
@@ -163,7 +189,12 @@ window.App.Bitcoin = {
     $lastUpdated: document.querySelector('#last-updated'),
     setLastUpdated() {
         this.repositories['NOW'].getDataUpToDateStatus().then(info => {
-            this.$lastUpdated.textContent = moment(info.lastFetched).fromNow();
+            const prettyLastUpdatedTime = moment(info.lastFetched).fromNow();
+            this.$lastUpdated.innerHTML = this.isLocalChartDataOld || this.isLocalNowDataOld ?
+                `<span class="negative">${prettyLastUpdatedTime}</span>.
+                Data request <span class="negative">failed</span>. Refresh the page to try again.` :
+                `<span class="positive">${prettyLastUpdatedTime}</span>.`;
+
             this.$lastUpdated.setAttribute('data-tooltip', moment(info.lastFetched).calendar())
         });
     },

@@ -220,3 +220,7 @@ window.App.Chart.prototype.init = function(_data) {
     var ctx = this.el.getContext('2d');
     this.chartInstance = new Chart(ctx, this.config);
 }
+
+window.App.Chart.prototype.destroy = function() {
+    this.chartInstance.destroy();
+}
