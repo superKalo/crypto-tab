@@ -222,5 +222,9 @@ window.App.Chart.prototype.init = function(_data) {
 }
 
 window.App.Chart.prototype.destroy = function() {
+    if (! this.isInitiated()) {
+        return;
+    }
+
     this.chartInstance.destroy();
 }

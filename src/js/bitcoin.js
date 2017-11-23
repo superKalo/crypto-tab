@@ -26,7 +26,12 @@ window.App.Bitcoin = {
 
                 const period = this.dataset.period;
                 self.repositories[period].getData()
-                    .then(_data => self.chart.init(_data));
+                    .then(_data => self.chart.init(_data))
+                    .catch((error) => {
+                        self.handleChartRejection(period, error);
+
+                        return Promise.reject();
+                    });
 
                 App.Settings.set('period', this.dataset.period);
 
@@ -70,6 +75,27 @@ window.App.Bitcoin = {
         }
     },
 
+    handleChartRejection(_period, _error) {
+        this.isLocalChartDataOld = true;
+
+        this.repositories[_period].getDataUpToDateStatus().then(_res => {
+            App.Loader.destroy();
+
+            if (_res.localData === null) {
+                App.Message.fireError('That\'s extremely sad. ' + _error);
+                this.chart.destroy();
+            } else if (_res.localData.length) {
+                App.Message.clear();
+
+                this.chart.init(_res.localData);
+                this.setLastUpdated(true);
+            }
+        });
+    },
+    handleNowRejection() {
+        this.isLocalNowDataOld = true;
+    },
+
     repositories: {},
     initRepositories() {
         const storageSetting =
@@ -87,21 +113,9 @@ window.App.Bitcoin = {
                         return res;
                     })
                     .catch((jqXHR, textStatus, errorThrown) => {
-                        this.isLocalChartDataOld = true;
+                        this.handleChartRejection(period, jqXHR);
 
-                        this.repositories[period].getDataUpToDateStatus().then(_res => {
-                            App.Loader.destroy();
-
-                            if (_res.localData === null) {
-                                App.Message.fireError('That\'s extremely sad. ' + jqXHR);
-                                this.chart.destroy();
-                            } else if (_res.localData.length) {
-                                App.Message.clear();
-
-                                this.chart.init(_res.localData);
-                                this.setLastUpdated(true);
-                            }
-                        })
+                        return Promise.reject();
                     })
             })
         );
@@ -122,7 +136,11 @@ window.App.Bitcoin = {
             request: () => App.API.getBitcoinRatesNow().then(res => {
                 this.isLocalNowDataOld = false;
                 return res;
-            }).catch(() => this.isLocalNowDataOld = true)
+            }).catch(() => {
+                this.handleNowRejection();
+
+                return Promise.reject();
+            })
         });
     },
 
@@ -204,6 +222,10 @@ window.App.Bitcoin = {
             this.setPriceNow(_data.price);
             this.setPriceChange();
             this.setLastUpdated();
+        }).catch( () => {
+            this.handleNowRejection();
+
+            return Promise.reject();
         });
 
         // Track timeframe changes
