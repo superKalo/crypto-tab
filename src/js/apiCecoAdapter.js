@@ -1,7 +1,7 @@
 window.App = window.App || {};
 
 window.App.apiCecoAdapter = {
-    baseURL: 'https://bitcoin-price-api.devlabs-projects.info/',
+    baseURL: 'https://api.crypto-tab.com/v1/',
 
     get: function(_endpoint) {
         return App.API.get(_endpoint);
