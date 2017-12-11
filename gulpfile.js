@@ -43,6 +43,27 @@ gulp.task('preprocess', function () {
                         <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
                         <meta name="theme-color" content="#ffffff">`
                 },
+                {
+                    match: 'socialMediaTags',
+                    replacement: ENV === 'extension' ? '' :
+                        `<!-- Schema.org for Google -->
+                        <meta itemprop="name" content="Crypto Tab">
+                        <meta itemprop="description" content="Replace your browser New Tab page with a Bitcoin price chart">
+                        <meta itemprop="image" content="https://i.imgur.com/pHG5fBk.jpg">
+                        <!-- Twitter -->
+                        <meta name="twitter:card" content="summary">
+                        <meta name="twitter:title" content="Crypto Tab">
+                        <meta name="twitter:description" content="Replace your browser New Tab page with a Bitcoin price chart">
+                        <meta name="twitter:image:src" content="https://i.imgur.com/pHG5fBk.jpg">
+                        <!-- Open Graph general (Facebook, Pinterest & Google+) -->
+                        <meta name="og:title" content="Crypto Tab">
+                        <meta name="og:description" content="Replace your browser New Tab page with a Bitcoin price chart">
+                        <meta name="og:image" content="https://i.imgur.com/pHG5fBk.jpg">
+                        <meta name="og:url" content="https://crypto-tab.com">
+                        <meta name="og:site_name" content="Crypto Tab">
+                        <meta name="og:locale" content="en_US">
+                        <meta name="og:type" content="website">`
+                }
             ]
         }))
         .pipe(gulp.dest(distPath));
