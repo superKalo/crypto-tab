@@ -92,6 +92,8 @@ window.App.Bitcoin = {
     },
     handleNowRejection() {
         this.isLocalNowDataOld = true;
+
+        App.Loader.destroy();
     },
 
     repositories: {},
