@@ -15,12 +15,6 @@ class API {
                 App.Loader.destroy();
 
                 return r;
-            })
-            .catch( (jqXHR, textStatus, errorThrown) => {
-                App.Loader.destroy();
-                App.Message.fireError('That\'s extremely sad. ' + jqXHR);
-
-                return Promise.reject();
             });
     }
 
