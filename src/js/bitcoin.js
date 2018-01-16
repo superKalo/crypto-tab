@@ -29,8 +29,6 @@ window.App.Bitcoin = {
                     .then(_data => self.chart.init(_data))
                     .catch((error) => {
                         self.handleChartRejection(period, error);
-
-                        return Promise.reject();
                     });
 
                 App.Settings.set('period', this.dataset.period);
@@ -114,8 +112,6 @@ window.App.Bitcoin = {
                     })
                     .catch((jqXHR, textStatus, errorThrown) => {
                         this.handleChartRejection(period, jqXHR);
-
-                        return Promise.reject();
                     })
             })
         );
@@ -138,8 +134,6 @@ window.App.Bitcoin = {
                 return res;
             }).catch(() => {
                 this.handleNowRejection();
-
-                return Promise.reject();
             })
         });
     },
@@ -224,8 +218,7 @@ window.App.Bitcoin = {
             this.setLastUpdated();
         }).catch( () => {
             this.handleNowRejection();
-
-            return Promise.reject();
+            this.setLastUpdated();
         });
 
         // Track timeframe changes
