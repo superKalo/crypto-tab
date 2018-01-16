@@ -144,9 +144,21 @@ window.App.Chart.prototype.alwaysVisibleTooltipsPlugin = function() {
                     const tooltipsMaxValue = Math.max(...dataset.data);
                     const tooltipsMinValue = Math.min(...dataset.data);
 
-                    const displayTooltipsFilter = (value) => (
-                        value === tooltipsMaxValue || value === tooltipsMinValue
-                    );
+                    // Mega dummy mechanism to catch duplicated values.
+                    let tooltipsMaxValueDisplayed = false;
+                    let tooltipsMinValueDisplayed = false;
+
+                    const displayTooltipsFilter = (value) => {
+                        if (value === tooltipsMaxValue && !tooltipsMaxValueDisplayed) {
+                            tooltipsMaxValueDisplayed = true;
+                            return true;
+                        } else if (value === tooltipsMinValue && !tooltipsMinValueDisplayed) {
+                            tooltipsMinValueDisplayed = true;
+                            return true;
+                        }
+
+                        return false;
+                    };
 
                     chart.getDatasetMeta(i).data.forEach(function (sector, j) {
                         const toolTipValue = dataset.data[j];
