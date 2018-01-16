@@ -138,28 +138,32 @@ window.App.Chart.prototype.alwaysVisibleTooltipsPlugin = function() {
                 chart.pluginTooltips = [];
                 chart.config.data.datasets.forEach(function (dataset, i) {
                     /**
-                     * If too many tooltips appear - the chart becomes unreadable,
-                     * therefore - filter out the tooltips.
+                     * Display only the tooltips with the min and the max values.
+                     * Filter out all the rest.
                      */
-                    const tooltipsLength = chart.getDatasetMeta(i).data.length;
-                    const displayTooltipsFilter = (i) => {
-                        if (tooltipsLength <= 5) {
-                            return i % 3 === 0;
-                        } else if (tooltipsLength <= 7) {
-                            return i % 3 === 0;
-                        } else if (tooltipsLength <= 12) {
-                            return i % 4 === 0 || i+1 === tooltipsLength;
-                        } else if (tooltipsLength <= 24) {
-                            return i % 8 === 0 || i+1 === tooltipsLength;
-                        } else if (tooltipsLength <= 31) {
-                            return i % 10 === 0 || i+1 === tooltipsLength;
+                    const tooltipsMaxValue = Math.max(...dataset.data);
+                    const tooltipsMinValue = Math.min(...dataset.data);
+
+                    // Mega dummy mechanism to catch duplicated values.
+                    let tooltipsMaxValueDisplayed = false;
+                    let tooltipsMinValueDisplayed = false;
+
+                    const displayTooltipsFilter = (value) => {
+                        if (value === tooltipsMaxValue && !tooltipsMaxValueDisplayed) {
+                            tooltipsMaxValueDisplayed = true;
+                            return true;
+                        } else if (value === tooltipsMinValue && !tooltipsMinValueDisplayed) {
+                            tooltipsMinValueDisplayed = true;
+                            return true;
                         }
 
-                        return (i) % 24 === 0 || i+1 === tooltipsLength;
+                        return false;
                     };
 
                     chart.getDatasetMeta(i).data.forEach(function (sector, j) {
-                        if (displayTooltipsFilter(j)) {
+                        const toolTipValue = dataset.data[j];
+
+                        if (displayTooltipsFilter(toolTipValue)) {
                             chart.pluginTooltips.push(new Chart.Tooltip({
                                 _chart: chart.chart,
                                 _chartInstance: chart,
