@@ -152,6 +152,8 @@ window.App.Bitcoin = {
             return;
         }
 
+        this.setPriceNow(localData.price);
+
         const { dayAgo, weekAgo, monthAgo } = localData.changePercent;
         let settings = await App.Settings.get();
 
@@ -215,11 +217,11 @@ window.App.Bitcoin = {
 
     displayPriceNow() {
         this.repositories['NOW'].getData().then( _data => {
-            this.setPriceNow(_data.price);
             this.setPriceChange();
             this.setLastUpdated();
         }).catch( () => {
             this.handleNowRejection();
+            this.setPriceChange();
             this.setLastUpdated();
         });
 
