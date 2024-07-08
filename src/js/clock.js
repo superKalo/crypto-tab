@@ -1,34 +1,33 @@
 window.App = window.App || {};
 
 /**
- * Yes, that's the most simple clock in the world.
+ * Simple and efficient clock.
  */
-App.Clock = function(){
-    // String that holds the current time (hours and minutes)
-    this.time;
+App.Clock = function () {
+  this.time = "";
+  this.clockElement = document.getElementById("clock");
 
-    this.setTime();
+  this.update();
+};
 
-    setInterval(this.setTime, 1000);
-}
+App.Clock.prototype.setTime = function () {
+  const today = new Date();
 
-/**
- * Source: https://www.w3schools.com/js/tryit.asp?filename=tryjs_timing_clock
- */
-App.Clock.prototype.setTime = function() {
-    const today = new Date();
+  const h = today.getHours();
+  const m = ("0" + today.getMinutes()).slice(-2);
 
-    const h = today.getHours();
-    // Add zero in front of numbers < 10
-    const m = ('0' + today.getMinutes()).slice(-2);
+  const currentTime = h + ":" + m;
 
-    const currentTime = h + ':' + m;
+  if (currentTime !== this.time) {
+    this.time = currentTime;
+    this.clockElement.innerText = currentTime;
+  }
+};
 
-    if (currentTime !== this.time) {
-        this.time = currentTime;
+App.Clock.prototype.update = function () {
+  this.setTime();
+  requestAnimationFrame(this.update.bind(this));
+};
 
-        document.getElementById('clock').innerText = currentTime;
-    }
-}
-
+// Initialize the clock
 new window.App.Clock();
