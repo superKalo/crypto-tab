@@ -3,42 +3,42 @@ window.App = window.App || {};
 window.App.apiFakeAdapter = {
     baseURL: 'fake-api/',
 
-    mapData: function(response, dateLabelFormat) {
-        return response.map( _rec => ({
+    mapData: function (response, dateLabelFormat) {
+        return response.map((_rec) => ({
             value: _rec.value,
-            timestamp: moment(_rec.timestamp).format(dateLabelFormat)
+            timestamp: dayjs(_rec.timestamp).format(dateLabelFormat),
         }));
     },
 
-    get: function(_endpoint) {
-        return App.API.get(_endpoint).then(r => r.data);
+    get: function (_endpoint) {
+        return App.API.get(_endpoint).then((r) => r.data);
     },
 
-    getBitcoinRatesForAll: function() {
+    getBitcoinRatesForAll: function () {
         return this.get('all.json');
     },
 
-    getBitcoinRatesForOneYear: function() {
+    getBitcoinRatesForOneYear: function () {
         return this.get('year.json');
     },
 
-    getBitcoinRatesForOneMonth: function() {
+    getBitcoinRatesForOneMonth: function () {
         return this.get('month.json');
     },
 
-    getBitcoinRatesForOneWeek: function() {
+    getBitcoinRatesForOneWeek: function () {
         return this.get('week.json');
     },
 
-    getBitcoinRatesForOneDay: function() {
+    getBitcoinRatesForOneDay: function () {
         return this.get('day.json');
     },
 
-    getBitcoinRatesForOneHour: function() {
+    getBitcoinRatesForOneHour: function () {
         return this.get('hour.json');
     },
 
-    getBitcoinRatesNow: function() {
+    getBitcoinRatesNow: function () {
         return this.get('hour.json');
-    }
+    },
 };

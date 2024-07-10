@@ -1,3 +1,8 @@
+dayjs.extend(window.dayjs_plugin_utc);
+dayjs.extend(window.dayjs_plugin_localizedFormat);
+dayjs.extend(window.dayjs_plugin_relativeTime);
+dayjs.extend(window.dayjs_plugin_calendar);
+
 window.App = window.App || {};
 
 window.App.Bitcoin = {
@@ -19,14 +24,15 @@ window.App.Bitcoin = {
     initEvents() {
         const self = this;
 
-        [...self.$dataPeriods].forEach(el => {
-            el.addEventListener('click', function() {
-                self.$dataPeriods.forEach(p => p.classList.remove('active'));
+        [...self.$dataPeriods].forEach((el) => {
+            el.addEventListener('click', function () {
+                self.$dataPeriods.forEach((p) => p.classList.remove('active'));
                 this.classList.add('active');
 
                 const period = this.dataset.period;
-                self.repositories[period].getData()
-                    .then(_data => self.chart.init(_data))
+                self.repositories[period]
+                    .getData()
+                    .then((_data) => self.chart.init(_data))
                     .catch((error) => {
                         self.handleChartRejection(period, error);
                     });
@@ -37,16 +43,15 @@ window.App.Bitcoin = {
             });
         });
 
-        App.Settings.get().then( ({ period }) => {
-            const selectedTab =
-                period ? Object.keys(this.PERIODS).indexOf(period) : 1;
+        App.Settings.get().then(({ period }) => {
+            const selectedTab = period ? Object.keys(this.PERIODS).indexOf(period) : 1;
 
             self.$dataPeriods[selectedTab].click();
         });
     },
 
     getBitcoinData(period) {
-        switch(period) {
+        switch (period) {
             case 'ALL':
                 return App.API.getBitcoinRatesForAll();
             case 'ONE_YEAR':
@@ -63,24 +68,30 @@ window.App.Bitcoin = {
     },
 
     getLabelFormat(period) {
-        switch(period) {
-            case 'ALL': return 'YYYY';
-            case 'ONE_YEAR': return 'MMM YYYY';
-            case 'ONE_MONTH': return 'Do MMM';
-            case 'ONE_WEEK': return 'dddd';
-            case 'ONE_DAY': return 'HH:mm';
-            case 'ONE_HOUR': return 'HH:mm';
+        switch (period) {
+            case 'ALL':
+                return 'YYYY';
+            case 'ONE_YEAR':
+                return 'MMM YYYY';
+            case 'ONE_MONTH':
+                return 'Do MMM';
+            case 'ONE_WEEK':
+                return 'dddd';
+            case 'ONE_DAY':
+                return 'HH:mm';
+            case 'ONE_HOUR':
+                return 'HH:mm';
         }
     },
 
     handleChartRejection(_period, _error) {
         this.isLocalChartDataOld = true;
 
-        this.repositories[_period].getDataUpToDateStatus().then(_res => {
+        this.repositories[_period].getDataUpToDateStatus().then((_res) => {
             App.Loader.destroy();
 
             if (_res.localData === null) {
-                App.Message.fireError('That\'s extremely sad. ' + _error);
+                App.Message.fireError("That's extremely sad. " + _error);
                 this.chart.destroy();
             } else if (_res.localData.length) {
                 App.Message.clear();
@@ -101,42 +112,47 @@ window.App.Bitcoin = {
         const storageSetting =
             App.ENV.platform === 'EXTENSION' ? 'BROWSER_STORAGE' : 'LOCAL_STORAGE';
 
-        Object.keys(this.PERIODS).forEach( period =>
-            this.repositories[period] = new SuperRepo({
-                storage: storageSetting,
-                name: 'bitcoin-' + period,
-                outOfDateAfter: 15 * 60 * 1000,
-                mapData: r => App.API.mapData(r, this.getLabelFormat(period)),
-                request: () => this.getBitcoinData(period)
-                    .then(res => {
-                        this.isLocalChartDataOld = false;
-                        return res;
-                    })
-                    .catch((jqXHR, textStatus, errorThrown) => {
-                        this.handleChartRejection(period, jqXHR);
-                    })
-            })
+        Object.keys(this.PERIODS).forEach(
+            (period) =>
+                (this.repositories[period] = new SuperRepo({
+                    storage: storageSetting,
+                    name: 'bitcoin-' + period,
+                    outOfDateAfter: 15 * 60 * 1000,
+                    mapData: (r) => App.API.mapData(r, this.getLabelFormat(period)),
+                    request: () =>
+                        this.getBitcoinData(period)
+                            .then((res) => {
+                                this.isLocalChartDataOld = false;
+                                return res;
+                            })
+                            .catch((jqXHR, textStatus, errorThrown) => {
+                                this.handleChartRejection(period, jqXHR);
+                            }),
+                }))
         );
 
         this.repositories['NOW'] = new SuperRepo({
             storage: storageSetting,
             name: 'bitcoin-NOW',
             outOfDateAfter: 3 * 60 * 1000,
-            mapData: data => {
+            mapData: (data) => {
                 const { value, changePercent } = data[0];
                 const { dayAgo, weekAgo, monthAgo } = changePercent;
 
                 return {
                     price: value,
-                    changePercent: { dayAgo, weekAgo, monthAgo }
+                    changePercent: { dayAgo, weekAgo, monthAgo },
                 };
             },
-            request: () => App.API.getBitcoinRatesNow().then(res => {
-                this.isLocalNowDataOld = false;
-                return res;
-            }).catch(() => {
-                this.handleNowRejection();
-            })
+            request: () =>
+                App.API.getBitcoinRatesNow()
+                    .then((res) => {
+                        this.isLocalNowDataOld = false;
+                        return res;
+                    })
+                    .catch(() => {
+                        this.handleNowRejection();
+                    }),
         });
     },
 
@@ -146,9 +162,9 @@ window.App.Bitcoin = {
     },
 
     $change: document.querySelector('#change'),
-    async setPriceChange () {
+    async setPriceChange() {
         let { localData } = await this.repositories['NOW'].getDataUpToDateStatus();
-        if (! localData) {
+        if (!localData) {
             return;
         }
 
@@ -159,7 +175,7 @@ window.App.Bitcoin = {
 
         let changePercent;
         let periodLabel;
-        switch(settings.period) {
+        switch (settings.period) {
             case this.PERIODS.ONE_DAY:
             default: {
                 changePercent = dayAgo;
@@ -188,42 +204,45 @@ window.App.Bitcoin = {
             const isChangePisitive = _number >= 0;
             const isChangeZero = _number === 0;
 
-            return isChangePisitive && ! isChangeZero ? `+${_number}%` : `${_number}%`;
+            return isChangePisitive && !isChangeZero ? `+${_number}%` : `${_number}%`;
         };
         const getVisualClass = (_number) => {
             const isChangePisitive = _number >= 0;
             const isChangeZero = _number === 0;
 
-            return isChangeZero ? '' : (isChangePisitive ? 'positive' : 'negative');
+            return isChangeZero ? '' : isChangePisitive ? 'positive' : 'negative';
         };
 
-        this.$change.innerHTML =
-            ` (<span class="${getVisualClass(changePercent)}">${getSignedPercentage(changePercent)}</span>
-            ${periodLabel})`;
+        this.$change.innerHTML = ` (<span class="${getVisualClass(changePercent)}">${getSignedPercentage(changePercent)}</span>
+        ${periodLabel})`;
     },
 
     $lastUpdated: document.querySelector('#last-updated'),
     setLastUpdated() {
-        this.repositories['NOW'].getDataUpToDateStatus().then(info => {
-            const prettyLastUpdatedTime = moment(info.lastFetched).fromNow();
-            this.$lastUpdated.innerHTML = this.isLocalChartDataOld || this.isLocalNowDataOld ?
-                `<span class="negative">${prettyLastUpdatedTime}</span>.
-                Data request <span class="negative">failed</span>. Refresh the page to try again.` :
-                `<span class="positive">${prettyLastUpdatedTime}</span>.`;
+        this.repositories['NOW'].getDataUpToDateStatus().then((info) => {
+            const prettyLastUpdatedTime = dayjs(info.lastFetched).fromNow();
+            this.$lastUpdated.innerHTML =
+                this.isLocalChartDataOld || this.isLocalNowDataOld
+                    ? `<span class="negative">${prettyLastUpdatedTime}</span>.
+          Data request <span class="negative">failed</span>. Refresh the page to try again.`
+                    : `<span class="positive">${prettyLastUpdatedTime}</span>.`;
 
-            this.$lastUpdated.setAttribute('data-tooltip', moment(info.lastFetched).calendar())
+            this.$lastUpdated.setAttribute('data-tooltip', dayjs(info.lastFetched).calendar());
         });
     },
 
     displayPriceNow() {
-        this.repositories['NOW'].getData().then( _data => {
-            this.setPriceChange();
-            this.setLastUpdated();
-        }).catch( () => {
-            this.handleNowRejection();
-            this.setPriceChange();
-            this.setLastUpdated();
-        });
+        this.repositories['NOW']
+            .getData()
+            .then((_data) => {
+                this.setPriceChange();
+                this.setLastUpdated();
+            })
+            .catch(() => {
+                this.handleNowRejection();
+                this.setPriceChange();
+                this.setLastUpdated();
+            });
 
         // Track timeframe changes
         setInterval(this.setLastUpdated.bind(this), 30 * 1000);
@@ -236,5 +255,5 @@ window.App.Bitcoin = {
         this.displayPriceNow();
 
         this.initEvents();
-    }
+    },
 };

@@ -95,8 +95,12 @@ gulp.task("copy-npm-dependencies", function () {
     .src([
       "node_modules/axios/dist/axios.min.js",
       "node_modules/chart.js/dist/Chart.min.js",
-      "node_modules/moment/min/moment.min.js",
       "node_modules/super-repo/lib/index.js",
+      "node_modules/dayjs/dayjs.min.js",
+      "node_modules/dayjs/plugin/relativeTime.js",
+      "node_modules/dayjs/plugin/utc.js",
+      "node_modules/dayjs/plugin/localizedFormat.js",
+      "node_modules/dayjs/plugin/calendar.js",
     ])
     .pipe(gulp.dest(`${distPath}/lib/`));
 });
