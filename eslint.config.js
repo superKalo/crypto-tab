@@ -12,6 +12,7 @@ module.exports = [
                 App: 'writable',
                 SuperRepo: 'readonly',
                 Chart: 'readonly',
+                dayjs: 'readonly',
             },
         },
     },
