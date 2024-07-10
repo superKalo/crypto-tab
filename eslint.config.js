@@ -10,7 +10,6 @@ module.exports = [
                 ...globals.browser,
                 axios: 'readonly',
                 App: 'writable',
-                moment: 'readonly',
                 SuperRepo: 'readonly',
                 Chart: 'readonly',
             },
