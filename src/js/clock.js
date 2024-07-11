@@ -4,29 +4,29 @@ window.App = window.App || {};
  * Simple and efficient clock.
  */
 App.Clock = function () {
-  this.time = "";
-  this.clockElement = document.getElementById("clock");
+    this.time = '';
+    this.clockElement = document.getElementById('clock');
 
-  this.update();
+    this.update();
 };
 
 App.Clock.prototype.setTime = function () {
-  const today = new Date();
+    const today = new Date();
 
-  const h = today.getHours();
-  const m = ("0" + today.getMinutes()).slice(-2);
+    const h = today.getHours();
+    const m = ('0' + today.getMinutes()).slice(-2);
 
-  const currentTime = h + ":" + m;
+    const currentTime = h + ':' + m;
 
-  if (currentTime !== this.time) {
-    this.time = currentTime;
-    this.clockElement.innerText = currentTime;
-  }
+    if (currentTime !== this.time) {
+        this.time = currentTime;
+        this.clockElement.innerText = currentTime;
+    }
 };
 
 App.Clock.prototype.update = function () {
-  this.setTime();
-  requestAnimationFrame(this.update.bind(this));
+    this.setTime();
+    requestAnimationFrame(this.update.bind(this));
 };
 
 // Initialize the clock
