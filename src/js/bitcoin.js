@@ -108,7 +108,7 @@ window.App.Bitcoin = {
             this.repositories[period] = new SuperRepo({
                 storage: storageSetting,
                 name: 'bitcoin-' + period,
-                outOfDateAfter: 0.1 * 60 * 1000, // 15 minutes
+                outOfDateAfter: 15 * 60 * 1000, // 15 minutes
                 mapData: (r) => App.API.mapData(r, this.getLabelFormat(period)),
                 request: () =>
                     this.getBitcoinDataFromBackground(period)
@@ -125,7 +125,7 @@ window.App.Bitcoin = {
         this.repositories['NOW'] = new SuperRepo({
             storage: storageSetting,
             name: 'bitcoin-NOW',
-            outOfDateAfter: 0.1 * 60 * 1000, // 3 minutes
+            outOfDateAfter: 3 * 60 * 1000, // 3 minutes
             mapData: (data) => {
                 const { value, changePercent } = data[0];
                 const { dayAgo, weekAgo, monthAgo } = changePercent;
