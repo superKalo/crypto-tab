@@ -5,7 +5,7 @@ dayjs.extend(window.dayjs_plugin_calendar);
 
 window.App = window.App || {};
 
-window.App.Bitcoin = {
+window.App.Crypto = {
     PERIODS: {
         ONE_HOUR: 'ONE_HOUR',
         ONE_DAY: 'ONE_DAY',
