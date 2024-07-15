@@ -21,6 +21,10 @@ window.App.Bitcoin = {
     chart: null,
 
     $dataPeriods: document.querySelectorAll('.js-period'),
+    $cryptoToggle: document.querySelectorAll('input[name="crypto"]'),
+    $cryptoTypeLabel: document.getElementById('crypto-type'),
+    currentCrypto: '',
+
     initEvents() {
         const self = this;
 
@@ -30,33 +34,64 @@ window.App.Bitcoin = {
                 this.classList.add('active');
 
                 const period = this.dataset.period;
-                self.getBitcoinData(period)
+                self.getCryptoData(period, self.currentCrypto)
                     .then((_data) => self.chart.init(_data))
                     .catch((error) => {
-                        self.handleChartRejection(period, error);
+                        self.handleChartRejection(period, self.currentCrypto, error);
                     });
 
                 App.Settings.set('period', this.dataset.period);
 
-                self.setPriceChange();
+                self.setPriceChange(self.currentCrypto);
             });
         });
 
-        App.Settings.get().then(({ period }) => {
+        [...self.$cryptoToggle].forEach((el) => {
+            el.addEventListener('change', function () {
+                if (this.checked) {
+                    self.currentCrypto = this.value;
+                    self.updateCryptoTypeLabel(self.currentCrypto);
+                    const period = document.querySelector('.js-period.active').dataset.period;
+                    self.getCryptoData(period, self.currentCrypto)
+                        .then((_data) => self.chart.init(_data))
+                        .catch((error) => {
+                            self.handleChartRejection(period, self.currentCrypto, error);
+                        });
+
+                    App.Settings.set('cryptoType', self.currentCrypto);
+
+                    self.setPriceChange(self.currentCrypto);
+                    self.setLastUpdated();
+                    self.displayPriceNow();
+                }
+            });
+        });
+
+        App.Settings.get().then(({ period, cryptoType }) => {
+            self.currentCrypto =
+                cryptoType || document.querySelector('input[name="crypto"]:checked').value;
             const selectedTab = period ? Object.keys(this.PERIODS).indexOf(period) : 1;
+            document.querySelector(`input[name="crypto"][value="${self.currentCrypto}"]`).checked =
+                true;
+            self.initRepositories();
             self.$dataPeriods[selectedTab].click();
         });
     },
 
-    getBitcoinData(period) {
+    updateCryptoTypeLabel(cryptoType) {
+        const label = cryptoType.charAt(0).toUpperCase() + cryptoType.slice(1);
+        this.$cryptoTypeLabel.textContent = label;
+    },
+
+    getCryptoData(period, cryptoType) {
         return new Promise((resolve, reject) => {
-            this.repositories[period]
+            this.repositories[cryptoType][period]
                 .getData()
                 .then((response) => {
                     resolve(response);
                 })
                 .catch((error) => {
-                    reject(error || 'Failed to retrieve Bitcoin price data');
+                    reject(error || `Failed to retrieve ${cryptoType} price data`);
                 });
         });
     },
@@ -78,19 +113,19 @@ window.App.Bitcoin = {
         }
     },
 
-    handleChartRejection(_period, _error) {
+    handleChartRejection(_period, _cryptoType, _error) {
         this.isLocalChartDataOld = true;
 
-        this.repositories[_period].getDataUpToDateStatus().then((_res) => {
+        this.repositories[_cryptoType][_period].getDataUpToDateStatus().then((_res) => {
             App.Loader.destroy();
 
             if (_res.localData === null) {
-                App.Message.fireError("That's extremely sad. " + _error);
+                App.Message.fireError(`That's extremely sad. ${_error}`);
                 this.chart.destroy();
             } else if (_res.localData.length) {
                 App.Message.clear();
                 this.chart.init(_res.localData);
-                this.setLastUpdated(true);
+                this.setLastUpdated();
             }
         });
     },
@@ -104,58 +139,64 @@ window.App.Bitcoin = {
         const storageSetting =
             App.ENV.platform === 'EXTENSION' ? 'BROWSER_STORAGE' : 'LOCAL_STORAGE';
 
-        Object.keys(this.PERIODS).forEach((period) => {
-            this.repositories[period] = new SuperRepo({
+        ['bitcoin', 'ethereum'].forEach((cryptoType) => {
+            this.repositories[cryptoType] = {};
+            Object.keys(this.PERIODS).forEach((period) => {
+                this.repositories[cryptoType][period] = new SuperRepo({
+                    storage: storageSetting,
+                    name: `${cryptoType}-${period}`,
+                    outOfDateAfter: 15 * 60 * 1000, // 15 minutes
+                    mapData: (r) => App.API.mapData(r, this.getLabelFormat(period)),
+                    request: () =>
+                        this.getCryptoDataFromBackground(period, cryptoType)
+                            .then((res) => {
+                                this.isLocalChartDataOld = false;
+                                return res;
+                            })
+                            .catch((jqXHR, textStatus, errorThrown) => {
+                                this.handleChartRejection(period, cryptoType, jqXHR);
+                            }),
+                });
+            });
+
+            this.repositories[cryptoType]['NOW'] = new SuperRepo({
                 storage: storageSetting,
-                name: 'bitcoin-' + period,
-                outOfDateAfter: 15 * 60 * 1000, // 15 minutes
-                mapData: (r) => App.API.mapData(r, this.getLabelFormat(period)),
+                name: `${cryptoType}-NOW`,
+                outOfDateAfter: 3 * 60 * 1000, // 3 minutes
+                mapData: (data) => {
+                    const { value, changePercent } = data[0];
+                    const { dayAgo, weekAgo, monthAgo } = changePercent;
+
+                    return {
+                        price: value,
+                        changePercent: { dayAgo, weekAgo, monthAgo },
+                    };
+                },
                 request: () =>
-                    this.getBitcoinDataFromBackground(period)
+                    this.getCryptoDataFromBackground('NOW', cryptoType)
                         .then((res) => {
-                            this.isLocalChartDataOld = false;
+                            this.isLocalNowDataOld = false;
                             return res;
                         })
-                        .catch((jqXHR, textStatus, errorThrown) => {
-                            this.handleChartRejection(period, jqXHR);
+                        .catch(() => {
+                            this.handleNowRejection();
                         }),
             });
         });
-
-        this.repositories['NOW'] = new SuperRepo({
-            storage: storageSetting,
-            name: 'bitcoin-NOW',
-            outOfDateAfter: 3 * 60 * 1000, // 3 minutes
-            mapData: (data) => {
-                const { value, changePercent } = data[0];
-                const { dayAgo, weekAgo, monthAgo } = changePercent;
-
-                return {
-                    price: value,
-                    changePercent: { dayAgo, weekAgo, monthAgo },
-                };
-            },
-            request: () =>
-                this.getBitcoinDataFromBackground('NOW')
-                    .then((res) => {
-                        this.isLocalNowDataOld = false;
-                        return res;
-                    })
-                    .catch(() => {
-                        this.handleNowRejection();
-                    }),
-        });
     },
 
-    getBitcoinDataFromBackground(period) {
+    getCryptoDataFromBackground(period, cryptoType) {
         return new Promise((resolve, reject) => {
-            chrome.runtime.sendMessage({ type: 'getBitcoinPrice', period: period }, (response) => {
-                if (response && !response.error) {
-                    resolve(response.data);
-                } else {
-                    reject(response.error || 'Failed to retrieve Bitcoin price data');
+            chrome.runtime.sendMessage(
+                { type: 'getCryptoPrice', period: period, cryptoType: cryptoType },
+                (response) => {
+                    if (response && !response.error) {
+                        resolve(response.data);
+                    } else {
+                        reject(response.error || `Failed to retrieve ${cryptoType} price data`);
+                    }
                 }
-            });
+            );
         });
     },
 
@@ -165,8 +206,8 @@ window.App.Bitcoin = {
     },
 
     $change: document.querySelector('#change'),
-    async setPriceChange() {
-        let { localData } = await this.repositories['NOW'].getDataUpToDateStatus();
+    async setPriceChange(cryptoType) {
+        let { localData } = await this.repositories[cryptoType]['NOW'].getDataUpToDateStatus();
         if (!localData) {
             return;
         }
@@ -222,12 +263,13 @@ window.App.Bitcoin = {
 
     $lastUpdated: document.querySelector('#last-updated'),
     setLastUpdated() {
-        this.repositories['NOW'].getDataUpToDateStatus().then((info) => {
+        const cryptoType = this.currentCrypto;
+        this.repositories[cryptoType]['NOW'].getDataUpToDateStatus().then((info) => {
             const prettyLastUpdatedTime = dayjs(info.lastFetched).fromNow();
             this.$lastUpdated.innerHTML =
                 this.isLocalChartDataOld || this.isLocalNowDataOld
                     ? `<span class="negative">${prettyLastUpdatedTime}</span>.
-          Data request <span class="negative">failed</span>. Refresh the page to try again.`
+                  Data request <span class="negative">failed</span>. Refresh the page to try again.`
                     : `<span class="positive">${prettyLastUpdatedTime}</span>.`;
 
             this.$lastUpdated.setAttribute('data-tooltip', dayjs(info.lastFetched).calendar());
@@ -235,15 +277,16 @@ window.App.Bitcoin = {
     },
 
     displayPriceNow() {
-        this.repositories['NOW']
+        const cryptoType = this.currentCrypto;
+        this.repositories[cryptoType]['NOW']
             .getData()
             .then((_data) => {
-                this.setPriceChange();
+                this.setPriceChange(cryptoType);
                 this.setLastUpdated();
             })
             .catch(() => {
                 this.handleNowRejection();
-                this.setPriceChange();
+                this.setPriceChange(cryptoType);
                 this.setLastUpdated();
             });
 
@@ -255,8 +298,13 @@ window.App.Bitcoin = {
         this.chart = new App.Chart(this.$chart);
 
         this.initRepositories();
-        this.displayPriceNow();
-
         this.initEvents();
+
+        App.Settings.get().then(({ cryptoType }) => {
+            this.currentCrypto =
+                cryptoType || document.querySelector('input[name="crypto"]:checked').value;
+            this.updateCryptoTypeLabel(this.currentCrypto);
+            this.displayPriceNow();
+        });
     },
 };

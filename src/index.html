@@ -80,8 +80,13 @@
         </a>
       </div>
 
+      <div class="toggle-switch text-center mb+">
+        <label> <input type="radio" name="crypto" value="bitcoin" checked /> Bitcoin </label>
+        <label> <input type="radio" name="crypto" value="ethereum" /> Ethereum </label>
+      </div>
+
       <h2 class="chart-period mb text-center">
-        Bitcoin price is
+        <span id="crypto-type">Crypto</span> price is
         <span id="price-now">...</span>
         <span id="change"></span>
       </h2>
@@ -145,6 +150,7 @@
     <script src="js/message.js"></script>
     <script src="js/loader.js"></script>
     <script src="js/apiCecoAdapter.js"></script>
+    <script src="js/apiBoyoAdapter.js"></script>
     <script src="js/api.js"></script>
     <script src="js/chart.js"></script>
     <script src="js/clock.js"></script>
