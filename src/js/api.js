@@ -8,14 +8,11 @@ class API {
     get(_endpoint) {
         App.Loader.init();
 
-        return axios.get(this.apiAdapter.baseURL + _endpoint)
-            .then( r => r.data )
-            .then (r => {
-                App.Message.clear();
-                App.Loader.destroy();
-
-                return r;
-            });
+        return this.apiAdapter.getBitcoinRatesForPeriod(_endpoint).then((r) => {
+            App.Message.clear();
+            App.Loader.destroy();
+            return r;
+        });
     }
 
     mapData(_r, _period) {
@@ -49,7 +46,7 @@ class API {
     getBitcoinRatesNow() {
         return this.apiAdapter.getBitcoinRatesNow();
     }
-};
+}
 
 // window.App.API = new API(App.apiFakeAdapter);
 //window.App.API = new API(App.apiGoranAdapter);
