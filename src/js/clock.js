@@ -22,22 +22,16 @@ App.Clock.prototype.setTime = function () {
     if (currentTime !== this.time) {
         this.time = currentTime;
         this.clockElement.innerText = currentTime;
-        return true; // Time updated
     }
-    return false; // Time not updated
 };
 
 App.Clock.prototype.update = function () {
-    const timeChanged = this.setTime();
+    this.setTime();
 
-    if (timeChanged) {
-        // Calculate the remaining time until the next minute
-        const now = new Date();
-        const delay = (60 - now.getSeconds()) * 1000 - now.getMilliseconds();
-        setTimeout(() => requestAnimationFrame(this.update.bind(this)), delay);
-    } else {
-        requestAnimationFrame(this.update.bind(this));
-    }
+    // Calculate the remaining time until the next minute
+    const now = new Date();
+    const delay = (60 - now.getSeconds()) * 1000 - now.getMilliseconds();
+    setTimeout(() => this.update(), delay);
 };
 
 // Initialize the clock
