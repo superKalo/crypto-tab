@@ -7,7 +7,10 @@
 
     @@favicons
 
-    <meta name="description" content="Replace your browser New Tab page with a Bitcoin price chart" />
+    <meta
+      name="description"
+      content="Replace your browser New Tab page with a Crypto price chart"
+    />
     <meta name="image" content="https://i.imgur.com/pHG5fBk.jpg" />
     @@socialMediaTags
 
@@ -40,7 +43,11 @@
           </span>
         </a>
 
-        <a class="install__link" target="_blank" href="https://addons.mozilla.org/en-US/firefox/addon/crypto-tab/">
+        <a
+          class="install__link"
+          target="_blank"
+          href="https://addons.mozilla.org/en-US/firefox/addon/crypto-tab/"
+        >
           <span class="install__icon">
             <svg
               width="34"
@@ -60,7 +67,9 @@
                 <path
                   d="m0.064 8.728c-0.027 0.128-0.041 0.25-0.049 0.367 0.02-0.146 0.055-0.392 0.055-0.388-3e-3 7e-3 -5e-3 0.014-6e-3 0.021z"
                 />
-                <path d="m0.015 9.095c0 7e-3 -2e-3 0.013-3e-3 0.02v-2e-3c0-6e-3 2e-3 -0.012 3e-3 -0.018z" />
+                <path
+                  d="m0.015 9.095c0 7e-3 -2e-3 0.013-3e-3 0.02v-2e-3c0-6e-3 2e-3 -0.012 3e-3 -0.018z"
+                />
               </g>
             </svg>
           </span>
@@ -71,8 +80,13 @@
         </a>
       </div>
 
+      <div class="toggle-switch text-center mb+">
+        <label> <input type="radio" name="crypto" value="bitcoin" checked /> Bitcoin </label>
+        <label> <input type="radio" name="crypto" value="ethereum" /> Ethereum </label>
+      </div>
+
       <h2 class="chart-period mb text-center">
-        Bitcoin price is
+        <span id="crypto-type">Crypto</span> price is
         <span id="price-now">...</span>
         <span id="change"></span>
       </h2>
@@ -114,6 +128,7 @@
               <a href="https://github.com/superKalo/crypto-tab">Open Source</a>
               |
               <a href="https://github.com/cmihaylov/bitcoin-price-api">API</a>
+              <!-- TODO: Change the source to the new API -->
             </small>
           </small>
         </p>
@@ -136,10 +151,11 @@
     <script src="js/message.js"></script>
     <script src="js/loader.js"></script>
     <script src="js/apiCecoAdapter.js"></script>
+    <script src="js/apiBoyoAdapter.js"></script>
     <script src="js/api.js"></script>
     <script src="js/chart.js"></script>
     <script src="js/clock.js"></script>
-    <script src="js/bitcoin.js"></script>
+    <script src="js/crypto.js"></script>
     <script src="js/script.js"></script>
   </body>
 </html>
