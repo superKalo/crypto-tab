@@ -14,7 +14,7 @@ if (ENV === "extension") {
 // Copy files from src to dist directory
 gulp.task("copy-files", function () {
   return gulp
-    .src(filesArr, { base: "./src" })
+    .src(filesArr, { base: "./src", encoding: false })
     .pipe(gulp.dest(distPath))
     .pipe(
       notify({
