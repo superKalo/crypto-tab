@@ -3,7 +3,7 @@
   "description": "Replace the New Tab page with Bitcoin price chart",
   "version": "1.1.0",
   "browser_specific_settings": {
-    "gecko": { "id": "crypto-tab.com" }
+    "gecko": { "id": "extension@crypto-tab.com" }
   },
   "icons": {
     "16": "icons/icon16.png",
