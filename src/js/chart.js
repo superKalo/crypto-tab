@@ -88,6 +88,7 @@ window.App.Chart = function (el) {
                         display: false,
                     },
                     ticks: {
+                        // Include a dollar sign in the ticks
                         callback: (value) => `$${value}`,
                     },
                 },
@@ -131,11 +132,18 @@ window.App.Chart.prototype.alwaysVisibleTooltipsPlugin = function () {
         id: 'alwaysVisibleTooltips',
         beforeRender: (chart) => {
             if (chart.config.options.showAllTooltips) {
+                // create an array of tooltips
+                // we can't use the chart tooltip because there is only one tooltip per chart
                 chart.pluginTooltips = [];
                 chart.config.data.datasets.forEach((dataset, i) => {
+                    /**
+                     * Display only the tooltips with the min and the max values.
+                     * Filter out all the rest.
+                     */
                     const tooltipsMaxValue = Math.max(...dataset.data);
                     const tooltipsMinValue = Math.min(...dataset.data);
 
+                    // Mega dummy mechanism to catch duplicated values.
                     let tooltipsMaxValueDisplayed = false;
                     let tooltipsMinValueDisplayed = false;
 
@@ -167,6 +175,7 @@ window.App.Chart.prototype.alwaysVisibleTooltipsPlugin = function () {
                     });
                 });
 
+                // turn off normal tooltips
                 chart.options.plugins.tooltip.enabled = false;
             }
         },
