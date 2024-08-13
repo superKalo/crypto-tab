@@ -48,7 +48,7 @@ window.App.Chart = function (el) {
                     borderColor: 'rgba(0,0,0,0)',
                     borderWidth: 2,
                     cornerRadius: 2,
-                    padding: 10,
+                    caretPadding: 10,
                     callbacks: {
                         title: () => '',
                         label: (tooltipItem) => App.Utils.formatPrice(tooltipItem.parsed.y),
