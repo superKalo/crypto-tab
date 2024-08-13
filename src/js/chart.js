@@ -31,8 +31,10 @@ window.App.Chart = function (el) {
             ],
         },
         options: {
+            showAllTooltips: true,
             plugins: {
                 tooltip: {
+                    multiple: true,
                     enabled: true,
                     mode: 'index',
                     intersect: false,
@@ -48,10 +50,10 @@ window.App.Chart = function (el) {
                     },
                     borderColor: 'rgba(0,0,0,0)',
                     borderWidth: 2,
-                    cornerRadius: 2,
+                    cornerRadius: 1,
                     padding: 4,
                     caretPadding: 10,
-                    caretSize: 10,
+                    caretSize: 11,
                     callbacks: {
                         title: () => '',
                         label: (tooltipItem) => App.Utils.formatPrice(tooltipItem.parsed.y),
@@ -126,74 +128,122 @@ window.App.Chart.prototype.prepareData = function (_data) {
     };
 };
 
-/**
- * Make tooltips always visible.
- * https://github.com/chartjs/Chart.js/issues/1861
- */
 window.App.Chart.prototype.alwaysVisibleTooltipsPlugin = function () {
     const plugin = {
         id: 'alwaysVisibleTooltips',
-        beforeRender: (chart) => {
-            if (chart.config.options.showAllTooltips) {
-                // create an array of tooltips
-                // we can't use the chart tooltip because there is only one tooltip per chart
-                chart.pluginTooltips = [];
-                chart.config.data.datasets.forEach((dataset, i) => {
-                    /**
-                     * Display only the tooltips with the min and the max values.
-                     * Filter out all the rest.
-                     */
-                    const tooltipsMaxValue = Math.max(...dataset.data);
-                    const tooltipsMinValue = Math.min(...dataset.data);
-
-                    // Mega dummy mechanism to catch duplicated values.
-                    let tooltipsMaxValueDisplayed = false;
-                    let tooltipsMinValueDisplayed = false;
-
-                    const displayTooltipsFilter = (value) => {
-                        if (value === tooltipsMaxValue && !tooltipsMaxValueDisplayed) {
-                            tooltipsMaxValueDisplayed = true;
-                            return true;
-                        } else if (value === tooltipsMinValue && !tooltipsMinValueDisplayed) {
-                            tooltipsMinValueDisplayed = true;
-                            return true;
-                        }
-                        return false;
-                    };
-
-                    chart.getDatasetMeta(i).data.forEach((sector, j) => {
-                        const toolTipValue = dataset.data[j];
-
-                        if (displayTooltipsFilter(toolTipValue)) {
-                            chart.pluginTooltips.push(
-                                new Chart.Tooltip({
-                                    chart,
-                                    tooltipItems: [
-                                        { element: sector, datasetIndex: i, dataIndex: j },
-                                    ],
-                                    options: chart.options.plugins.tooltip,
-                                })
-                            );
-                        }
-                    });
-                });
-
-                // turn off normal tooltips
-                chart.options.plugins.tooltip.enabled = false;
+        afterDraw: (chart) => {
+            if (!chart.config.options.showAllTooltips) {
+                return;
             }
-        },
-        afterDraw: (chart, easing) => {
-            if (chart.config.options.showAllTooltips) {
-                chart.options.plugins.tooltip.enabled = true;
 
-                Chart.helpers.each(chart.pluginTooltips, (tooltip) => {
-                    tooltip.initialize();
-                    tooltip.update();
-                    tooltip.pivot();
-                    tooltip.transition(easing).draw();
+            const ctx = chart.ctx;
+            const dataset = chart.config.data.datasets[0];
+            const data = dataset.data;
+            const maxValue = Math.max(...data);
+            const minValue = Math.min(...data);
+
+            let foundMax = false;
+            let foundMin = false;
+            const permanentTooltips = [];
+
+            // Find min and max values
+            chart.config.data.datasets.forEach((dataset, datasetIndex) => {
+                const meta = chart.getDatasetMeta(datasetIndex);
+
+                meta.data.forEach((element, index) => {
+                    const value = data[index];
+
+                    if (value === maxValue && !foundMax) {
+                        foundMax = true;
+                        permanentTooltips.push({
+                            datasetIndex,
+                            index,
+                            element,
+                        });
+                    } else if (value === minValue && !foundMin) {
+                        foundMin = true;
+                        permanentTooltips.push({
+                            datasetIndex,
+                            index,
+                            element,
+                        });
+                    }
+
+                    // Stop checking if both min and max are found
+                    if (foundMax && foundMin) {
+                        return;
+                    }
                 });
-                chart.options.plugins.tooltip.enabled = true;
-            }
+            });
+
+            // Draw permanent tooltips
+            permanentTooltips.forEach(({ datasetIndex, index, element }) => {
+                const tooltipPosition = element.tooltipPosition();
+                const value = chart.config.data.datasets[datasetIndex].data[index];
+                const formattedValue = App.Utils.formatPrice(value);
+
+                // Calculate tooltip dimensions
+                ctx.font = '12px Arial';
+                const textMetrics = ctx.measureText(formattedValue);
+                const tooltipWidth = textMetrics.width + 7; // Plus some padding
+                const tooltipHeight = 22;
+
+                // Determine whether to place the tooltip on the left or right
+                const chartWidth = chart.width;
+                let tooltipX;
+                const tooltipY = tooltipPosition.y - tooltipHeight / 2;
+
+                if (tooltipPosition.x > chartWidth / 2) {
+                    // Position tooltip to the left + some padding
+                    tooltipX = tooltipPosition.x - tooltipWidth - 22;
+                } else {
+                    // Position tooltip to the right + some padding
+                    tooltipX = tooltipPosition.x + 22;
+                }
+
+                // Draw tooltip background
+                ctx.save();
+                ctx.fillStyle = 'rgba(79, 120, 226, 0.85)';
+                ctx.beginPath();
+                ctx.roundRect(tooltipX, tooltipY, tooltipWidth, tooltipHeight, 1);
+                ctx.fill();
+
+                // Draw tooltip text
+                ctx.fillStyle = '#fff';
+                ctx.font = '12px Arial';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(
+                    formattedValue,
+                    tooltipX + tooltipWidth / 2,
+                    tooltipY + tooltipHeight / 2
+                );
+
+                // Draw tooltip arrow
+                ctx.fillStyle = 'rgba(79, 120, 226, 0.85)';
+                ctx.beginPath();
+
+                /** Positions are like this:
+                 * 1. Top corner of the tooltip
+                 * 2. Pointing to the point
+                 * 3. Bottom corner of the tooltip
+                 */
+                if (tooltipPosition.x > chartWidth / 2) {
+                    // Arrow pointing left to the point
+                    ctx.moveTo(tooltipX + tooltipWidth - 0.1, tooltipY);
+                    ctx.lineTo(tooltipX + tooltipWidth + 12, tooltipPosition.y);
+                    ctx.lineTo(tooltipX + tooltipWidth - 0.1, tooltipY + tooltipHeight);
+                } else {
+                    // Arrow pointing right to the point
+                    ctx.moveTo(tooltipX + 0.1, tooltipY);
+                    ctx.lineTo(tooltipX - 12, tooltipPosition.y);
+                    ctx.lineTo(tooltipX + 0.1, tooltipY + tooltipHeight);
+                }
+
+                ctx.closePath();
+                ctx.fill();
+                ctx.restore();
+            });
         },
     };
 
