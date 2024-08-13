@@ -20,6 +20,7 @@ window.App.Chart = function (el) {
                     pointBorderColor: '#4F78E2',
                     pointHoverBorderColor: '#4F78E2',
                     pointBorderWidth: 3,
+                    pointHoverBorderWidth: 3,
                     pointRadius: 5,
                     pointHoverRadius: 5,
                     data: [],
@@ -48,7 +49,9 @@ window.App.Chart = function (el) {
                     borderColor: 'rgba(0,0,0,0)',
                     borderWidth: 2,
                     cornerRadius: 2,
+                    padding: 4,
                     caretPadding: 10,
+                    caretSize: 10,
                     callbacks: {
                         title: () => '',
                         label: (tooltipItem) => App.Utils.formatPrice(tooltipItem.parsed.y),
