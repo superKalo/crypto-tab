@@ -229,15 +229,15 @@ window.App.Chart.prototype.alwaysVisibleTooltipsPlugin = function () {
                  * 3. Bottom corner of the tooltip
                  */
                 if (tooltipPosition.x > chartWidth / 2) {
-                    // Arrow pointing left to the point
-                    ctx.moveTo(tooltipX + tooltipWidth - 0.1, tooltipY);
+                    // Arrow pointing right
+                    ctx.moveTo(tooltipX + tooltipWidth - 0.2, tooltipY);
                     ctx.lineTo(tooltipX + tooltipWidth + 12, tooltipPosition.y);
-                    ctx.lineTo(tooltipX + tooltipWidth - 0.1, tooltipY + tooltipHeight);
+                    ctx.lineTo(tooltipX + tooltipWidth - 0.2, tooltipY + tooltipHeight);
                 } else {
-                    // Arrow pointing right to the point
-                    ctx.moveTo(tooltipX + 0.1, tooltipY);
+                    // Arrow pointing left
+                    ctx.moveTo(tooltipX + 0.3, tooltipY);
                     ctx.lineTo(tooltipX - 12, tooltipPosition.y);
-                    ctx.lineTo(tooltipX + 0.1, tooltipY + tooltipHeight);
+                    ctx.lineTo(tooltipX + 0.3, tooltipY + tooltipHeight);
                 }
 
                 ctx.closePath();
