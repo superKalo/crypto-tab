@@ -187,6 +187,7 @@ window.App.Chart.prototype.alwaysVisibleTooltipsPlugin = function () {
                 const textMetrics = ctx.measureText(formattedValue);
                 const tooltipWidth = textMetrics.width + 7; // Plus some padding
                 const tooltipHeight = 22;
+                const cornerRadius = 0.5;
 
                 // Determine whether to place the tooltip on the left or right
                 const chartWidth = chart.width;
@@ -196,17 +197,40 @@ window.App.Chart.prototype.alwaysVisibleTooltipsPlugin = function () {
                 if (tooltipPosition.x > chartWidth / 2) {
                     // Position tooltip to the left + some padding
                     tooltipX = tooltipPosition.x - tooltipWidth - 22;
+
+                    // Draw tooltip background and arrow as a single element
+                    ctx.save();
+                    ctx.fillStyle = 'rgba(79, 120, 226, 0.85)';
+                    ctx.beginPath();
+
+                    // Draw the rounded rectangle
+                    ctx.roundRect(tooltipX, tooltipY, tooltipWidth, tooltipHeight, cornerRadius);
+
+                    // Draw the arrow pointing to the right
+                    ctx.moveTo(tooltipX + tooltipWidth, tooltipY + tooltipHeight / 2 - 11);
+                    ctx.lineTo(tooltipX + tooltipWidth + 12, tooltipPosition.y);
+                    ctx.lineTo(tooltipX + tooltipWidth, tooltipY + tooltipHeight / 2 + 11);
+                    ctx.closePath();
+                    ctx.fill();
                 } else {
                     // Position tooltip to the right + some padding
                     tooltipX = tooltipPosition.x + 22;
-                }
 
-                // Draw tooltip background
-                ctx.save();
-                ctx.fillStyle = 'rgba(79, 120, 226, 0.85)';
-                ctx.beginPath();
-                ctx.roundRect(tooltipX, tooltipY, tooltipWidth, tooltipHeight, 1);
-                ctx.fill();
+                    // Draw tooltip background and arrow as a single element
+                    ctx.save();
+                    ctx.fillStyle = 'rgba(79, 120, 226, 0.85)';
+                    ctx.beginPath();
+
+                    // Draw the rounded rectangle
+                    ctx.roundRect(tooltipX, tooltipY, tooltipWidth, tooltipHeight, cornerRadius);
+
+                    // Draw the arrow pointing to the left
+                    ctx.moveTo(tooltipX, tooltipY + tooltipHeight / 2 - 11);
+                    ctx.lineTo(tooltipX - 12, tooltipPosition.y);
+                    ctx.lineTo(tooltipX, tooltipY + tooltipHeight / 2 + 11);
+                    ctx.closePath();
+                    ctx.fill();
+                }
 
                 // Draw tooltip text
                 ctx.fillStyle = '#fff';
@@ -219,29 +243,6 @@ window.App.Chart.prototype.alwaysVisibleTooltipsPlugin = function () {
                     tooltipY + tooltipHeight / 2
                 );
 
-                // Draw tooltip arrow
-                ctx.fillStyle = 'rgba(79, 120, 226, 0.85)';
-                ctx.beginPath();
-
-                /** Positions are like this:
-                 * 1. Top corner of the tooltip
-                 * 2. Pointing to the point
-                 * 3. Bottom corner of the tooltip
-                 */
-                if (tooltipPosition.x > chartWidth / 2) {
-                    // Arrow pointing right
-                    ctx.moveTo(tooltipX + tooltipWidth - 0.2, tooltipY);
-                    ctx.lineTo(tooltipX + tooltipWidth + 12, tooltipPosition.y);
-                    ctx.lineTo(tooltipX + tooltipWidth - 0.2, tooltipY + tooltipHeight);
-                } else {
-                    // Arrow pointing left
-                    ctx.moveTo(tooltipX + 0.3, tooltipY);
-                    ctx.lineTo(tooltipX - 12, tooltipPosition.y);
-                    ctx.lineTo(tooltipX + 0.3, tooltipY + tooltipHeight);
-                }
-
-                ctx.closePath();
-                ctx.fill();
                 ctx.restore();
             });
         },
