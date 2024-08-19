@@ -5,214 +5,258 @@ window.App = window.App || {};
  *
  * {@link: https://github.com/chartjs/Chart.js}
  */
-window.App.Chart = function(el) {
+window.App.Chart = function (el) {
     this.el = el;
 
     this.config = {
         type: 'line',
-
         data: {
             labels: [],
-            datasets: [{
-                backgroundColor: '#fff',
-                pointHoverBackgroundColor: '#fff',
-                borderColor: '#B0C4F6',
-                pointBorderColor: '#4F78E2',
-                pointHoverBorderColor: '#4F78E2',
-                pointBorderWidth: 3,
-                pointRadius: 5,
-                pointHoverRadius: 5,
-                data: [],
-                borderWidth: 2,
-                fill: false,
-                // Bezier curve tension of the line
-                lineTension: 0
-            }]
+            datasets: [
+                {
+                    backgroundColor: '#fff',
+                    pointHoverBackgroundColor: '#fff',
+                    borderColor: '#B0C4F6',
+                    pointBorderColor: '#4F78E2',
+                    pointHoverBorderColor: '#4F78E2',
+                    pointBorderWidth: 3,
+                    pointHoverBorderWidth: 3,
+                    pointRadius: 5,
+                    pointHoverRadius: 5,
+                    data: [],
+                    borderWidth: 2,
+                    fill: false,
+                    tension: 0, // Bezier curve tension of the line
+                },
+            ],
         },
         options: {
             showAllTooltips: true,
+            plugins: {
+                tooltip: {
+                    multiple: true,
+                    enabled: true,
+                    mode: 'index',
+                    intersect: false,
+                    backgroundColor: 'rgba(79, 120, 226, 0.85)',
+                    titleFont: {
+                        style: 'normal',
+                        color: '#000',
+                    },
+                    bodyFont: {
+                        style: 'normal',
+                        color: '#fff',
+                        size: 12,
+                    },
+                    borderColor: 'rgba(0,0,0,0)',
+                    borderWidth: 2,
+                    cornerRadius: 1,
+                    padding: 4,
+                    caretPadding: 10,
+                    caretSize: 11,
+                    callbacks: {
+                        title: () => '',
+                        label: (tooltipItem) => App.Utils.formatPrice(tooltipItem.parsed.y),
+                    },
+                    displayColors: false,
+                },
+                legend: {
+                    display: false,
+                },
+            },
             layout: {
                 padding: {
                     left: 40,
                     right: 40,
                     top: 10,
-                    bottom: 0
-                }
+                    bottom: 0,
+                },
             },
             responsive: true,
-            tooltips: {
-                mode: 'index',
-                intersect: false,
-                backgroundColor: 'rgba(79, 120, 226, 0.85)',
-                titleFontStyle: 'normal',
-                titleFontColor: '#000',
-                bodyFontColor: '#fff',
-                bodyFontStyle: 'normal',
-                borderColor: 'rgba(0,0,0,0)',
-                borderWidth: 2,
-                cornerRadius: 2,
-                caretPadding: 10,
-                xPadding: 5,
-                yPadding: 5,
-                caretSize: 10,
-                bodyFontSize: 12,
-                displayColors: false,
-                callbacks: {
-                    title: () => '',
-                    label: tooltipItem => App.Utils.formatPrice(tooltipItem.yLabel)
-                }
-            },
-            legend: {
-                display: false
-            },
             hover: {
                 mode: 'nearest',
-                intersect: true
+                intersect: true,
             },
             scales: {
-                xAxes: [{
+                x: {
                     display: true,
-                    gridLines: {
-                        display: false
+                    grid: {
+                        display: false,
                     },
                     ticks: {
-                        fontColor: '#333'
-                    }
-                }],
-                yAxes: [{
+                        color: '#333',
+                    },
+                },
+                y: {
                     display: false,
-                    gridLines: {
-                        display: false
+                    grid: {
+                        display: false,
                     },
                     ticks: {
                         // Include a dollar sign in the ticks
-                        callback: value => `$${value}`
-                    }
-                }]
-            }
-        }
+                        callback: (value) => `$${value}`,
+                    },
+                },
+            },
+        },
     };
-}
+};
 
-window.App.Chart.prototype.isInitiated = function() {
-    return !! this.chartInstance;
-}
+window.App.Chart.prototype.isInitiated = function () {
+    return !!this.chartInstance;
+};
 
-window.App.Chart.prototype.update = function(_labels, _data) {
+window.App.Chart.prototype.update = function (_labels, _data) {
     this.chartInstance.data.labels = _labels;
     this.chartInstance.data.datasets[0].data = _data;
 
     this.chartInstance.update();
-}
+};
 
-window.App.Chart.prototype.prepareData = function(_data) {
+window.App.Chart.prototype.prepareData = function (_data) {
     let labels = [];
     let values = [];
 
-    _data.forEach( dataPoint => {
+    _data.forEach((dataPoint) => {
         labels.push(dataPoint.timestamp);
         values.push(dataPoint.value);
     });
 
     return {
         values,
-        labels
+        labels,
     };
-}
+};
 
-/**
- * Make tooltips always visible.
- * https://github.com/chartjs/Chart.js/issues/1861
- */
-window.App.Chart.prototype.alwaysVisibleTooltipsPlugin = function() {
-    Chart.pluginService.register({
-        beforeRender: function (chart) {
-            // Bug fix: Do not re-render tooltips on tooltip :hover
-            if (chart.chartDrawnIdNastyJumpBugFix === chart.config.data.labels.join('')) {
+window.App.Chart.prototype.alwaysVisibleTooltipsPlugin = function () {
+    const plugin = {
+        id: 'alwaysVisibleTooltips',
+        afterDraw: (chart) => {
+            if (!chart.config.options.showAllTooltips) {
                 return;
             }
 
-            if (chart.config.options.showAllTooltips) {
-                // create an array of tooltips
-                // we can't use the chart tooltip because there is only one tooltip per chart
-                chart.pluginTooltips = [];
-                chart.config.data.datasets.forEach(function (dataset, i) {
-                    /**
-                     * Display only the tooltips with the min and the max values.
-                     * Filter out all the rest.
-                     */
-                    const tooltipsMaxValue = Math.max(...dataset.data);
-                    const tooltipsMinValue = Math.min(...dataset.data);
+            const ctx = chart.ctx;
+            const dataset = chart.config.data.datasets[0];
+            const data = dataset.data;
+            const maxValue = Math.max(...data);
+            const minValue = Math.min(...data);
 
-                    // Mega dummy mechanism to catch duplicated values.
-                    let tooltipsMaxValueDisplayed = false;
-                    let tooltipsMinValueDisplayed = false;
+            let foundMax = false;
+            let foundMin = false;
+            const permanentTooltips = [];
 
-                    const displayTooltipsFilter = (value) => {
-                        if (value === tooltipsMaxValue && !tooltipsMaxValueDisplayed) {
-                            tooltipsMaxValueDisplayed = true;
-                            return true;
-                        } else if (value === tooltipsMinValue && !tooltipsMinValueDisplayed) {
-                            tooltipsMinValueDisplayed = true;
-                            return true;
-                        }
+            // Find min and max values
+            chart.config.data.datasets.forEach((dataset, datasetIndex) => {
+                const meta = chart.getDatasetMeta(datasetIndex);
 
-                        return false;
-                    };
+                meta.data.forEach((element, index) => {
+                    const value = data[index];
 
-                    chart.getDatasetMeta(i).data.forEach(function (sector, j) {
-                        const toolTipValue = dataset.data[j];
+                    if (value === maxValue && !foundMax) {
+                        foundMax = true;
+                        permanentTooltips.push({
+                            datasetIndex,
+                            index,
+                            element,
+                        });
+                    } else if (value === minValue && !foundMin) {
+                        foundMin = true;
+                        permanentTooltips.push({
+                            datasetIndex,
+                            index,
+                            element,
+                        });
+                    }
 
-                        if (displayTooltipsFilter(toolTipValue)) {
-                            chart.pluginTooltips.push(new Chart.Tooltip({
-                                _chart: chart.chart,
-                                _chartInstance: chart,
-                                _data: chart.data,
-                                _options: chart.options.tooltips,
-                                _active: [sector]
-                            }, chart));
-                        }
-                    });
-
-                    chart.chartDrawnIdNastyJumpBugFix = chart.config.data.labels.join('');
+                    // Stop checking if both min and max are found
+                    if (foundMax && foundMin) {
+                        return;
+                    }
                 });
+            });
 
-                // turn off normal tooltips
-                chart.options.tooltips.enabled = false;
-            }
+            // Draw permanent tooltips
+            permanentTooltips.forEach(({ datasetIndex, index, element }) => {
+                const tooltipPosition = element.tooltipPosition();
+                const value = chart.config.data.datasets[datasetIndex].data[index];
+                const formattedValue = App.Utils.formatPrice(value);
+
+                // Calculate tooltip dimensions
+                ctx.font = '12px Arial';
+                const textMetrics = ctx.measureText(formattedValue);
+                const tooltipWidth = textMetrics.width + 7; // Plus some padding
+                const tooltipHeight = 22;
+                const cornerRadius = 0.5;
+
+                // Determine whether to place the tooltip on the left or right
+                const chartWidth = chart.width;
+                let tooltipX;
+                const tooltipY = tooltipPosition.y - tooltipHeight / 2;
+
+                if (tooltipPosition.x > chartWidth / 2) {
+                    // Position tooltip to the left + some padding
+                    tooltipX = tooltipPosition.x - tooltipWidth - 22;
+
+                    // Draw tooltip background and arrow as a single element
+                    ctx.save();
+                    ctx.fillStyle = 'rgba(79, 120, 226, 0.85)';
+                    ctx.beginPath();
+
+                    // Draw the rounded rectangle
+                    ctx.roundRect(tooltipX, tooltipY, tooltipWidth, tooltipHeight, cornerRadius);
+
+                    // Draw the arrow pointing to the right
+                    ctx.moveTo(tooltipX + tooltipWidth, tooltipY + tooltipHeight / 2 - 11);
+                    ctx.lineTo(tooltipX + tooltipWidth + 12, tooltipPosition.y);
+                    ctx.lineTo(tooltipX + tooltipWidth, tooltipY + tooltipHeight / 2 + 11);
+                    ctx.closePath();
+                    ctx.fill();
+                } else {
+                    // Position tooltip to the right + some padding
+                    tooltipX = tooltipPosition.x + 22;
+
+                    // Draw tooltip background and arrow as a single element
+                    ctx.save();
+                    ctx.fillStyle = 'rgba(79, 120, 226, 0.85)';
+                    ctx.beginPath();
+
+                    // Draw the rounded rectangle
+                    ctx.roundRect(tooltipX, tooltipY, tooltipWidth, tooltipHeight, cornerRadius);
+
+                    // Draw the arrow pointing to the left
+                    ctx.moveTo(tooltipX, tooltipY + tooltipHeight / 2 - 11);
+                    ctx.lineTo(tooltipX - 12, tooltipPosition.y);
+                    ctx.lineTo(tooltipX, tooltipY + tooltipHeight / 2 + 11);
+                    ctx.closePath();
+                    ctx.fill();
+                }
+
+                // Draw tooltip text
+                ctx.fillStyle = '#fff';
+                ctx.font = '12px Arial';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(
+                    formattedValue,
+                    tooltipX + tooltipWidth / 2,
+                    tooltipY + tooltipHeight / 2
+                );
+
+                ctx.restore();
+            });
         },
-        afterDraw: function (chart, easing) {
-            if (chart.config.options.showAllTooltips) {
-                // we don't want the permanent tooltips to animate, so don't do anything till the animation runs atleast once
-                // if (!chart.allTooltipsOnce) {
-                //     if (easing !== 1)
-                //         return;
-                //     chart.allTooltipsOnce = true;
-                // }
+    };
 
-                // turn on tooltips
-                chart.options.tooltips.enabled = true;
-
-                Chart.helpers.each(chart.pluginTooltips, function (tooltip, i) {
-                    tooltip.initialize();
-                    tooltip.update();
-                    // we don't actually need this since we are not animating tooltips
-                    tooltip.pivot();
-                    tooltip.transition(easing).draw();
-                });
-                chart.options.tooltips.enabled = true;
-            }
-        }
-    });
+    Chart.register(plugin);
 };
 
-window.App.Chart.prototype.init = function(_data) {
+window.App.Chart.prototype.init = function (_data) {
     const { labels, values } = this.prepareData(_data);
 
     // If already initiated - do not init twice! Update data only.
     if (this.isInitiated()) {
         this.update(labels, values);
-
         return;
     }
 
@@ -221,14 +265,14 @@ window.App.Chart.prototype.init = function(_data) {
     this.config.data.labels = labels;
     this.config.data.datasets[0].data = values;
 
-    var ctx = this.el.getContext('2d');
+    const ctx = this.el.getContext('2d');
     this.chartInstance = new Chart(ctx, this.config);
-}
+};
 
-window.App.Chart.prototype.destroy = function() {
-    if (! this.isInitiated()) {
+window.App.Chart.prototype.destroy = function () {
+    if (!this.isInitiated()) {
         return;
     }
 
     this.chartInstance.destroy();
-}
+};
