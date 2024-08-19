@@ -68,7 +68,7 @@ window.App.Chart = function (el) {
                 padding: {
                     left: 40,
                     right: 40,
-                    top: 10,
+                    top: 20,
                     bottom: 0,
                 },
             },
@@ -84,7 +84,7 @@ window.App.Chart = function (el) {
                         display: false,
                     },
                     ticks: {
-                        color: '#333',
+                        color: '#777',
                     },
                 },
                 y: {
