@@ -1,7 +1,7 @@
 {
   "private": true,
   "name": "crypto-tab",
-  "version": "1.0.4",
+  "version": "1.1.0",
   "scripts": {
     "build:extension": "ENV='extension' gulp build",
     "build:extension:watch": "ENV='extension' gulp build:watch",
@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "axios": "0.16.2",
-    "chart.js": "2.6.0",
+    "chart.js": "4.4.3",
     "dayjs": "1.11.11",
     "super-repo": "2.1.4"
   },
