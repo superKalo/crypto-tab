@@ -7,7 +7,7 @@ const { ENV } = process.env;
 const distPath = `./dist/${ENV}/`;
 
 const filesArr = ["./src/js/**/*", "./src/css/**/*"];
-if (ENV === "extension") {
+if (ENV.includes("extension")) {
   filesArr.push("./src/manifest.json", "./src/icons/**/*");
 }
 
@@ -30,7 +30,7 @@ gulp.task("copy-favicons", function () {
 });
 
 // Preprocess HTML files by replacing certain patterns based on the environment
-gulp.task("preprocess", function () {
+gulp.task("preprocess-index", function () {
   return gulp
     .src("./src/index.html")
     .pipe(
@@ -38,12 +38,12 @@ gulp.task("preprocess", function () {
         patterns: [
           {
             match: "title",
-            replacement: ENV === "extension" ? "New Tab" : "Crypto Tab",
+            replacement: ENV.includes("extension") ? "New Tab" : "Crypto Tab",
           },
           {
             match: "favicons",
             replacement:
-              ENV === "extension"
+              ENV.includes("extension")
                 ? ""
                 : `<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
                         <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
@@ -55,7 +55,7 @@ gulp.task("preprocess", function () {
           {
             match: "socialMediaTags",
             replacement:
-              ENV === "extension"
+              ENV.includes("extension")
                 ? ""
                 : `<!-- Schema.org for Google -->
                         <meta itemprop="name" content="Crypto Tab">
@@ -81,10 +81,30 @@ gulp.task("preprocess", function () {
     .pipe(gulp.dest(distPath));
 });
 
+// Preprocess manifest.json by replacing certain patterns based on the environment
+gulp.task("preprocess-manifest", function () {
+  return gulp
+    .src("./src/manifest.json")
+    .pipe(
+      replace({
+        patterns: [
+          {
+            match: "background",
+            // Firefox doesn't yet support service workers, but they have a concept
+            // for background scripts that can be used in a similar way.
+            replacement: ENV === 'extension-webkit' ?
+              { "service_worker": "js/background.js" } : { "scripts": ["js/background.js"] }
+          },
+        ],
+      })
+    )
+    .pipe(gulp.dest(distPath));
+});
+
 // Set the environment configuration by copying the appropriate env file to the dist directory
 gulp.task("set-env", function () {
   return gulp
-    .src(`./src/env/${ENV}.env.js`)
+    .src(`./src/env/${ENV.includes('extension') ? 'extension' : 'website'}.env.js`)
     .pipe(rename("env.js"))
     .pipe(gulp.dest(`${distPath}/env/`));
 });
@@ -107,7 +127,8 @@ gulp.task("copy-npm-dependencies", function () {
 
 // Define the build tasks based on the environment
 const buildTasks = gulp.series(
-  gulp.parallel("copy-files", "preprocess", "copy-npm-dependencies", "set-env"),
+  gulp.parallel("copy-files", "preprocess-index", "copy-npm-dependencies", "set-env"),
+  ENV.includes("extension") ? "preprocess-manifest" : (done) => done(),
   ENV === "website" ? "copy-favicons" : (done) => done()
 );
 
@@ -116,5 +137,5 @@ gulp.task("build", buildTasks);
 
 // Watch for changes in the src directory and rerun relevant tasks
 gulp.task("build:watch", function () {
-  gulp.watch("./src/**/*", gulp.series("copy-files", "preprocess"));
+  gulp.watch("./src/**/*", gulp.series("copy-files", "preprocess-index"));
 });
