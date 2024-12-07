@@ -3,8 +3,10 @@
   "name": "crypto-tab",
   "version": "1.1.0",
   "scripts": {
-    "build:extension": "ENV='extension' gulp build",
-    "build:extension:watch": "ENV='extension' gulp build:watch",
+    "build:extension:webkit": "ENV='extension-webkit' gulp build",
+    "build:extension:gecko": "ENV='extension-gecko' gulp build",
+    "build:extension:watch:webkit": "ENV='extension-webkit' gulp build:watch",
+    "build:extension:watch:gecko": "ENV='extension-gecko' gulp build:watch",
     "build:website": "ENV='website' gulp build",
     "build:website:watch": "ENV='website' gulp build:watch"
   },
