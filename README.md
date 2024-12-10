@@ -23,12 +23,24 @@ To install the project, first make sure you have NodeJS and NPM installed. Prefe
 
 1. To build the extension distribution files, run:
     ```bash
-    npm run build:extension
+    npm run build:extension:webkit
+    ```
+
+    or
+
+    ```bash
+    npm run build:extension:gecko
     ```
 
 1. To build the extension distribution files and re-build (watch) in case of changes, run:
     ```bash
-    npm run build:extension:watch
+    npm run build:extension:watch:webkit
+    ```
+
+    or
+
+    ```bash
+    npm run build:extension:watch:gecko
     ```
 
 1. To build the website distribution files, run:
@@ -38,7 +50,13 @@ To install the project, first make sure you have NodeJS and NPM installed. Prefe
 
 1. To build the website distribution files and re-build (watch) in case of changes, run:
     ```bash
-    npm run build:extension:watch
+    npm run build:extension:watch:webkit
+    ```
+
+    or
+
+    ```bash
+    npm run build:extension:watch:gecko
     ```
 
 Finally, load the extension:
@@ -46,11 +64,11 @@ Finally, load the extension:
 - In Chrome:
     - Navigate to chrome://extensions
     - Select "Developer Mode" and then click "Load unpacked extension..."
-    - From the file browser, choose the `dist/extension/` directory
+    - From the file browser, choose the `dist/extension-webkit/` directory
 
 - In Firefox:
     - Navigate to `about:debugging`
-    - Click "Load Temporary Add-on" and from the file browser, choose the `manifest.json` file in the `dist/extension/` directory
+    - Click "Load Temporary Add-on" and from the file browser, choose the `manifest.json` file in the `dist/extension-gecko/` directory
 
 # 🚔 License
 

@@ -187,7 +187,7 @@ window.App.Crypto = {
 
     getCryptoDataFromBackground(period, cryptoType) {
         return new Promise((resolve, reject) => {
-            chrome.runtime.sendMessage(
+            window.browser.runtime.sendMessage(
                 { type: 'getCryptoPrice', period: period, cryptoType: cryptoType },
                 (response) => {
                     if (response && !response.error) {
@@ -239,7 +239,7 @@ window.App.Crypto = {
             case this.PERIODS.ONE_HOUR:
             case this.PERIODS.ONE_YEAR:
             case this.PERIODS.ALL: {
-                this.$change.innerHTML = '';
+                this.$change.textContent = '';
                 return;
             }
         }
@@ -257,8 +257,17 @@ window.App.Crypto = {
             return isChangeZero ? '' : isChangePositive ? 'positive' : 'negative';
         };
 
-        this.$change.innerHTML = ` (<span class="${getVisualClass(changePercent)}">${getSignedPercentage(changePercent)}</span>
-        ${periodLabel})`;
+        // Clear existing content
+        this.$change.textContent = '';
+
+        // Create and append new content safely
+        const changeElement = document.createElement('span');
+        changeElement.className = getVisualClass(changePercent);
+        changeElement.textContent = getSignedPercentage(changePercent);
+
+        this.$change.appendChild(document.createTextNode(' ('));
+        this.$change.appendChild(changeElement);
+        this.$change.appendChild(document.createTextNode(` ${periodLabel})`));
     },
 
     $lastUpdated: document.querySelector('#last-updated'),
@@ -266,11 +275,23 @@ window.App.Crypto = {
         const cryptoType = this.currentCrypto;
         this.repositories[cryptoType]['NOW'].getDataUpToDateStatus().then((info) => {
             const prettyLastUpdatedTime = dayjs(info.lastFetched).fromNow();
-            this.$lastUpdated.innerHTML =
+
+            // Clear existing content
+            this.$lastUpdated.textContent = '';
+
+            const lastUpdatedSpan = document.createElement('span');
+            lastUpdatedSpan.className =
+                this.isLocalChartDataOld || this.isLocalNowDataOld ? 'negative' : 'positive';
+            lastUpdatedSpan.textContent = prettyLastUpdatedTime;
+
+            const failureMessage =
                 this.isLocalChartDataOld || this.isLocalNowDataOld
                     ? `<span class="negative">${prettyLastUpdatedTime}</span>.
                   Data request <span class="negative">failed</span>. Refresh the page to try again.`
                     : `<span class="positive">${prettyLastUpdatedTime}</span>.`;
+
+            this.$lastUpdated.appendChild(lastUpdatedSpan);
+            this.$lastUpdated.appendChild(document.createTextNode(failureMessage));
 
             this.$lastUpdated.setAttribute('data-tooltip', dayjs(info.lastFetched).calendar());
         });

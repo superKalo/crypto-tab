@@ -15,13 +15,16 @@ window.App.apiCecoAdapter = {
 
     getBitcoinRatesForPeriod: function (period) {
         return new Promise((resolve, reject) => {
-            chrome.runtime.sendMessage({ type: 'getBitcoinPrice', period: period }, (response) => {
-                if (response && !response.error) {
-                    resolve(response.data);
-                } else {
-                    reject(response.error || 'Failed to retrieve Bitcoin price data');
+            window.browser.runtime.sendMessage(
+                { type: 'getBitcoinPrice', period: period },
+                (response) => {
+                    if (response && !response.error) {
+                        resolve(response.data);
+                    } else {
+                        reject(response.error || 'Failed to retrieve Bitcoin price data');
+                    }
                 }
-            });
+            );
         });
     },
 
