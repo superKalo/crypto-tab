@@ -286,9 +286,8 @@ window.App.Crypto = {
 
             const failureMessage =
                 this.isLocalChartDataOld || this.isLocalNowDataOld
-                    ? `<span class="negative">${prettyLastUpdatedTime}</span>.
-                  Data request <span class="negative">failed</span>. Refresh the page to try again.`
-                    : `<span class="positive">${prettyLastUpdatedTime}</span>.`;
+                    ? `. Data request failed. Refresh the page to try again.`
+                    : `.`;
 
             this.$lastUpdated.appendChild(lastUpdatedSpan);
             this.$lastUpdated.appendChild(document.createTextNode(failureMessage));
