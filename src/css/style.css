@@ -565,3 +565,75 @@ small {
 .mt { margin-top: 15px; }
 .mt\+ { margin-top: 30px; }
 .mt\+\+ { margin-top: 50px; }
+
+
+/* Settings Panel */
+.settings {
+    position: fixed;
+    bottom: 40px;
+    right: 10px;
+    background: #ffffff;
+    border-radius: 10px;
+    border: 1px solid #ddd;
+    padding: 20px;
+    width: 320px;
+    z-index: 1000;
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+}
+.settings.hidden {
+    display: none;
+}
+.settings h2 {
+    font-size: 18px;
+    margin-bottom: 10px;
+    color: #333;
+}
+.settings label {
+    display: block;
+    margin: 10px 0 5px;
+    font-weight: bold;
+    color: #555;
+}
+.settings input[type='color'],
+.settings select {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+}
+.close-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    cursor: pointer;
+    font-size: 20px;
+    color: #333;
+    border: none;
+    background-color: transparent;
+}
+
+/* Customize Button */
+.toggle-settings {
+    position: fixed;
+    bottom: 10px;
+    right: 10px;
+    z-index: 1000;
+    color: #000;
+    padding: 5px;
+    font-size: 14px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    opacity: 0.7;
+}
+.toggle-settings svg {
+    width: 16px;
+    height: 16px;
+    margin-right: 5px;
+    fill: #000;
+}
