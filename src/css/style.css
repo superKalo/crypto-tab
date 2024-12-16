@@ -585,26 +585,50 @@ small {
 .settings.hidden {
     display: none;
 }
+.settings-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 20px;
+}
 .settings h2 {
     font-size: 18px;
     margin-bottom: 10px;
     color: #333;
+    font-weight: bold;
 }
 .settings label {
     display: block;
-    margin: 10px 0 5px;
     font-weight: bold;
     color: #555;
 }
-.settings input[type='color'],
 .settings select {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
     width: 100%;
-    padding: 8px;
-    margin-bottom: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
+    padding: 8px 12px;
     font-size: 14px;
+    color: #555;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    outline: none;
 }
+.settings select:hover {
+    background-color: #fff;
+    border-color: #bbb;
+}
+.settings-container {
+    position: relative;
+}
+.settings select {
+    padding-right: 30px;
+}
+
 .close-button {
     position: absolute;
     top: 10px;
@@ -616,7 +640,6 @@ small {
     background-color: transparent;
 }
 
-/* Customize Button */
 .toggle-settings {
     position: fixed;
     bottom: 10px;
@@ -636,4 +659,93 @@ small {
     height: 16px;
     margin-right: 5px;
     fill: #000;
+}
+
+.theme-toggle {
+    margin: 10px 0;
+}
+.toggle-container {
+    display: flex;
+}
+
+.toggle {
+    display: flex;
+    background: #e0e0e0;
+    border-radius: 50px;
+    width: 120px;
+    height: 35px;
+    position: relative;
+    font-family: Arial, sans-serif;
+}
+.toggle-option {
+    flex: 1;
+    text-align: center;
+    line-height: 35px;
+    font-weight: bold;
+    color: #888;
+    cursor: pointer;
+    z-index: 1;
+    transition: color 0.3s;
+}
+.toggle-option.active {
+    color: #333;
+}
+.toggle.dark-active .toggle-option {
+    color: #bbb;
+}
+.toggle.dark-active .toggle-option.active {
+    color: #fff;
+}
+.toggle::before {
+    content: '';
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 56px;
+    height: 29px;
+    background: #fff;
+    border-radius: 50px;
+    transition:
+        transform 0.3s,
+        background-color 0.3s;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+.toggle.dark-active::before {
+    transform: translateX(60px);
+    background: #333;
+}
+
+.color-picker-row {
+    display: flex;
+    align-items: center;
+}
+.color-picker-row input[type='color'] {
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+    border-radius: 50%;
+    border: none;
+    background: none;
+    box-shadow:
+        0 4px 6px rgba(0, 0, 0, 0.2),
+        inset 0 2px 4px rgba(255, 255, 255, 0.4);
+    -webkit-appearance: none;
+    appearance: none;
+}
+.color-picker-row input[type='color']:focus {
+    outline: none;
+}
+.color-picker-row input[type='color']::-webkit-color-swatch-wrapper {
+    padding: 0;
+}
+.color-picker-row input[type='color']::-webkit-color-swatch {
+    border: none;
+    border-radius: 50%;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+.arrow-icon {
+    transition: fill 0.3s ease;
+    margin: 0 10px;
+    cursor: default;
+    fill: #888;
 }
