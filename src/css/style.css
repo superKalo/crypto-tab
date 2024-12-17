@@ -232,7 +232,7 @@ small {
     min-width: 120px;
     background-color: var(--theme-color);
     background-color: rgba(79, 120, 226, 0.85);
-    color: var(--background-color);
+    color: #fff;
     content: attr(data-tooltip);
     font-size: 12px;
     line-height: 1.2;
