@@ -56,10 +56,10 @@ small {
 }
 
 .positive {
-    color: #61ca00;
+    color: var(--color-up, #61ca00);
 }
 .negative {
-    color: #ff4949;
+    color: var(--color-down, #ff4949);
 }
 
 .chart-container {

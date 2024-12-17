@@ -35,13 +35,15 @@ window.App.Settings = (function () {
         });
 
         document.getElementById('color-up').addEventListener('input', (e) => {
-            updateArrowColor('arrow-up', e.target.value);
-            saveSetting('colorup', e.target.value);
+            const color = e.target.value;
+            document.documentElement.style.setProperty('--color-up', color);
+            saveSetting('colorup', color);
         });
 
         document.getElementById('color-down').addEventListener('input', (e) => {
-            updateArrowColor('arrow-down', e.target.value);
-            saveSetting('colordown', e.target.value);
+            const color = e.target.value;
+            document.documentElement.style.setProperty('--color-down', color);
+            saveSetting('colordown', color);
         });
 
         loadSettings();
@@ -98,8 +100,12 @@ window.App.Settings = (function () {
         const upColor = localStorage.getItem('colorup') || '#61ca00';
         const downColor = localStorage.getItem('colordown') || '#ff4949';
 
+        document.documentElement.style.setProperty('--color-up', upColor);
+        document.documentElement.style.setProperty('--color-down', downColor);
+
         document.getElementById('color-up').value = upColor;
         document.getElementById('color-down').value = downColor;
+
         updateArrowColor('arrow-up', upColor);
         updateArrowColor('arrow-down', downColor);
 
