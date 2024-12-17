@@ -26,7 +26,12 @@ window.App.Settings = (function () {
         });
 
         document.getElementById('clock-format').addEventListener('change', (e) => {
-            saveSetting('clockFormat', e.target.value);
+            const newFormat = e.target.value;
+            localStorage.setItem('clockFormat', newFormat);
+
+            if (window.App.ClockInstance) {
+                window.App.ClockInstance.updateFormat(newFormat);
+            }
         });
 
         document.getElementById('color-up').addEventListener('input', (e) => {
