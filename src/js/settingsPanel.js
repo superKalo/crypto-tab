@@ -37,12 +37,14 @@ window.App.Settings = (function () {
         document.getElementById('color-up').addEventListener('input', (e) => {
             const color = e.target.value;
             document.documentElement.style.setProperty('--color-up', color);
+            updateArrowColor('arrow-up', color);
             saveSetting('colorup', color);
         });
 
         document.getElementById('color-down').addEventListener('input', (e) => {
             const color = e.target.value;
             document.documentElement.style.setProperty('--color-down', color);
+            updateArrowColor('arrow-down', color);
             saveSetting('colordown', color);
         });
 
@@ -123,7 +125,12 @@ window.App.Settings = (function () {
     function updateArrowColor(arrowId, color) {
         const arrow = document.getElementById(arrowId);
         if (arrow) {
-            arrow.querySelector('path').setAttribute('fill', color);
+            arrow.style.fill = color;
+
+            const path = arrow.querySelector('path');
+            if (path) {
+                path.setAttribute('fill', color);
+            }
         }
     }
 
