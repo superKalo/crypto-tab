@@ -1,6 +1,6 @@
 window.App = window.App || {};
 
-window.App.Settings = (function () {
+window.App.SettingsPanel = (function () {
     let settingsPanel;
     let toggleButton;
     let closeButton;
@@ -140,5 +140,5 @@ window.App.Settings = (function () {
 })();
 
 document.addEventListener('DOMContentLoaded', () => {
-    window.App.Settings.init();
+    window.App.SettingsPanel.init();
 });
