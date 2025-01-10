@@ -6,6 +6,10 @@ window.App.SettingsPanel = (function () {
     let closeButton;
     let themeToggle;
     let themeOptions;
+    let resetButton;
+
+    const DEFAULT_UP_COLOR = '#61ca00';
+    const DEFAULT_DOWN_COLOR = '#ff4949';
 
     function init() {
         settingsPanel = document.getElementById('settings-panel');
@@ -13,6 +17,7 @@ window.App.SettingsPanel = (function () {
         closeButton = document.getElementById('close-settings');
         themeToggle = document.getElementById('theme-toggle');
         themeOptions = document.querySelectorAll('.toggle-option');
+        resetButton = document.getElementById('reset-colors');
 
         toggleButton.addEventListener('click', togglePanelVisibility);
         closeButton.addEventListener('click', hidePanel);
@@ -39,6 +44,7 @@ window.App.SettingsPanel = (function () {
             document.documentElement.style.setProperty('--color-up', color);
             updateArrowColor('arrow-up', color);
             saveSetting('colorup', color);
+            toggleResetButtonVisibility();
         });
 
         document.getElementById('color-down').addEventListener('input', (e) => {
@@ -46,9 +52,16 @@ window.App.SettingsPanel = (function () {
             document.documentElement.style.setProperty('--color-down', color);
             updateArrowColor('arrow-down', color);
             saveSetting('colordown', color);
+            toggleResetButtonVisibility();
+        });
+
+        document.getElementById('reset-colors').addEventListener('click', () => {
+            resetColors();
+            toggleResetButtonVisibility();
         });
 
         loadSettings();
+        toggleResetButtonVisibility();
     }
 
     function togglePanelVisibility() {
@@ -76,6 +89,31 @@ window.App.SettingsPanel = (function () {
         themeToggle.setAttribute('data-active', theme);
 
         saveSetting('theme', theme);
+    }
+
+    function resetColors() {
+        document.documentElement.style.setProperty('--color-up', DEFAULT_UP_COLOR);
+        document.documentElement.style.setProperty('--color-down', DEFAULT_DOWN_COLOR);
+
+        document.getElementById('color-up').value = DEFAULT_UP_COLOR;
+        document.getElementById('color-down').value = DEFAULT_DOWN_COLOR;
+
+        updateArrowColor('arrow-up', DEFAULT_UP_COLOR);
+        updateArrowColor('arrow-down', DEFAULT_DOWN_COLOR);
+
+        saveSetting('colorup', DEFAULT_UP_COLOR);
+        saveSetting('colordown', DEFAULT_DOWN_COLOR);
+    }
+
+    function toggleResetButtonVisibility() {
+        const upColor = document.getElementById('color-up').value;
+        const downColor = document.getElementById('color-down').value;
+
+        if (upColor !== DEFAULT_UP_COLOR || downColor !== DEFAULT_DOWN_COLOR) {
+            resetButton.style.display = 'inline-block';
+        } else {
+            resetButton.style.display = 'none';
+        }
     }
 
     function saveSetting(key, value) {

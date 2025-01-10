@@ -781,3 +781,8 @@ small {
     cursor: default;
     fill: var(--toggle-inactive-color);
 }
+.reset-colors {
+    font-weight: bold;
+    margin: 0 10px;
+    padding: 0;
+}
