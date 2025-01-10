@@ -691,7 +691,7 @@ small {
     display: flex;
     background: var(--toggle-bg);
     border-radius: 50px;
-    width: 120px;
+    width: 200px;
     height: 35px;
     position: relative;
     font-family: Arial, sans-serif;
@@ -720,7 +720,7 @@ small {
     position: absolute;
     top: 3px;
     left: 3px;
-    width: 56px;
+    width: 66px;
     height: 29px;
     background: var(--background-color);
     border-radius: 50px;
@@ -729,9 +729,14 @@ small {
         background-color 0.3s;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
-.toggle.dark-active::before {
-    transform: translateX(60px);
-    background: var(--text-color);
+.toggle[data-active='light']::before {
+    transform: translateX(0);
+}
+.toggle[data-active='system']::before {
+    transform: translateX(64px);
+}
+.toggle[data-active='dark']::before {
+    transform: translateX(129px);
 }
 
 .color-picker-row {
@@ -749,7 +754,7 @@ small {
         0 4px 6px rgba(0, 0, 0, 0.2),
         inset 0 2px 4px rgba(255, 255, 255, 0.4);
     -webkit-appearance: none;
-    -moz-appearance: none; 
+    -moz-appearance: none;
     appearance: none;
 }
 .color-picker-row input[type='color']:focus {

@@ -13,6 +13,8 @@ window.App.ThemeManager = (function () {
         themeOptions.forEach((option) => {
             option.addEventListener('click', handleThemeToggle);
         });
+
+        listenToSystemThemeChange();
     }
 
     function handleThemeToggle(event) {
@@ -32,15 +34,43 @@ window.App.ThemeManager = (function () {
                 option.classList.add('active');
             }
         });
+
+        const themeToggle = document.getElementById('theme-toggle');
+        if (themeToggle) {
+            themeToggle.setAttribute('data-active', theme);
+        }
     }
 
     function applyTheme(theme) {
         const body = document.body;
-        if (theme === 'dark') {
+
+        if (theme === 'system') {
+            const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+            if (systemPrefersDark) {
+                body.classList.add('dark-theme');
+                body.classList.remove('light-theme');
+            } else {
+                body.classList.add('light-theme');
+                body.classList.remove('dark-theme');
+            }
+        } else if (theme === 'dark') {
             body.classList.add('dark-theme');
+            body.classList.remove('light-theme');
         } else {
+            body.classList.add('light-theme');
             body.classList.remove('dark-theme');
         }
+    }
+
+    function listenToSystemThemeChange() {
+        const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+        mediaQuery.addEventListener('change', () => {
+            const savedTheme = getSavedTheme();
+            if (savedTheme === 'system') {
+                applyTheme('system');
+            }
+        });
     }
 
     function getSavedTheme() {
@@ -53,6 +83,7 @@ window.App.ThemeManager = (function () {
 
     return {
         init,
+        applyTheme,
     };
 })();
 

@@ -65,15 +65,17 @@ window.App.SettingsPanel = (function () {
         themeOptions.forEach((option) => option.classList.remove('active'));
         selectedOption.classList.add('active');
 
-        if (selectedOption.dataset.theme === 'dark') {
-            themeToggle.classList.add('dark-active');
+        const theme = selectedOption.dataset.theme;
+
+        if (theme === 'dark') {
             document.body.classList.add('dark-theme');
         } else {
-            themeToggle.classList.remove('dark-active');
             document.body.classList.remove('dark-theme');
         }
 
-        saveSetting('theme', selectedOption.dataset.theme);
+        themeToggle.setAttribute('data-active', theme);
+
+        saveSetting('theme', theme);
     }
 
     function saveSetting(key, value) {
@@ -81,23 +83,14 @@ window.App.SettingsPanel = (function () {
     }
 
     function loadSettings() {
-        const savedTheme = localStorage.getItem('theme');
-        if (savedTheme) {
-            themeOptions.forEach((option) => option.classList.remove('active'));
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        themeToggle.setAttribute('data-active', savedTheme);
 
-            themeOptions.forEach((option) => {
-                if (option.dataset.theme === savedTheme) {
-                    option.classList.add('active');
-                    if (savedTheme === 'dark') {
-                        themeToggle.classList.add('dark-active');
-                        document.body.classList.add('dark-theme');
-                    } else {
-                        themeToggle.classList.remove('dark-active');
-                        document.body.classList.remove('dark-theme');
-                    }
-                }
-            });
-        }
+        themeOptions.forEach((option) => {
+            option.classList.toggle('active', option.dataset.theme === savedTheme);
+        });
+
+        window.App.ThemeManager.applyTheme(savedTheme);
 
         const upColor = localStorage.getItem('colorup') || '#61ca00';
         const downColor = localStorage.getItem('colordown') || '#ff4949';
