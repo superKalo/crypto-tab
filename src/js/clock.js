@@ -30,14 +30,23 @@ App.Clock.prototype.setTime = function () {
         h = h % 12 || 12; // Convert "0" hour to "12"
     }
 
-    const currentTime =
-        this.format === '24h'
-            ? `${h}:${m}`
-            : `${h}:${m}<span class="clock-period">${period}</span>`;
+    const timeWithoutPeriod = `${h}:${m}`; // Time without AM/PM
+    if (timeWithoutPeriod !== this.time) {
+        this.time = timeWithoutPeriod;
 
-    if (currentTime !== this.time) {
-        this.time = currentTime;
-        this.clockElement.innerHTML = currentTime;
+        // Update the clock's main time
+        const timeElement = document.getElementById('clock-time');
+        timeElement.innerText = timeWithoutPeriod;
+
+        // Update the period if in 12h format
+        const periodElement = document.getElementById('clock-period');
+        if (this.format === '12h') {
+            periodElement.innerText = period;
+            periodElement.style.display = '';
+        } else {
+            periodElement.innerText = '';
+            periodElement.style.display = 'none';
+        }
     }
 };
 
