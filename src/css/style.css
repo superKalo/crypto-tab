@@ -595,7 +595,6 @@ small {
     background: var(--background-color);
     border-radius: 10px;
     border: 1px solid var(--border-color);
-    padding: 20px;
     width: 320px;
     z-index: 1000;
     box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
@@ -605,16 +604,29 @@ small {
 .settings.hidden {
     display: none;
 }
+.settings-header {
+    border-bottom: 1px solid var(--border-color);
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.settings-title {
+    font-size: 18px;
+    font-weight: bold;
+    color: var(--text-color);
+    margin: 0;
+}
+.settings-body {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
 .settings-container {
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    margin-top: 20px;
-}
-.settings h2 {
-    font-size: 18px;
-    margin-bottom: 10px;
-    font-weight: bold;
+    gap: 12px;
 }
 .settings label {
     display: block;
@@ -649,11 +661,8 @@ small {
 }
 
 .close-button {
-    position: absolute;
-    top: 10px;
-    right: 10px;
     cursor: pointer;
-    font-size: 20px;
+    font-size: 22px;
     color: var(--toggle-active-color);
     border: none;
     background-color: transparent;
@@ -742,47 +751,90 @@ small {
 .color-picker-row {
     display: flex;
     align-items: center;
+    justify-content: space-between;
+    gap: 20px;
 }
-.color-picker-row input[type='color'] {
-    width: 40px;
-    height: 40px;
+.color-picker {
+    width: 50%;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+.color-picker-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: var(--text-color-secondary);
+}
+.color-picker__label span {
+    font-size: 14px;
+}
+.circle-icon {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background-color: var(--toggle-inactive-color);
+}
+.color-input-wrapper {
+    position: relative;
+    display: inline-block;
+}
+.color-button {
+    width: 100%;
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    background: var(--input-bg);
     cursor: pointer;
-    border-radius: 50%;
-    border: none;
-    background: none;
-    box-shadow:
-        0 4px 6px rgba(0, 0, 0, 0.2),
-        inset 0 2px 4px rgba(255, 255, 255, 0.4);
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
+    font-size: 14px;
+    color: var(--text-color-secondary);
 }
-.color-picker-row input[type='color']:focus {
-    outline: none;
+.color-input-wrapper input[type='color'] {
+    position: absolute;
+    left: 0;
+    top: 0;
+    opacity: 0;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
 }
-.color-picker-row input[type='color']::-webkit-color-swatch-wrapper {
-    padding: 0;
-}
-.color-picker-row input[type='color']::-webkit-color-swatch {
-    border: none;
-    border-radius: 50%;
-    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-.color-picker-row input[type='color']::-moz-color-swatch {
-    border: none;
-    border-radius: 50%;
-    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
-    padding: 0;
-    background-color: transparent;
-}
-.arrow-icon {
-    transition: fill 0.3s ease;
-    margin: 0 10px;
-    cursor: default;
-    fill: var(--toggle-inactive-color);
+.settings-footer {
+    border-top: 1px solid var(--border-color);
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
 .reset-colors {
+    border: 1px solid var(--border-color);
+    background: var(--background-color);
+    color: var(--text-color);
     font-weight: bold;
-    margin: 0 10px;
-    padding: 0;
+    font-size: 14px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+.reset-colors:hover {
+    background-color: var(--toggle-bg);
+    border-color: var(--toggle-inactive-color);
+    text-decoration: none;
+}
+.apply-button {
+    border: 1px solid var(--text-color);
+    background: var(--text-color);
+    color: var(--background-color);
+    font-weight: bold;
+    font-size: 14px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+.apply-button:hover {
+    background-color: var(--toggle-bg);
+    border-color: var(--toggle-inactive-color);
+    text-decoration: none;
+    color: var(--text-color);
 }

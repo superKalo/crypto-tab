@@ -3,7 +3,6 @@ window.App = window.App || {};
 window.App.SettingsPanel = (function () {
     let settingsPanel;
     let toggleButton;
-    let closeButton;
     let themeToggle;
     let themeOptions;
     let resetButton;
@@ -14,13 +13,15 @@ window.App.SettingsPanel = (function () {
     function init() {
         settingsPanel = document.getElementById('settings-panel');
         toggleButton = document.getElementById('toggle-settings');
-        closeButton = document.getElementById('close-settings');
         themeToggle = document.getElementById('theme-toggle');
         themeOptions = document.querySelectorAll('.toggle-option');
         resetButton = document.getElementById('reset-colors');
 
         toggleButton.addEventListener('click', togglePanelVisibility);
-        closeButton.addEventListener('click', hidePanel);
+        
+        document.querySelectorAll('#close-settings').forEach(btn => {
+            btn.addEventListener('click', hidePanel);
+        });
 
         themeOptions.forEach((option) => {
             option.addEventListener('click', handleThemeToggle);
@@ -42,26 +43,24 @@ window.App.SettingsPanel = (function () {
         document.getElementById('color-up').addEventListener('input', (e) => {
             const color = e.target.value;
             document.documentElement.style.setProperty('--color-up', color);
-            updateArrowColor('arrow-up', color);
+            updateCircleColor('circle-up', color);
+            updateBorderColor('border-up', color);
             saveSetting('colorup', color);
-            toggleResetButtonVisibility();
         });
 
         document.getElementById('color-down').addEventListener('input', (e) => {
             const color = e.target.value;
             document.documentElement.style.setProperty('--color-down', color);
-            updateArrowColor('arrow-down', color);
+            updateCircleColor('circle-down', color);
+            updateBorderColor('border-down', color);
             saveSetting('colordown', color);
-            toggleResetButtonVisibility();
         });
 
         document.getElementById('reset-colors').addEventListener('click', () => {
             resetColors();
-            toggleResetButtonVisibility();
         });
 
         loadSettings();
-        toggleResetButtonVisibility();
     }
 
     function togglePanelVisibility() {
@@ -98,22 +97,14 @@ window.App.SettingsPanel = (function () {
         document.getElementById('color-up').value = DEFAULT_UP_COLOR;
         document.getElementById('color-down').value = DEFAULT_DOWN_COLOR;
 
-        updateArrowColor('arrow-up', DEFAULT_UP_COLOR);
-        updateArrowColor('arrow-down', DEFAULT_DOWN_COLOR);
+        updateCircleColor('circle-up', DEFAULT_UP_COLOR);
+        updateCircleColor('circle-down', DEFAULT_DOWN_COLOR);
+
+        updateBorderColor('border-up', DEFAULT_UP_COLOR);
+        updateBorderColor('border-down', DEFAULT_DOWN_COLOR);
 
         saveSetting('colorup', DEFAULT_UP_COLOR);
         saveSetting('colordown', DEFAULT_DOWN_COLOR);
-    }
-
-    function toggleResetButtonVisibility() {
-        const upColor = document.getElementById('color-up').value;
-        const downColor = document.getElementById('color-down').value;
-
-        if (upColor !== DEFAULT_UP_COLOR || downColor !== DEFAULT_DOWN_COLOR) {
-            resetButton.style.display = 'inline-block';
-        } else {
-            resetButton.style.display = 'none';
-        }
     }
 
     function saveSetting(key, value) {
@@ -139,8 +130,11 @@ window.App.SettingsPanel = (function () {
         document.getElementById('color-up').value = upColor;
         document.getElementById('color-down').value = downColor;
 
-        updateArrowColor('arrow-up', upColor);
-        updateArrowColor('arrow-down', downColor);
+        updateCircleColor('circle-up', upColor);
+        updateCircleColor('circle-down', downColor);
+
+        updateBorderColor('border-up', upColor);
+        updateBorderColor('border-down', downColor);
 
         const token = localStorage.getItem('token');
         if (token) {
@@ -153,15 +147,17 @@ window.App.SettingsPanel = (function () {
         }
     }
 
-    function updateArrowColor(arrowId, color) {
-        const arrow = document.getElementById(arrowId);
-        if (arrow) {
-            arrow.style.fill = color;
+    function updateCircleColor(circleId, color) {
+        const circle = document.getElementById(circleId);
+        if (circle) {
+            circle.style.backgroundColor = color;
+        }
+    }
 
-            const path = arrow.querySelector('path');
-            if (path) {
-                path.setAttribute('fill', color);
-            }
+    function updateBorderColor(borderId, color) {
+        const border = document.getElementById(borderId);
+        if (border) {
+            border.style.borderColor = color;
         }
     }
 
