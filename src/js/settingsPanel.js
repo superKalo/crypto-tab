@@ -119,8 +119,10 @@ window.App.SettingsPanel = (function () {
         updateBorderColor('border-up', DEFAULT_UP_COLOR);
         updateBorderColor('border-down', DEFAULT_DOWN_COLOR);
 
-        window.App.Settings.set('colorup', DEFAULT_UP_COLOR);
-        window.App.Settings.set('colordown', DEFAULT_DOWN_COLOR);
+        window.App.Settings.setMultiple({
+            colorup: DEFAULT_UP_COLOR,
+            colordown: DEFAULT_DOWN_COLOR,
+        });
     }
 
     async function loadSettings() {
@@ -135,8 +137,8 @@ window.App.SettingsPanel = (function () {
 
         window.App.ThemeManager.applyTheme(savedTheme);
 
-        const upColor = settings.colorup || '#61ca00';
-        const downColor = settings.colordown || '#ff4949';
+        const upColor = settings.colorup || DEFAULT_UP_COLOR;
+        const downColor = settings.colordown || DEFAULT_DOWN_COLOR;
 
         document.documentElement.style.setProperty('--color-up', upColor);
         document.documentElement.style.setProperty('--color-down', downColor);
