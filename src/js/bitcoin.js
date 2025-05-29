@@ -30,8 +30,10 @@ window.App.Bitcoin = {
                 this.classList.add('active');
 
                 const period = this.dataset.period;
-                self.getBitcoinData(period)
-                    .then((_data) => self.chart.init(_data))
+                self.getBitcoinDataFromBackground(period)
+                    .then((_data) => {
+                        self.chart.init(_data);
+                    })
                     .catch((error) => {
                         self.handleChartRejection(period, error);
                     });
@@ -61,26 +63,12 @@ window.App.Bitcoin = {
         });
     },
 
-    getLabelFormat(period) {
-        switch (period) {
-            case 'ALL':
-                return 'YYYY';
-            case 'ONE_YEAR':
-                return 'MMM YYYY';
-            case 'ONE_MONTH':
-                return 'D MMM';
-            case 'ONE_WEEK':
-                return 'dddd';
-            case 'ONE_DAY':
-                return 'HH:mm';
-            case 'ONE_HOUR':
-                return 'HH:mm';
-        }
-    },
-
     handleChartRejection(_period, _error) {
         this.isLocalChartDataOld = true;
 
+        // TODO: Temporarily
+        App.Loader.destroy();
+        // TODO: Adjust
         this.repositories[_period].getDataUpToDateStatus().then((_res) => {
             App.Loader.destroy();
 
@@ -104,23 +92,23 @@ window.App.Bitcoin = {
         const storageSetting =
             App.ENV.platform === 'EXTENSION' ? 'BROWSER_STORAGE' : 'LOCAL_STORAGE';
 
-        Object.keys(this.PERIODS).forEach((period) => {
-            this.repositories[period] = new SuperRepo({
-                storage: storageSetting,
-                name: 'bitcoin-' + period,
-                outOfDateAfter: 15 * 60 * 1000, // 15 minutes
-                mapData: (r) => App.API.mapData(r, this.getLabelFormat(period)),
-                request: () =>
-                    this.getBitcoinDataFromBackground(period)
-                        .then((res) => {
-                            this.isLocalChartDataOld = false;
-                            return res;
-                        })
-                        .catch((jqXHR, textStatus, errorThrown) => {
-                            this.handleChartRejection(period, jqXHR);
-                        }),
-            });
-        });
+        // Object.keys(this.PERIODS).forEach((period) => {
+        //     this.repositories[period] = new SuperRepo({
+        //         storage: storageSetting,
+        //         name: 'bitcoin-' + period,
+        //         outOfDateAfter: 15 * 60 * 1000, // 15 minutes
+        //         mapData: (r) => App.API.mapData(r, this.getLabelFormat(period)),
+        //         request: () =>
+        //             this.getBitcoinDataFromBackground(period)
+        //                 .then((res) => {
+        //                     this.isLocalChartDataOld = false;
+        //                     return res;
+        //                 })
+        //                 .catch((jqXHR, textStatus, errorThrown) => {
+        //                     this.handleChartRejection(period, jqXHR);
+        //                 }),
+        //     });
+        // });
 
         this.repositories['NOW'] = new SuperRepo({
             storage: storageSetting,
