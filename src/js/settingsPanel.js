@@ -58,6 +58,9 @@ window.App.SettingsPanel = (function () {
             resetColors();
         });
 
+        // Close settings panel when clicking outside of it
+        document.addEventListener('click', handleOutsideClick);
+
         loadSettings();
     }
 
@@ -67,6 +70,21 @@ window.App.SettingsPanel = (function () {
 
     function hidePanel() {
         settingsPanel.classList.add('hidden');
+    }
+
+    function handleOutsideClick(event) {
+        // Don't close if the panel is already hidden
+        if (settingsPanel.classList.contains('hidden')) {
+            return;
+        }
+
+        // Don't close if clicking on the toggle button or inside the settings panel
+        if (toggleButton.contains(event.target) || settingsPanel.contains(event.target)) {
+            return;
+        }
+
+        // Close the panel
+        hidePanel();
     }
 
     function handleThemeToggle(event) {
