@@ -590,8 +590,8 @@ small {
 /* Settings Panel */
 .settings {
     position: fixed;
-    bottom: 45px;
-    right: 15px;
+    bottom: 50px;
+    right: 20px;
     background: var(--background-color);
     border-radius: 10px;
     border: 1px solid var(--border-color);
@@ -670,8 +670,8 @@ small {
 
 .toggle-settings {
     position: fixed;
-    bottom: 10px;
-    right: 10px;
+    bottom: 15px;
+    right: 15px;
     z-index: 1000;
     color: var(--theme-color);
     padding: 5px;
