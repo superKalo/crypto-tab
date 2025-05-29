@@ -133,7 +133,7 @@
 
       <div id="settings-panel" class="settings hidden">
         <div class="settings-header">
-          <h2 class="settings-title">Customize Panel</h2>
+          <h2 class="settings-title">Make It Yours</h2>
           <button id="close-settings" class="close-button">&times;</button>
         </div>
         <div class="settings-body">
@@ -141,14 +141,14 @@
             <label>Theme</label>
             <div class="toggle-container">
               <div id="theme-toggle" class="toggle">
-                <div class="toggle-option active" data-theme="light">Light</div>
-                <div class="toggle-option" data-theme="system">System</div>
-                <div class="toggle-option" data-theme="dark">Dark</div>
+                <div class="toggle-option active" data-theme="light">☀️ Light</div>
+                <div class="toggle-option" data-theme="system">🌗 System</div>
+                <div class="toggle-option" data-theme="dark">🌙 Dark</div>
               </div>
             </div>
           </div>
           <div class="settings-container">
-            <label for="token-select">Token</label>
+            <label for="token-select">Change Token (coming soon 🤞)</label>
             <!-- Disabled until we have more token support. -->
             <select id="token-select" disabled>
               <option value="bitcoin">Bitcoin</option>
@@ -158,40 +158,37 @@
           <div class="settings-container">
             <label for="clock-format">Clock Format</label>
             <select id="clock-format">
-              <option value="24h">24 Hour</option>
-              <option value="12h">12 Hour (AM/PM)</option>
+              <option value="24h">24h</option>
+              <option value="12h">12h (AM/PM)</option>
             </select>
           </div>
           <div class="settings-container">
-            <label for="clock-up-down">Modify colors</label>
+            <label for="clock-up-down">Color Vibes</label>
             <div class="color-picker-row">
               <div class="color-picker">
                 <div class="color-picker-label">
-                  <span>UP</span>
+                  <span>📈 Up</span>
                   <div id="circle-up" class="circle-icon"></div>
                 </div>
                 <div class="color-input-wrapper">
-                  <button id="border-up" type="button" class="color-button">Select color</button>
+                  <button id="border-up" type="button" class="color-button">Change color</button>
                   <input type="color" id="color-up" value="#61ca00" />
                 </div>
               </div>
 
               <div class="color-picker">
                 <div class="color-picker-label">
-                  <span>DOWN</span>
+                  <span>📉 Down</span>
                   <div id="circle-down" class="circle-icon"></div>
                 </div>
                 <div class="color-input-wrapper">
-                  <button id="border-down" type="button" class="color-button">Select color</button>
+                  <button id="border-down" type="button" class="color-button">Change color</button>
                   <input type="color" id="color-down" value="#ff4949" />
                 </div>
               </div>
             </div>
+            <button id="reset-colors" class="btn reset-colors">Reset colors</button>
           </div>
-        </div>
-        <div class="settings-footer">
-          <button id="reset-colors" class="btn reset-colors">Reset</button>
-          <button id="close-settings" class="btn apply-button">Apply</button>
         </div>
       </div>
 

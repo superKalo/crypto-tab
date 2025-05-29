@@ -590,8 +590,8 @@ small {
 /* Settings Panel */
 .settings {
     position: fixed;
-    bottom: 40px;
-    right: 10px;
+    bottom: 45px;
+    right: 15px;
     background: var(--background-color);
     border-radius: 10px;
     border: 1px solid var(--border-color);
@@ -700,7 +700,7 @@ small {
     display: flex;
     background: var(--toggle-bg);
     border-radius: 50px;
-    width: 200px;
+    width: 280px;
     height: 35px;
     position: relative;
     font-family: Arial, sans-serif;
@@ -729,7 +729,7 @@ small {
     position: absolute;
     top: 3px;
     left: 3px;
-    width: 66px;
+    width: 90px;
     height: 29px;
     background: var(--background-color);
     border-radius: 50px;
@@ -742,10 +742,10 @@ small {
     transform: translateX(0);
 }
 .toggle[data-active='system']::before {
-    transform: translateX(64px);
+    transform: translateX(92px);
 }
 .toggle[data-active='dark']::before {
-    transform: translateX(129px);
+    transform: translateX(184px);
 }
 
 .color-picker-row {
@@ -809,7 +809,6 @@ small {
     border: 1px solid var(--border-color);
     background: var(--background-color);
     color: var(--text-color);
-    font-weight: bold;
     font-size: 14px;
     padding: 8px 12px;
     border-radius: 8px;
