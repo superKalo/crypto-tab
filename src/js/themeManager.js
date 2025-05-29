@@ -3,10 +3,10 @@ window.App = window.App || {};
 window.App.ThemeManager = (function () {
     let themeOptions;
 
-    function init() {
+    async function init() {
         themeOptions = document.querySelectorAll('.toggle-option');
 
-        const savedTheme = getSavedTheme();
+        const savedTheme = await getSavedTheme();
         applyTheme(savedTheme);
         updateActiveOption(savedTheme);
 
@@ -17,7 +17,7 @@ window.App.ThemeManager = (function () {
         listenToSystemThemeChange();
     }
 
-    function handleThemeToggle(event) {
+    async function handleThemeToggle(event) {
         const selectedTheme = event.target.dataset.theme;
 
         updateActiveOption(selectedTheme);
@@ -63,22 +63,23 @@ window.App.ThemeManager = (function () {
         }
     }
 
-    function listenToSystemThemeChange() {
+    async function listenToSystemThemeChange() {
         const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-        mediaQuery.addEventListener('change', () => {
-            const savedTheme = getSavedTheme();
+        mediaQuery.addEventListener('change', async () => {
+            const savedTheme = await getSavedTheme();
             if (savedTheme === 'system') {
                 applyTheme('system');
             }
         });
     }
 
-    function getSavedTheme() {
-        return localStorage.getItem('theme') || 'light';
+    async function getSavedTheme() {
+        const settings = await window.App.Settings.get();
+        return settings.theme || 'light';
     }
 
     function saveTheme(theme) {
-        localStorage.setItem('theme', theme);
+        window.App.Settings.set('theme', theme);
     }
 
     return {

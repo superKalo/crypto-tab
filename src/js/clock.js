@@ -6,8 +6,15 @@ window.App = window.App || {};
 App.Clock = function () {
     this.time = '';
     this.clockElement = document.getElementById('clock');
-    this.format = localStorage.getItem('clockFormat') || '24h';
+    this.format = '24h'; // Default format, will be loaded from settings
 
+    this.init();
+};
+
+// Initialize clock with settings
+App.Clock.prototype.init = async function () {
+    const settings = await window.App.Settings.get();
+    this.format = settings.clockFormat || '24h';
     this.update();
 };
 
