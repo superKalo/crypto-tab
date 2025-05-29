@@ -75,7 +75,7 @@ window.App.ThemeManager = (function () {
 
     async function getSavedTheme() {
         const settings = await window.App.Settings.get();
-        return settings.theme || 'light';
+        return settings.theme || 'system';
     }
 
     function saveTheme(theme) {
