@@ -88,6 +88,4 @@ window.App.ThemeManager = (function () {
     };
 })();
 
-document.addEventListener('DOMContentLoaded', () => {
-    window.App.ThemeManager.init();
-});
+window.App.ThemeManager.init();

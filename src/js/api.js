@@ -6,11 +6,8 @@ class API {
     }
 
     get(_endpoint) {
-        App.Loader.init();
-
         return this.apiAdapter.getBitcoinRatesForPeriod(_endpoint).then((r) => {
             App.Message.clear();
-            App.Loader.destroy();
             return r;
         });
     }
