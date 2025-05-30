@@ -45,15 +45,7 @@ window.App.ThemeManager = (function () {
         const body = document.body;
 
         if (theme === 'system') {
-            const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-
-            if (systemPrefersDark) {
-                body.classList.add('dark-theme');
-                body.classList.remove('light-theme');
-            } else {
-                body.classList.add('light-theme');
-                body.classList.remove('dark-theme');
-            }
+            body.classList.remove('dark-theme', 'light-theme');
         } else if (theme === 'dark') {
             body.classList.add('dark-theme');
             body.classList.remove('light-theme');
