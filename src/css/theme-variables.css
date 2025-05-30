@@ -1,41 +1,116 @@
-/* Light Theme (default) */
+/* Base theme definitions */
 :root {
-    --theme-color: #000;
-    --background-color: #ffffff;
-    --text-color: #333333;
-    --text-color-secondary: #555;
-    --border-color: #dddddd;
-    --btn-background: #4f78e2;
-    --btn-active-color: #ffffff;
-    --toggle-bg: #e0e0e0;
-    --toggle-active-color: #333333;
-    --toggle-inactive-color: #888888;
-    --toggle-indicator-bg: #ffffff;
+    /* Light theme values */
+    --light-theme-color: #000;
+    --light-background-color: #ffffff;
+    --light-text-color: #333333;
+    --light-text-color-secondary: #555;
+    --light-border-color: #dddddd;
+    --light-btn-background: #4f78e2;
+    --light-btn-active-color: #ffffff;
+    --light-toggle-bg: #e0e0e0;
+    --light-toggle-active-color: #333333;
+    --light-toggle-inactive-color: #888888;
+    --light-toggle-indicator-bg: #ffffff;
+    --light-input-bg: #f9f9f9;
+    --light-input-border-color: #ddd;
+    --light-tooltip-bg: rgba(79, 120, 226, 0.85);
+    --light-tooltip-text-color: #ffffff;
+
+    /* Dark theme values */
+    --dark-theme-color: #fff;
+    --dark-background-color: #121212;
+    --dark-text-color: #f5f5f5;
+    --dark-text-color-secondary: #aaa;
+    --dark-border-color: #444444;
+    --dark-btn-background: #61ca00;
+    --dark-btn-active-color: #121212;
+    --dark-toggle-bg: #333333;
+    --dark-toggle-active-color: #ffffff;
+    --dark-toggle-inactive-color: #bbbbbb;
+    --dark-toggle-indicator-bg: #444444;
+    --dark-input-bg: #333333;
+    --dark-input-border-color: #555555;
+    --dark-tooltip-bg: rgba(44, 44, 44, 0.9);
+    --dark-tooltip-text-color: #f5f5f5;
+
+    /* Shared colors (same in both themes) */
     --positive-color: #61ca00;
     --negative-color: #ff4949;
-    --input-bg: #f9f9f9;
-    --input-border-color: #ddd;
-    --tooltip-bg: rgba(79, 120, 226, 0.85);
-    --tooltip-text-color: #ffffff;
+
+    /* Default theme (light) */
+    --theme-color: var(--light-theme-color);
+    --background-color: var(--light-background-color);
+    --text-color: var(--light-text-color);
+    --text-color-secondary: var(--light-text-color-secondary);
+    --border-color: var(--light-border-color);
+    --btn-background: var(--light-btn-background);
+    --btn-active-color: var(--light-btn-active-color);
+    --toggle-bg: var(--light-toggle-bg);
+    --toggle-active-color: var(--light-toggle-active-color);
+    --toggle-inactive-color: var(--light-toggle-inactive-color);
+    --toggle-indicator-bg: var(--light-toggle-indicator-bg);
+    --input-bg: var(--light-input-bg);
+    --input-border-color: var(--light-input-border-color);
+    --tooltip-bg: var(--light-tooltip-bg);
+    --tooltip-text-color: var(--light-tooltip-text-color);
 }
 
-/* Dark Theme */
+/* System Dark Theme Preference */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --theme-color: var(--dark-theme-color);
+        --background-color: var(--dark-background-color);
+        --text-color: var(--dark-text-color);
+        --text-color-secondary: var(--dark-text-color-secondary);
+        --border-color: var(--dark-border-color);
+        --btn-background: var(--dark-btn-background);
+        --btn-active-color: var(--dark-btn-active-color);
+        --toggle-bg: var(--dark-toggle-bg);
+        --toggle-active-color: var(--dark-toggle-active-color);
+        --toggle-inactive-color: var(--dark-toggle-inactive-color);
+        --toggle-indicator-bg: var(--dark-toggle-indicator-bg);
+        --input-bg: var(--dark-input-bg);
+        --input-border-color: var(--dark-input-border-color);
+        --tooltip-bg: var(--dark-tooltip-bg);
+        --tooltip-text-color: var(--dark-tooltip-text-color);
+    }
+}
+
+/* Light Theme Override */
+body.light-theme {
+    --theme-color: var(--light-theme-color);
+    --background-color: var(--light-background-color);
+    --text-color: var(--light-text-color);
+    --text-color-secondary: var(--light-text-color-secondary);
+    --border-color: var(--light-border-color);
+    --btn-background: var(--light-btn-background);
+    --btn-active-color: var(--light-btn-active-color);
+    --toggle-bg: var(--light-toggle-bg);
+    --toggle-active-color: var(--light-toggle-active-color);
+    --toggle-inactive-color: var(--light-toggle-inactive-color);
+    --toggle-indicator-bg: var(--light-toggle-indicator-bg);
+    --input-bg: var(--light-input-bg);
+    --input-border-color: var(--light-input-border-color);
+    --tooltip-bg: var(--light-tooltip-bg);
+    --tooltip-text-color: var(--light-tooltip-text-color);
+}
+
+/* Dark Theme Override */
 body.dark-theme {
-    --theme-color: #fff;
-    --background-color: #121212;
-    --text-color: #f5f5f5;
-    --text-color-secondary: #aaa;
-    --border-color: #444444;
-    --btn-background: #61ca00;
-    --btn-active-color: #121212;
-    --toggle-bg: #333333;
-    --toggle-active-color: #ffffff;
-    --toggle-inactive-color: #bbbbbb;
-    --toggle-indicator-bg: #444444;
-    --positive-color: #61ca00;
-    --negative-color: #ff4949;
-    --input-bg: #333333;
-    --input-border-color: #555555;
-    --tooltip-bg: rgba(44, 44, 44, 0.9);
-    --tooltip-text-color: #f5f5f5;
+    --theme-color: var(--dark-theme-color);
+    --background-color: var(--dark-background-color);
+    --text-color: var(--dark-text-color);
+    --text-color-secondary: var(--dark-text-color-secondary);
+    --border-color: var(--dark-border-color);
+    --btn-background: var(--dark-btn-background);
+    --btn-active-color: var(--dark-btn-active-color);
+    --toggle-bg: var(--dark-toggle-bg);
+    --toggle-active-color: var(--dark-toggle-active-color);
+    --toggle-inactive-color: var(--dark-toggle-inactive-color);
+    --toggle-indicator-bg: var(--dark-toggle-indicator-bg);
+    --input-bg: var(--dark-input-bg);
+    --input-border-color: var(--dark-input-border-color);
+    --tooltip-bg: var(--dark-tooltip-bg);
+    --tooltip-text-color: var(--dark-tooltip-text-color);
 }

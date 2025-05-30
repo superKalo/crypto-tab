@@ -82,8 +82,6 @@ window.App.Bitcoin = {
         this.isLocalChartDataOld = true;
 
         this.repositories[_period].getDataUpToDateStatus().then((_res) => {
-            App.Loader.destroy();
-
             if (_res.localData === null) {
                 App.Message.fireError("That's extremely sad. " + _error);
                 this.chart.destroy();
@@ -96,7 +94,6 @@ window.App.Bitcoin = {
     },
     handleNowRejection() {
         this.isLocalNowDataOld = true;
-        App.Loader.destroy();
     },
 
     repositories: {},
