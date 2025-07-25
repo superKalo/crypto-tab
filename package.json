@@ -1,7 +1,7 @@
 {
   "private": true,
   "name": "crypto-tab",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "scripts": {
     "build:extension:webkit": "ENV='extension-webkit' gulp build",
     "build:extension:gecko": "ENV='extension-gecko' gulp build",
