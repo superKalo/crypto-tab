@@ -1,6 +1,6 @@
 {
   "name": "Crypto Tab",
-  "description": "Replace the New Tab page with Bitcoin price chart",
+  "description": "Replace the New Tab page with live cryptocurrency price charts",
   "version": "1.2.0",
   "browser_specific_settings": {
     "gecko": { "id": "{904ad0ba-0f9e-4b2d-a868-a467138ba9df}" }
@@ -16,9 +16,6 @@
   },
   "manifest_version": 3,
   "permissions": ["storage"],
-  "host_permissions": [
-    "https://bitcoin-price-api.devlabs-projects.info/**/*",
-    "https://api.crypto-tab.com/**/*"
-  ],
+  "host_permissions": ["https://api.crypto-tab.com/*"],
   "background": @@background
 }

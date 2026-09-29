@@ -9,7 +9,7 @@
 
     <meta
       name="description"
-      content="Replace your browser New Tab page with a Bitcoin price chart"
+      content="Replace your browser New Tab page with live price charts for Bitcoin, Ethereum, and more."
     />
     <meta name="image" content="https://i.imgur.com/pHG5fBk.jpg" />
     @@socialMediaTags
@@ -84,7 +84,7 @@
       </div>
 
       <h2 class="chart-period mb text-center">
-        Bitcoin price is
+        <span id="crypto-type">Bitcoin</span> price is
         <span id="price-now">...</span>
         <span id="change"></span>
       </h2>
@@ -100,12 +100,6 @@
 
       <div class="chart-container mb+">
         <canvas id="chart" width="700" height="200"></canvas>
-
-        <div id="loader" class="la-ball-pulse-sync">
-          <div></div>
-          <div></div>
-          <div></div>
-        </div>
 
         <span id="message" class="message"></span>
       </div>
@@ -124,8 +118,6 @@
               <a href="https://www.producthunt.com/posts/crypto-tab/">About</a>
               |
               <a href="https://github.com/superKalo/crypto-tab">Open Source</a>
-              |
-              <a href="https://github.com/cmihaylov/bitcoin-price-api">API</a>
             </small>
           </small>
         </p>
@@ -148,11 +140,9 @@
             </div>
           </div>
           <div class="settings-container">
-            <label for="token-select">Change Token (coming soon 🤞)</label>
-            <!-- Disabled until we have more token support. -->
-            <select id="token-select" disabled>
-              <option value="bitcoin">Bitcoin</option>
-              <option value="ethereum">Ethereum</option>
+            <label for="token-select">Change Token</label>
+            <select id="token-select">
+              <!-- Options will be populated by JavaScript from cryptoTokens.js -->
             </select>
           </div>
           <div class="settings-container">
@@ -222,13 +212,14 @@
     <script src="js/browser-extension-api.js"></script>
     <script src="env/env.js"></script>
     <script src="js/utils.js"></script>
+    <script src="js/cryptoTokens.js"></script>
     <script src="js/settings.js"></script>
     <script src="js/message.js"></script>
-    <script src="js/apiCecoAdapter.js"></script>
-    <script src="js/api.js"></script>
+    <script src="js/priceApi.js"></script>
+    <script src="js/priceRepositoryFactory.js"></script>
     <script src="js/chart.js"></script>
     <script src="js/clock.js"></script>
-    <script src="js/bitcoin.js"></script>
+    <script src="js/crypto.js"></script>
     <script src="js/script.js"></script>
     <script src="js/settingsPanel.js"></script>
     <script src="js/themeManager.js"></script>

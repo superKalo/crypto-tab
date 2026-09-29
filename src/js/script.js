@@ -1,4 +1,6 @@
-window.App.Bitcoin.init();
+window.App.Crypto.init().catch((error) => {
+    window.App.Message.fireError(`Unable to initialize Crypto Tab. ${error.message}`);
+});
 
 window.onload = () => {
     const { platform } = App.ENV;
