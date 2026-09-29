@@ -1,4 +1,4 @@
-window.App.Bitcoin.init();
+window.App.Crypto.init();
 
 window.onload = () => {
     const { platform } = App.ENV;

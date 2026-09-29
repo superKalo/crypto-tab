@@ -47,4 +47,4 @@ class API {
 
 // window.App.API = new API(App.apiFakeAdapter);
 //window.App.API = new API(App.apiGoranAdapter);
-window.App.API = new API(App.apiCecoAdapter);
+window.App.API = new API(App.apiBoyoAdapter);
