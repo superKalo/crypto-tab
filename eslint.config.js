@@ -8,7 +8,6 @@ module.exports = [
         languageOptions: {
             globals: {
                 ...globals.browser,
-                axios: 'readonly',
                 App: 'writable',
                 SuperRepo: 'readonly',
                 Chart: 'readonly',

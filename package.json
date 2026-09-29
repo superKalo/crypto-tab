@@ -2,6 +2,9 @@
   "private": true,
   "name": "crypto-tab",
   "version": "1.2.0",
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "build:extension:webkit": "ENV='extension-webkit' gulp build",
     "build:extension:gecko": "ENV='extension-gecko' gulp build",
@@ -11,7 +14,6 @@
     "build:website:watch": "ENV='website' gulp build:watch"
   },
   "dependencies": {
-    "axios": "0.16.2",
     "chart.js": "4.4.3",
     "dayjs": "1.11.11",
     "super-repo": "2.1.4"
@@ -21,7 +23,6 @@
     "eslint": "9.6.0",
     "globals": "15.8.0",
     "gulp": "5.0.0",
-    "gulp-notify": "4.0.0",
     "gulp-rename": "2.0.0",
     "gulp-replace-task": "2.0.1",
     "prettier": "3.3.2"

@@ -1,6 +1,5 @@
 const gulp = require("gulp");
 const rename = require("gulp-rename");
-const notify = require("gulp-notify");
 const replace = require("gulp-replace-task");
 
 const { ENV } = process.env;
@@ -15,13 +14,7 @@ if (ENV.includes("extension")) {
 gulp.task("copy-files", function () {
   return gulp
     .src(filesArr, { base: "./src", encoding: false })
-    .pipe(gulp.dest(distPath))
-    .pipe(
-      notify({
-        message: "Done!",
-        onLast: true,
-      })
-    );
+    .pipe(gulp.dest(distPath));
 });
 
 // Copy favicons from src to dist directory
@@ -113,7 +106,6 @@ gulp.task("set-env", function () {
 gulp.task("copy-npm-dependencies", function () {
   return gulp
     .src([
-      "node_modules/axios/dist/axios.min.js",
       "node_modules/chart.js/dist/chart.umd.js",
       "node_modules/super-repo/lib/index.js",
       "node_modules/dayjs/dayjs.min.js",
