@@ -30,7 +30,7 @@ window.App.PriceRepositoryFactory = class PriceRepositoryFactory {
             request: () => App.PriceApi.getPriceData(period, cryptoType),
             mapData: isCurrentPrice
                 ? this.mapCurrentPrice
-                : (data) => App.API.mapData(data, this.getLabelFormat(period)),
+                : (data) => this.mapChartData(data, period),
         });
     }
 
@@ -107,13 +107,23 @@ window.App.PriceRepositoryFactory = class PriceRepositoryFactory {
         const { value, changePercent } = data[0];
 
         return {
-            price: Number(value),
-            changePercent: {
-                dayAgo: Number(changePercent.dayAgo),
-                weekAgo: Number(changePercent.weekAgo),
-                monthAgo: Number(changePercent.monthAgo),
-            },
+            price: value,
+            changePercent,
         };
+    }
+
+    mapChartData(data, period) {
+        const labelFormat = this.getLabelFormat(period);
+
+        return data
+            .map(({ timestamp, value }) => ({
+                value,
+                timestamp: dayjs
+                    .utc(timestamp < 1e12 ? timestamp * 1000 : timestamp)
+                    .local()
+                    .format(labelFormat),
+            }))
+            .reverse();
     }
 
     getLabelFormat(period) {

@@ -5,6 +5,7 @@ const pluginJs = require('@eslint/js');
 module.exports = [
     { files: ['**/*.js'], languageOptions: { sourceType: 'script' } },
     {
+        files: ['src/js/*.js'],
         languageOptions: {
             globals: {
                 ...globals.browser,
@@ -15,6 +16,12 @@ module.exports = [
                 chrome: 'readonly',
                 importScripts: 'readonly',
             },
+        },
+    },
+    {
+        files: ['gulpfile.js'],
+        languageOptions: {
+            globals: globals.node,
         },
     },
     pluginJs.configs.recommended,

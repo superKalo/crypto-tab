@@ -13,38 +13,54 @@ window.App.PriceApi = (function () {
         return endpointPath;
     }
 
-    function validateResponse(data, period) {
+    function normalizeNumber(value) {
+        if (
+            (typeof value !== 'number' && typeof value !== 'string') ||
+            (typeof value === 'string' && value.trim() === '')
+        ) {
+            return null;
+        }
+
+        const normalizedValue = Number(value);
+
+        return Number.isFinite(normalizedValue) ? normalizedValue : null;
+    }
+
+    function normalizeResponse(data, period) {
         if (!Array.isArray(data) || data.length === 0) {
             throw new Error('The price API returned no data');
         }
 
-        const isFiniteNumber = (value) => Number.isFinite(Number(value));
-
         if (period === 'NOW') {
-            const [{ value, changePercent }] = data;
+            const currentPrice = data[0];
+            const value = normalizeNumber(currentPrice?.value);
+            const changePercent = currentPrice?.changePercent;
+            const normalizedChange = changePercent && {
+                dayAgo: normalizeNumber(changePercent.dayAgo),
+                weekAgo: normalizeNumber(changePercent.weekAgo),
+                monthAgo: normalizeNumber(changePercent.monthAgo),
+            };
             const isValidChange =
-                changePercent &&
-                ['dayAgo', 'weekAgo', 'monthAgo'].every((key) =>
-                    isFiniteNumber(changePercent[key])
-                );
+                normalizedChange &&
+                Object.values(normalizedChange).every((value) => value !== null);
 
-            if (!isFiniteNumber(value) || !isValidChange) {
+            if (value === null || !isValidChange) {
                 throw new Error('The price API returned an invalid current-price payload');
             }
+
+            return [{ value, changePercent: normalizedChange }];
         } else {
-            const hasInvalidRecord = data.some((record) => {
-                const timestamp = record.timestamp ?? record.time;
-                const value = record.value ?? record.average;
+            return data.map((record) => {
+                const timestamp = normalizeNumber(record?.timestamp ?? record?.time);
+                const value = normalizeNumber(record?.value ?? record?.average);
 
-                return !isFiniteNumber(timestamp) || !isFiniteNumber(value);
+                if (timestamp === null || value === null) {
+                    throw new Error('The price API returned an invalid chart payload');
+                }
+
+                return { timestamp, value };
             });
-
-            if (hasInvalidRecord) {
-                throw new Error('The price API returned an invalid chart payload');
-            }
         }
-
-        return data;
     }
 
     async function fetchDirectly(period, cryptoType) {
@@ -55,7 +71,7 @@ window.App.PriceApi = (function () {
             throw new Error(`The price API responded with HTTP ${response.status}`);
         }
 
-        return validateResponse(await response.json(), period);
+        return normalizeResponse(await response.json(), period);
     }
 
     async function fetchFromExtension(period, cryptoType) {
@@ -71,7 +87,7 @@ window.App.PriceApi = (function () {
             throw new Error(response?.error || `Failed to retrieve ${cryptoType} price data`);
         }
 
-        return validateResponse(response.data, period);
+        return normalizeResponse(response.data, period);
     }
 
     return {

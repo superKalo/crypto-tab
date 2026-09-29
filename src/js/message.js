@@ -1,13 +1,13 @@
 window.App = window.App || {};
 
 window.App.Message = {
-    loaderEl: document.getElementById('message'),
+    messageEl: document.getElementById('message'),
 
     fireError(text) {
-        this.loaderEl.textContent = text;
+        this.messageEl.textContent = text;
     },
 
     clear() {
-        this.loaderEl.textContent = '';
-    }
+        this.messageEl.textContent = '';
+    },
 };
