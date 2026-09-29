@@ -19,13 +19,10 @@ window.App.Crypto = {
     chart: null,
     currentCrypto: '',
     currentPeriod: '',
-    dataStatus: {
-        chart: null,
-        now: null,
-    },
     isInitialized: false,
     refreshTimer: null,
     repositoryFactory: null,
+    repositoryStatuses: {},
     requestGeneration: 0,
 
     async init() {
@@ -86,6 +83,8 @@ window.App.Crypto = {
         this.currentPeriod = period;
         this.requestGeneration += 1;
         this.updateActivePeriod();
+        this.$change.textContent = '';
+        this.updateLastUpdated();
         App.Settings.set('period', period);
 
         await this.loadActiveData(this.requestGeneration);
@@ -98,12 +97,12 @@ window.App.Crypto = {
 
         this.currentCrypto = cryptoType;
         this.requestGeneration += 1;
-        this.dataStatus = { chart: null, now: null };
 
         this.chart.destroy();
         this.$priceNow.textContent = '...';
         this.$change.textContent = '';
         this.updateCryptoTypeLabel();
+        this.updateLastUpdated();
         App.Message.clear();
         App.Settings.set('cryptoType', cryptoType);
 
@@ -117,59 +116,55 @@ window.App.Crypto = {
     async loadChart(generation) {
         const cryptoType = this.currentCrypto;
         const period = this.currentPeriod;
+        const result = await this.repositoryFactory.getData(cryptoType, period);
 
-        try {
-            const result = await this.repositoryFactory.getData(cryptoType, period);
-
-            if (!this.isCurrentRequest(generation, cryptoType, period)) {
-                return;
-            }
-
-            this.dataStatus.chart = result;
-            this.chart.init(result.data);
-
-            if (result.isStale) {
-                App.Message.fireError(
-                    'Showing cached chart data because the latest request failed.'
-                );
-            } else {
-                App.Message.clear();
-            }
-
-            this.updateLastUpdated();
-        } catch (error) {
-            if (!this.isCurrentRequest(generation, cryptoType, period)) {
-                return;
-            }
-
-            this.dataStatus.chart = { error, isStale: true, lastFetched: null };
-            App.Message.fireError(`Unable to load ${cryptoType} chart data. ${error.message}`);
-            this.updateLastUpdated();
+        if (!this.isCurrentRequest(generation, cryptoType, period)) {
+            return;
         }
+
+        this.setRepositoryStatus(cryptoType, period, result);
+        this.renderChartResult(result, cryptoType);
     },
 
     async loadCurrentPrice(generation) {
         const cryptoType = this.currentCrypto;
+        const result = await this.repositoryFactory.getData(cryptoType, 'NOW');
 
-        try {
-            const result = await this.repositoryFactory.getData(cryptoType, 'NOW');
+        if (!this.isCurrentRequest(generation, cryptoType)) {
+            return;
+        }
 
-            if (!this.isCurrentRequest(generation, cryptoType)) {
-                return;
-            }
+        this.setRepositoryStatus(cryptoType, 'NOW', result);
+        this.renderCurrentPriceResult(result);
+    },
 
-            this.dataStatus.now = result;
+    renderChartResult(result, cryptoType) {
+        if (!result.ok) {
+            App.Message.fireError(
+                `Unable to load ${cryptoType} chart data. ${result.error?.message || ''}`.trim()
+            );
+            this.updateLastUpdated();
+            return;
+        }
+
+        this.chart.init(result.data);
+
+        if (result.isStale) {
+            App.Message.fireError('Showing cached chart data because the latest request failed.');
+        } else {
+            App.Message.clear();
+        }
+
+        this.updateLastUpdated();
+    },
+
+    renderCurrentPriceResult(result) {
+        if (result.ok) {
             this.setPriceNow(result.data.price);
             this.setPriceChange(result.data.changePercent);
-            this.updateLastUpdated();
-        } catch (error) {
-            if (!this.isCurrentRequest(generation, cryptoType)) {
-                return;
-            }
-
-            this.dataStatus.now = { error, isStale: true, lastFetched: null };
-            this.updateLastUpdated();
         }
+
+        this.updateLastUpdated();
     },
 
     isCurrentRequest(generation, cryptoType, period = this.currentPeriod) {
@@ -188,6 +183,18 @@ window.App.Crypto = {
         this.$dataPeriods.forEach((element) => {
             element.classList.toggle('active', element.dataset.period === this.currentPeriod);
         });
+    },
+
+    setRepositoryStatus(cryptoType, period, status) {
+        this.repositoryStatuses[this.getRepositoryStatusKey(cryptoType, period)] = status;
+    },
+
+    getRepositoryStatus(cryptoType, period) {
+        return this.repositoryStatuses[this.getRepositoryStatusKey(cryptoType, period)] || null;
+    },
+
+    getRepositoryStatusKey(cryptoType, period) {
+        return `${cryptoType}:${period}`;
     },
 
     setPriceNow(price) {
@@ -219,28 +226,32 @@ window.App.Crypto = {
     },
 
     updateLastUpdated() {
-        const statuses = [this.dataStatus.chart, this.dataStatus.now].filter(Boolean);
-        const lastFetched = this.dataStatus.now?.lastFetched || this.dataStatus.chart?.lastFetched;
-        const hasFailure = statuses.some((status) => status.isStale || status.error);
+        const chartStatus = this.getRepositoryStatus(this.currentCrypto, this.currentPeriod);
+        const currentPriceStatus = this.getRepositoryStatus(this.currentCrypto, 'NOW');
+        const statuses = [chartStatus, currentPriceStatus].filter(Boolean);
+        const lastFetched = currentPriceStatus?.lastFetched || chartStatus?.lastFetched;
+        const hasError = statuses.some((status) => !status.ok);
+        const hasStaleData = statuses.some((status) => status.isStale);
 
         this.$lastUpdated.textContent = '';
 
         if (!lastFetched) {
-            this.$lastUpdated.textContent = hasFailure
-                ? 'unavailable. Data request failed.'
-                : '...';
+            this.$lastUpdated.textContent = hasError ? 'unavailable. Data request failed.' : '...';
             this.$lastUpdated.removeAttribute('data-tooltip');
             return;
         }
 
         const lastUpdatedSpan = document.createElement('span');
-        lastUpdatedSpan.className = hasFailure ? 'negative' : 'positive';
+        lastUpdatedSpan.className = hasError || hasStaleData ? 'negative' : 'positive';
         lastUpdatedSpan.textContent = dayjs(lastFetched).fromNow();
 
         this.$lastUpdated.appendChild(lastUpdatedSpan);
-        this.$lastUpdated.appendChild(
-            document.createTextNode(hasFailure ? '. Showing cached data.' : '.')
-        );
+        const statusMessage = hasError
+            ? '. Some data could not be refreshed.'
+            : hasStaleData
+              ? '. Showing cached data.'
+              : '.';
+        this.$lastUpdated.appendChild(document.createTextNode(statusMessage));
         this.$lastUpdated.setAttribute('data-tooltip', dayjs(lastFetched).calendar());
     },
 

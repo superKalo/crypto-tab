@@ -37,24 +37,34 @@ window.App.PriceRepositoryFactory = class PriceRepositoryFactory {
     async getData(cryptoType, period) {
         const repositoryKey = this.getRepositoryKey(cryptoType, period);
         const repository = this.getRepository(cryptoType, period);
-        const cacheStatus = await repository.getDataUpToDateStatus();
+        let cacheStatus;
+
+        try {
+            cacheStatus = await repository.getDataUpToDateStatus();
+        } catch (error) {
+            delete this.repositories[repositoryKey];
+
+            return this.createResult({ error, repositoryKey });
+        }
 
         if (cacheStatus.isDataUpToDate) {
-            return {
+            return this.createResult({
                 data: cacheStatus.localData,
-                isStale: false,
                 lastFetched: cacheStatus.lastFetched,
-            };
+                repositoryKey,
+                source: 'cache',
+            });
         }
 
         try {
             const data = await repository.getData();
 
-            return {
+            return this.createResult({
                 data,
-                isStale: false,
                 lastFetched: Date.now(),
-            };
+                repositoryKey,
+                source: 'network',
+            });
         } catch (error) {
             // SuperRepo 2.1.4 keeps a rejected request marked as pending. Evicting
             // the in-memory instance lets the next refresh retry while preserving
@@ -62,16 +72,35 @@ window.App.PriceRepositoryFactory = class PriceRepositoryFactory {
             delete this.repositories[repositoryKey];
 
             if (cacheStatus.localData !== null) {
-                return {
+                return this.createResult({
                     data: cacheStatus.localData,
                     error,
-                    isStale: true,
                     lastFetched: cacheStatus.lastFetched,
-                };
+                    repositoryKey,
+                    source: 'stale-cache',
+                });
             }
 
-            throw error;
+            return this.createResult({ error, repositoryKey });
         }
+    }
+
+    createResult({
+        data = null,
+        error = null,
+        lastFetched = null,
+        repositoryKey,
+        source = 'none',
+    }) {
+        return {
+            data,
+            error,
+            isStale: source === 'stale-cache',
+            lastFetched,
+            ok: data !== null,
+            repositoryKey,
+            source,
+        };
     }
 
     mapCurrentPrice(data) {
