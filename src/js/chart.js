@@ -275,4 +275,5 @@ window.App.Chart.prototype.destroy = function () {
     }
 
     this.chartInstance.destroy();
+    this.chartInstance = null;
 };

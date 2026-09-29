@@ -86,7 +86,8 @@ gulp.task("preprocess-manifest", function () {
             // Firefox doesn't yet support service workers, but they have a concept
             // for background scripts that can be used in a similar way.
             replacement: ENV === 'extension-webkit' ?
-              { "service_worker": "js/background.js" } : { "scripts": ["js/background.js"] }
+              { "service_worker": "js/background.js" } :
+              { "scripts": ["js/cryptoTokens.js", "js/background.js"] }
           },
         ],
       })

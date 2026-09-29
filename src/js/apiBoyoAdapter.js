@@ -13,26 +13,11 @@ window.App.apiBoyoAdapter = {
                 const formatted = dayjs.utc(timestampMs).local().format(dateLabelFormat);
 
                 return {
-                    value: _rec.value !== undefined ? _rec.value : _rec.average,
+                    value: Number(_rec.value !== undefined ? _rec.value : _rec.average),
                     timestamp: formatted,
                 };
             })
             .filter(Boolean)
             .reverse();
-    },
-
-    getCryptoRatesForPeriod: function (period, cryptoType) {
-        return new Promise((resolve, reject) => {
-            chrome.runtime.sendMessage(
-                { type: 'getCryptoPrice', period: period, cryptoType: cryptoType },
-                (response) => {
-                    if (response && !response.error) {
-                        resolve(response.data);
-                    } else {
-                        reject(response.error || `Failed to retrieve ${cryptoType} price data`);
-                    }
-                }
-            );
-        });
     },
 };

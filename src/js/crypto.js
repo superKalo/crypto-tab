@@ -6,353 +6,267 @@ dayjs.extend(window.dayjs_plugin_calendar);
 window.App = window.App || {};
 
 window.App.Crypto = {
-    PERIODS: {
-        ONE_HOUR: 'ONE_HOUR',
-        ONE_DAY: 'ONE_DAY',
-        ONE_WEEK: 'ONE_WEEK',
-        ONE_MONTH: 'ONE_MONTH',
-        ONE_YEAR: 'ONE_YEAR',
-        ALL: 'ALL',
-    },
-    isLocalChartDataOld: false,
-    isLocalNowDataOld: false,
+    PERIODS: window.App.CryptoTokens.PERIODS,
+    REFRESH_INTERVAL: 30 * 1000,
 
     $chart: document.getElementById('chart'),
-    chart: null,
-
-    $dataPeriods: document.querySelectorAll('.js-period'),
+    $change: document.getElementById('change'),
     $cryptoTypeLabel: document.getElementById('crypto-type'),
+    $dataPeriods: document.querySelectorAll('.js-period'),
+    $lastUpdated: document.getElementById('last-updated'),
+    $priceNow: document.getElementById('price-now'),
+
+    chart: null,
     currentCrypto: '',
-
-    initEvents() {
-        const self = this;
-
-        [...self.$dataPeriods].forEach((el) => {
-            el.addEventListener('click', function () {
-                self.$dataPeriods.forEach((p) => p.classList.remove('active'));
-                this.classList.add('active');
-
-                const period = this.dataset.period;
-                self.getCryptoData(period, self.currentCrypto)
-                    .then((_data) => self.chart.init(_data))
-                    .catch((error) => {
-                        self.handleChartRejection(period, self.currentCrypto, error);
-                    });
-
-                App.Settings.set('period', this.dataset.period);
-
-                self.setPriceChange(self.currentCrypto);
-            });
-        });
-
-
-
-        App.Settings.get().then(({ period, cryptoType }) => {
-            self.currentCrypto = cryptoType || window.App.CryptoTokens.getDefaultToken();
-            const selectedTab = period ? Object.keys(this.PERIODS).indexOf(period) : 1;
-            self.updateCryptoTypeLabel(self.currentCrypto);
-            self.initRepositories();
-            self.$dataPeriods[selectedTab].click();
-        });
+    currentPeriod: '',
+    dataStatus: {
+        chart: null,
+        now: null,
     },
+    isInitialized: false,
+    refreshTimer: null,
+    repositoryFactory: null,
+    requestGeneration: 0,
 
-    updateCryptoTypeLabel(cryptoType) {
-        const displayName = window.App.CryptoTokens.getDisplayName(cryptoType);
-        this.$cryptoTypeLabel.textContent = displayName;
-    },
-
-    changeCryptoType(cryptoType) {
-        this.currentCrypto = cryptoType;
-        this.initRepositories();
-        this.updateCryptoTypeLabel(cryptoType);
-        const period = document.querySelector('.js-period.active').dataset.period;
-        this.getCryptoData(period, cryptoType)
-            .then((_data) => this.chart.init(_data))
-            .catch((error) => {
-                this.handleChartRejection(period, cryptoType, error);
-            });
-
-        App.Settings.set('cryptoType', cryptoType);
-
-        this.setPriceChange(cryptoType);
-        this.setLastUpdated();
-        this.displayPriceNow();
-    },
-
-    getCryptoData(period, cryptoType) {
-        return new Promise((resolve, reject) => {
-            this.currentRepositories[cryptoType][period]
-                .getData()
-                .then((response) => {
-                    resolve(response);
-                })
-                .catch((error) => {
-                    reject(error || `Failed to retrieve ${cryptoType} price data`);
-                });
-        });
-    },
-
-    getLabelFormat(period) {
-        switch (period) {
-            case 'ALL':
-                return 'YYYY';
-            case 'ONE_YEAR':
-                return 'MMM YYYY';
-            case 'ONE_MONTH':
-                return 'D MMM';
-            case 'ONE_WEEK':
-                return 'dddd';
-            case 'ONE_DAY':
-                return 'HH:mm';
-            case 'ONE_HOUR':
-                return 'HH:mm';
-        }
-    },
-
-    handleChartRejection(_period, _cryptoType, _error) {
-        this.isLocalChartDataOld = true;
-
-        this.currentRepositories[_cryptoType][_period].getDataUpToDateStatus().then((_res) => {
-            App.Loader.destroy();
-
-            if (_res.localData === null) {
-                App.Message.fireError(`That's extremely sad. ${_error}`);
-                this.chart.destroy();
-            } else if (_res.localData.length) {
-                App.Message.clear();
-                this.chart.init(_res.localData);
-                this.setLastUpdated();
-            }
-        });
-    },
-    handleNowRejection() {
-        this.isLocalNowDataOld = true;
-    },
-
-    repositories: {},
-    currentRepositories: {},
-
-    initRepositories() {
-        const storageSetting =
-            App.ENV.platform === 'EXTENSION' ? 'BROWSER_STORAGE' : 'LOCAL_STORAGE';
-
-        const cryptoType = this.currentCrypto || window.App.CryptoTokens.getDefaultToken();
-        
-        this.cleanupInactiveRepositories(cryptoType);
-        
-        if (!this.currentRepositories[cryptoType]) {
-            this.currentRepositories[cryptoType] = {};
-        }
-
-        Object.keys(this.PERIODS).forEach((period) => {
-            if (!this.currentRepositories[cryptoType][period]) {
-                this.currentRepositories[cryptoType][period] = new SuperRepo({
-                    storage: storageSetting,
-                    name: `${cryptoType}-${period}`,
-                    outOfDateAfter: 15 * 60 * 1000, // 15 minutes
-                    mapData: (r) => App.API.mapData(r, this.getLabelFormat(period)),
-                    request: () =>
-                        this.getCryptoDataFromBackground(period, cryptoType)
-                            .then((res) => {
-                                this.isLocalChartDataOld = false;
-                                return res;
-                            })
-                            .catch((jqXHR, textStatus, errorThrown) => {
-                                this.handleChartRejection(period, cryptoType, jqXHR);
-                            }),
-                });
-            }
-        });
-
-        if (!this.currentRepositories[cryptoType]['NOW']) {
-            this.currentRepositories[cryptoType]['NOW'] = new SuperRepo({
-                storage: storageSetting,
-                name: `${cryptoType}-NOW`,
-                outOfDateAfter: 3 * 60 * 1000, // 3 minutes
-                mapData: (data) => {
-                    const { value, changePercent } = data[0];
-                    const { dayAgo, weekAgo, monthAgo } = changePercent;
-
-                    return {
-                        price: value,
-                        changePercent: { dayAgo, weekAgo, monthAgo },
-                    };
-                },
-                request: () =>
-                    this.getCryptoDataFromBackground('NOW', cryptoType)
-                        .then((res) => {
-                            this.isLocalNowDataOld = false;
-                            return res;
-                        })
-                        .catch(() => {
-                            this.handleNowRejection();
-                        }),
-            });
-        }
-    },
-
-    cleanupInactiveRepositories(newCryptoType) {
-        Object.keys(this.currentRepositories).forEach(tokenId => {
-            if (tokenId !== newCryptoType) {
-                if (this.currentRepositories[tokenId]) {
-                    Object.values(this.currentRepositories[tokenId]).forEach(repo => {
-                        if (repo && typeof repo.destroy === 'function') {
-                            repo.destroy();
-                        }
-                        if (repo && repo._interval) {
-                            clearInterval(repo._interval);
-                        }
-                        if (repo && repo._timeout) {
-                            clearTimeout(repo._timeout);
-                        }
-                    });
-                    delete this.currentRepositories[tokenId];
-                }
-            }
-        });
-    },
-
-    getCryptoDataFromBackground(period, cryptoType) {
-        return new Promise((resolve, reject) => {
-            window.browser.runtime.sendMessage(
-                { type: 'getCryptoPrice', period: period, cryptoType: cryptoType },
-                (response) => {
-                    if (response && !response.error) {
-                        resolve(response.data);
-                    } else {
-                        reject(response.error || `Failed to retrieve ${cryptoType} price data`);
-                    }
-                }
-            );
-        });
-    },
-
-    $priceNow: document.querySelector('#price-now'),
-    setPriceNow(_price) {
-        this.$priceNow.textContent = App.Utils.formatPrice(_price);
-    },
-
-    $change: document.querySelector('#change'),
-    async setPriceChange(cryptoType) {
-        if (!this.currentRepositories[cryptoType]) this.initRepositories();
-        let { localData } = await this.currentRepositories[cryptoType]['NOW'].getDataUpToDateStatus();
-        if (!localData) {
+    async init() {
+        if (this.isInitialized) {
             return;
         }
 
-        this.setPriceNow(localData.price);
+        this.isInitialized = true;
+        this.chart = new App.Chart(this.$chart);
+        this.repositoryFactory = new App.PriceRepositoryFactory();
 
-        const { dayAgo, weekAgo, monthAgo } = localData.changePercent;
-        let settings = await App.Settings.get();
+        const settings = await App.Settings.get();
+        this.currentCrypto = App.CryptoTokens.isSupportedToken(settings.cryptoType)
+            ? settings.cryptoType
+            : App.CryptoTokens.getDefaultToken();
+        this.currentPeriod = App.CryptoTokens.isChartPeriod(settings.period)
+            ? settings.period
+            : App.CryptoTokens.getDefaultPeriod();
 
-        let changePercent;
-        let periodLabel;
-        switch (settings.period) {
-            case this.PERIODS.ONE_DAY:
-            default: {
-                changePercent = dayAgo;
-                periodLabel = 'since yesterday';
-                break;
-            }
-            case this.PERIODS.ONE_WEEK: {
-                changePercent = weekAgo;
-                periodLabel = 'since last week';
-                break;
-            }
-            case this.PERIODS.ONE_MONTH: {
-                changePercent = monthAgo;
-                periodLabel = 'since last month';
-                break;
-            }
-            case this.PERIODS.ONE_HOUR:
-            case this.PERIODS.ONE_YEAR:
-            case this.PERIODS.ALL: {
-                this.$change.textContent = '';
-                return;
-            }
+        if (settings.cryptoType !== this.currentCrypto || settings.period !== this.currentPeriod) {
+            App.Settings.setMultiple({
+                cryptoType: this.currentCrypto,
+                period: this.currentPeriod,
+            });
         }
 
-        const getSignedPercentage = (_number) => {
-            const isChangePositive = _number >= 0;
-            const isChangeZero = _number === 0;
+        this.updateCryptoTypeLabel();
+        this.updateActivePeriod();
+        this.initEvents();
+        this.startRefreshTimer();
 
-            return isChangePositive && !isChangeZero ? `+${_number}%` : `${_number}%`;
+        await this.loadActiveData(this.requestGeneration);
+    },
+
+    initEvents() {
+        this.$dataPeriods.forEach((element) => {
+            element.addEventListener('click', () => {
+                this.changePeriod(element.dataset.period);
+            });
+        });
+
+        this.handleVisibilityChange = () => {
+            if (!document.hidden) {
+                this.refreshActiveData();
+            }
         };
-        const getVisualClass = (_number) => {
-            const isChangePositive = _number >= 0;
-            const isChangeZero = _number === 0;
+        this.handlePageHide = () => this.destroy();
 
-            return isChangeZero ? '' : isChangePositive ? 'positive' : 'negative';
+        document.addEventListener('visibilitychange', this.handleVisibilityChange);
+        window.addEventListener('pagehide', this.handlePageHide, { once: true });
+    },
+
+    async changePeriod(period) {
+        if (!App.CryptoTokens.isChartPeriod(period)) {
+            return;
+        }
+
+        this.currentPeriod = period;
+        this.requestGeneration += 1;
+        this.updateActivePeriod();
+        App.Settings.set('period', period);
+
+        await this.loadActiveData(this.requestGeneration);
+    },
+
+    async changeCryptoType(cryptoType) {
+        if (!App.CryptoTokens.isSupportedToken(cryptoType) || cryptoType === this.currentCrypto) {
+            return;
+        }
+
+        this.currentCrypto = cryptoType;
+        this.requestGeneration += 1;
+        this.dataStatus = { chart: null, now: null };
+
+        this.chart.destroy();
+        this.$priceNow.textContent = '...';
+        this.$change.textContent = '';
+        this.updateCryptoTypeLabel();
+        App.Message.clear();
+        App.Settings.set('cryptoType', cryptoType);
+
+        await this.loadActiveData(this.requestGeneration);
+    },
+
+    async loadActiveData(generation) {
+        await Promise.allSettled([this.loadChart(generation), this.loadCurrentPrice(generation)]);
+    },
+
+    async loadChart(generation) {
+        const cryptoType = this.currentCrypto;
+        const period = this.currentPeriod;
+
+        try {
+            const result = await this.repositoryFactory.getData(cryptoType, period);
+
+            if (!this.isCurrentRequest(generation, cryptoType, period)) {
+                return;
+            }
+
+            this.dataStatus.chart = result;
+            this.chart.init(result.data);
+
+            if (result.isStale) {
+                App.Message.fireError(
+                    'Showing cached chart data because the latest request failed.'
+                );
+            } else {
+                App.Message.clear();
+            }
+
+            this.updateLastUpdated();
+        } catch (error) {
+            if (!this.isCurrentRequest(generation, cryptoType, period)) {
+                return;
+            }
+
+            this.dataStatus.chart = { error, isStale: true, lastFetched: null };
+            App.Message.fireError(`Unable to load ${cryptoType} chart data. ${error.message}`);
+            this.updateLastUpdated();
+        }
+    },
+
+    async loadCurrentPrice(generation) {
+        const cryptoType = this.currentCrypto;
+
+        try {
+            const result = await this.repositoryFactory.getData(cryptoType, 'NOW');
+
+            if (!this.isCurrentRequest(generation, cryptoType)) {
+                return;
+            }
+
+            this.dataStatus.now = result;
+            this.setPriceNow(result.data.price);
+            this.setPriceChange(result.data.changePercent);
+            this.updateLastUpdated();
+        } catch (error) {
+            if (!this.isCurrentRequest(generation, cryptoType)) {
+                return;
+            }
+
+            this.dataStatus.now = { error, isStale: true, lastFetched: null };
+            this.updateLastUpdated();
+        }
+    },
+
+    isCurrentRequest(generation, cryptoType, period = this.currentPeriod) {
+        return (
+            generation === this.requestGeneration &&
+            cryptoType === this.currentCrypto &&
+            period === this.currentPeriod
+        );
+    },
+
+    updateCryptoTypeLabel() {
+        this.$cryptoTypeLabel.textContent = App.CryptoTokens.getDisplayName(this.currentCrypto);
+    },
+
+    updateActivePeriod() {
+        this.$dataPeriods.forEach((element) => {
+            element.classList.toggle('active', element.dataset.period === this.currentPeriod);
+        });
+    },
+
+    setPriceNow(price) {
+        this.$priceNow.textContent = App.Utils.formatPrice(price);
+    },
+
+    setPriceChange(changePercent) {
+        const changesByPeriod = {
+            ONE_DAY: { value: changePercent.dayAgo, label: 'since yesterday' },
+            ONE_WEEK: { value: changePercent.weekAgo, label: 'since last week' },
+            ONE_MONTH: { value: changePercent.monthAgo, label: 'since last month' },
         };
+        const selectedChange = changesByPeriod[this.currentPeriod];
 
-        // Clear existing content
         this.$change.textContent = '';
 
-        // Create and append new content safely
+        if (!selectedChange || !Number.isFinite(selectedChange.value)) {
+            return;
+        }
+
+        const isZero = selectedChange.value === 0;
         const changeElement = document.createElement('span');
-        changeElement.className = getVisualClass(changePercent);
-        changeElement.textContent = getSignedPercentage(changePercent);
+        changeElement.className = isZero ? '' : selectedChange.value > 0 ? 'positive' : 'negative';
+        changeElement.textContent = `${selectedChange.value > 0 ? '+' : ''}${selectedChange.value}%`;
 
         this.$change.appendChild(document.createTextNode(' ('));
         this.$change.appendChild(changeElement);
-        this.$change.appendChild(document.createTextNode(` ${periodLabel})`));
+        this.$change.appendChild(document.createTextNode(` ${selectedChange.label})`));
     },
 
-    $lastUpdated: document.querySelector('#last-updated'),
-    setLastUpdated() {
-        const cryptoType = this.currentCrypto;
-        if (!this.currentRepositories[cryptoType]) this.initRepositories();
-        this.currentRepositories[cryptoType]['NOW'].getDataUpToDateStatus().then((info) => {
-            const prettyLastUpdatedTime = dayjs(info.lastFetched).fromNow();
+    updateLastUpdated() {
+        const statuses = [this.dataStatus.chart, this.dataStatus.now].filter(Boolean);
+        const lastFetched = this.dataStatus.now?.lastFetched || this.dataStatus.chart?.lastFetched;
+        const hasFailure = statuses.some((status) => status.isStale || status.error);
 
-            // Clear existing content
-            this.$lastUpdated.textContent = '';
+        this.$lastUpdated.textContent = '';
 
-            const lastUpdatedSpan = document.createElement('span');
-            lastUpdatedSpan.className =
-                this.isLocalChartDataOld || this.isLocalNowDataOld ? 'negative' : 'positive';
-            lastUpdatedSpan.textContent = prettyLastUpdatedTime;
+        if (!lastFetched) {
+            this.$lastUpdated.textContent = hasFailure
+                ? 'unavailable. Data request failed.'
+                : '...';
+            this.$lastUpdated.removeAttribute('data-tooltip');
+            return;
+        }
 
-            const failureMessage =
-                this.isLocalChartDataOld || this.isLocalNowDataOld
-                    ? `. Data request failed. Refresh the page to try again.`
-                    : `.`;
+        const lastUpdatedSpan = document.createElement('span');
+        lastUpdatedSpan.className = hasFailure ? 'negative' : 'positive';
+        lastUpdatedSpan.textContent = dayjs(lastFetched).fromNow();
 
-            this.$lastUpdated.appendChild(lastUpdatedSpan);
-            this.$lastUpdated.appendChild(document.createTextNode(failureMessage));
-
-            this.$lastUpdated.setAttribute('data-tooltip', dayjs(info.lastFetched).calendar());
-        });
+        this.$lastUpdated.appendChild(lastUpdatedSpan);
+        this.$lastUpdated.appendChild(
+            document.createTextNode(hasFailure ? '. Showing cached data.' : '.')
+        );
+        this.$lastUpdated.setAttribute('data-tooltip', dayjs(lastFetched).calendar());
     },
 
-    displayPriceNow() {
-        const cryptoType = this.currentCrypto;
-        this.currentRepositories[cryptoType]['NOW']
-            .getData()
-            .then((_data) => {
-                this.setPriceChange(cryptoType);
-                this.setLastUpdated();
-            })
-            .catch(() => {
-                this.handleNowRejection();
-                this.setPriceChange(cryptoType);
-                this.setLastUpdated();
-            });
+    startRefreshTimer() {
+        if (this.refreshTimer) {
+            return;
+        }
 
-        // Track timeframe changes
-        setInterval(this.setLastUpdated.bind(this), 30 * 1000);
+        this.refreshTimer = window.setInterval(() => {
+            this.refreshActiveData();
+        }, this.REFRESH_INTERVAL);
     },
 
-    init() {
-        this.chart = new App.Chart(this.$chart);
+    refreshActiveData() {
+        this.loadActiveData(this.requestGeneration);
+        this.updateLastUpdated();
+    },
 
-        this.initRepositories();
-        this.initEvents();
+    destroy() {
+        if (this.refreshTimer) {
+            window.clearInterval(this.refreshTimer);
+            this.refreshTimer = null;
+        }
 
-        App.Settings.get().then(({ cryptoType }) => {
-            this.currentCrypto = cryptoType || 'bitcoin';
-            this.updateCryptoTypeLabel(this.currentCrypto);
-            this.displayPriceNow();
-        });
+        if (this.handleVisibilityChange) {
+            document.removeEventListener('visibilitychange', this.handleVisibilityChange);
+        }
     },
 };

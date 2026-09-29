@@ -1,39 +1,33 @@
-let cryptoPriceData = {};
-
-function initCryptoDataForToken(cryptoType) {
-    if (!cryptoPriceData[cryptoType]) {
-        cryptoPriceData[cryptoType] = {};
-    }
+if (typeof importScripts === 'function') {
+    importScripts('cryptoTokens.js');
 }
 
 async function fetchCryptoPrice(period, cryptoType) {
-    initCryptoDataForToken(cryptoType);
-    
-    const endpoints = {
-        ALL: `${cryptoType}/all`,
-        ONE_YEAR: `${cryptoType}/year`,
-        ONE_MONTH: `${cryptoType}/month`,
-        ONE_WEEK: `${cryptoType}/week`,
-        ONE_DAY: `${cryptoType}/day`,
-        ONE_HOUR: `${cryptoType}/hour`,
-        NOW: `${cryptoType}/now`,
-    };
+    const endpointPath = globalThis.App.CryptoTokens.getEndpointPath(cryptoType, period);
 
-    try {
-        const response = await fetch(`https://api.crypto-tab.com/v1/${endpoints[period]}`);
-        const data = await response.json();
-        cryptoPriceData[cryptoType][period] = data;
-    } catch (error) {
-        console.error(`Error fetching ${cryptoType} price for ${period}:`, error);
+    if (!endpointPath) {
+        throw new Error(`Unsupported price request: ${cryptoType}/${period}`);
     }
+
+    const response = await fetch(`https://api.crypto-tab.com/v1/${endpointPath}`);
+
+    if (!response.ok) {
+        throw new Error(`The price API responded with HTTP ${response.status}`);
+    }
+
+    return response.json();
 }
 
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+chrome.runtime.onMessage.addListener((request, _sender, sendResponse) => {
     if (request.type === 'getCryptoPrice') {
         const { period, cryptoType } = request;
-        fetchCryptoPrice(period, cryptoType).then(() => {
-            sendResponse({ data: cryptoPriceData[cryptoType][period], cached: false });
-        });
-        return true; // Indicates that the response will be sent asynchronously
+
+        fetchCryptoPrice(period, cryptoType)
+            .then((data) => sendResponse({ data }))
+            .catch((error) => sendResponse({ error: error.message }));
+
+        return true;
     }
+
+    return false;
 });

@@ -44,7 +44,6 @@ window.App.SettingsPanel = (function () {
 
         document.getElementById('token-select').addEventListener('change', (e) => {
             const cryptoType = e.target.value;
-            window.App.Settings.set('cryptoType', cryptoType);
 
             if (window.App.Crypto && window.App.Crypto.changeCryptoType) {
                 window.App.Crypto.changeCryptoType(cryptoType);
@@ -174,7 +173,9 @@ window.App.SettingsPanel = (function () {
         updateBorderColor('border-up', upColor);
         updateBorderColor('border-down', downColor);
 
-        const cryptoType = settings.cryptoType || window.App.CryptoTokens.getDefaultToken();
+        const cryptoType = window.App.CryptoTokens.isSupportedToken(settings.cryptoType)
+            ? settings.cryptoType
+            : window.App.CryptoTokens.getDefaultToken();
         document.getElementById('token-select').value = cryptoType;
 
         const clockFormat = settings.clockFormat;

@@ -1,8 +1,6 @@
-// Configuration for all supported crypto tokens
-window.App = window.App || {};
+globalThis.App = globalThis.App || {};
 
-window.App.CryptoTokens = {
-    // Token configuration
+globalThis.App.CryptoTokens = {
     TOKENS: {
         bitcoin: {
             id: 'bitcoin',
@@ -22,24 +20,63 @@ window.App.CryptoTokens = {
         },
     },
 
-    // Get all available tokens as an array
+    PERIODS: {
+        ONE_HOUR: 'ONE_HOUR',
+        ONE_DAY: 'ONE_DAY',
+        ONE_WEEK: 'ONE_WEEK',
+        ONE_MONTH: 'ONE_MONTH',
+        ONE_YEAR: 'ONE_YEAR',
+        ALL: 'ALL',
+    },
+
+    PERIOD_PATHS: {
+        ONE_HOUR: 'hour',
+        ONE_DAY: 'day',
+        ONE_WEEK: 'week',
+        ONE_MONTH: 'month',
+        ONE_YEAR: 'year',
+        ALL: 'all',
+        NOW: 'now',
+    },
+
     getAllTokens() {
         return Object.values(this.TOKENS);
     },
 
-    // Get token by ID
     getToken(tokenId) {
         return this.TOKENS[tokenId] || null;
     },
 
-    // Get the display name for a token
     getDisplayName(tokenId) {
         const token = this.getToken(tokenId);
         return token ? token.displayName : tokenId;
     },
 
-    // Get the default token ID
     getDefaultToken() {
         return 'bitcoin';
+    },
+
+    getDefaultPeriod() {
+        return this.PERIODS.ONE_DAY;
+    },
+
+    isSupportedToken(tokenId) {
+        return Boolean(this.getToken(tokenId));
+    },
+
+    isSupportedPeriod(period) {
+        return Object.prototype.hasOwnProperty.call(this.PERIOD_PATHS, period);
+    },
+
+    isChartPeriod(period) {
+        return Object.prototype.hasOwnProperty.call(this.PERIODS, period);
+    },
+
+    getEndpointPath(tokenId, period) {
+        if (!this.isSupportedToken(tokenId) || !this.isSupportedPeriod(period)) {
+            return null;
+        }
+
+        return `${tokenId}/${this.PERIOD_PATHS[period]}`;
     },
 };

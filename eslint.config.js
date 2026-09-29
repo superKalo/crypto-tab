@@ -12,6 +12,8 @@ module.exports = [
                 SuperRepo: 'readonly',
                 Chart: 'readonly',
                 dayjs: 'readonly',
+                chrome: 'readonly',
+                importScripts: 'readonly',
             },
         },
     },
