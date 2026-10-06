@@ -76,6 +76,19 @@ gulp.task("preprocess-index", function () {
                         <meta property="og:locale" content="en_US">
                         <meta property="og:type" content="website">`,
           },
+          {
+            match: "superRepoScript",
+            replacement:
+              ENV === "website" ? '<script src="lib/index.js"></script>' : "",
+          },
+          {
+            match: "priceRepositoryScripts",
+            replacement:
+              ENV === "website"
+                ? `<script src="js/priceApi.js"></script>
+    <script src="js/priceRepositoryFactory.js"></script>`
+                : "",
+          },
         ],
       })
     )
@@ -95,7 +108,17 @@ gulp.task("preprocess-manifest", function () {
             // for background scripts that can be used in a similar way.
             replacement: ENV === 'extension-webkit' ?
               { "service_worker": "js/background.js" } :
-              { "scripts": ["js/cryptoTokens.js", "js/background.js"] }
+              {
+                "scripts": [
+                  "lib/dayjs.min.js",
+                  "lib/utc.js",
+                  "lib/index.js",
+                  "js/cryptoTokens.js",
+                  "js/priceApi.js",
+                  "js/priceRepositoryFactory.js",
+                  "js/background.js"
+                ]
+              }
           },
         ],
       })

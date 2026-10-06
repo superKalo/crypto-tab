@@ -1,6 +1,6 @@
-window.App = window.App || {};
+globalThis.App = globalThis.App || {};
 
-window.App.PriceApi = (function () {
+globalThis.App.PriceApi = (function () {
     const API_BASE_URL = 'https://api.crypto-tab.com/v1';
 
     function validateRequest(period, cryptoType) {
@@ -63,7 +63,7 @@ window.App.PriceApi = (function () {
         }
     }
 
-    async function fetchDirectly(period, cryptoType) {
+    async function getPriceData(period, cryptoType) {
         const endpointPath = validateRequest(period, cryptoType);
         const response = await fetch(`${API_BASE_URL}/${endpointPath}`);
 
@@ -74,27 +74,7 @@ window.App.PriceApi = (function () {
         return normalizeResponse(await response.json(), period);
     }
 
-    async function fetchFromExtension(period, cryptoType) {
-        validateRequest(period, cryptoType);
-
-        const response = await window.browser.runtime.sendMessage({
-            type: 'getCryptoPrice',
-            period,
-            cryptoType,
-        });
-
-        if (!response || response.error) {
-            throw new Error(response?.error || `Failed to retrieve ${cryptoType} price data`);
-        }
-
-        return normalizeResponse(response.data, period);
-    }
-
     return {
-        getPriceData(period, cryptoType) {
-            return App.ENV.platform === 'EXTENSION'
-                ? fetchFromExtension(period, cryptoType)
-                : fetchDirectly(period, cryptoType);
-        },
+        getPriceData,
     };
 })();

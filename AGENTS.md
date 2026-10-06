@@ -23,10 +23,12 @@ is loaded as ordered browser scripts and shares the `App` namespace.
 
 ## Runtime Architecture
 
-Keep the price-data flow unidirectional:
+Keep the price-data flow unidirectional, with one repository owner per platform:
 
 ```text
-Crypto UI -> PriceRepositoryFactory -> SuperRepo -> PriceApi -> transport -> api.crypto-tab.com
+Website:   Crypto UI -> PriceRepositoryClient -> PriceRepositoryFactory -> SuperRepo -> PriceApi
+Extension: Crypto UI -> PriceRepositoryClient -> background worker -> PriceRepositoryFactory
+                                                      -> SuperRepo -> PriceApi
 ```
 
 -   `src/js/script.js` is the application entry point.
@@ -35,12 +37,13 @@ Crypto UI -> PriceRepositoryFactory -> SuperRepo -> PriceApi -> transport -> api
 -   `src/js/cryptoTokens.js` is the source of truth for supported tokens, periods, display names, defaults,
     validation, and API endpoint paths. It uses `globalThis.App` because it also runs in an extension
     background context.
--   `src/js/priceApi.js` validates requests, selects the platform transport, validates payloads, and
-    normalizes numeric strings into finite numbers.
+-   `src/js/priceApi.js` validates requests and API payloads, performs the remote request, and normalizes
+    numeric strings into finite numbers.
 -   `src/js/priceRepositoryFactory.js` owns SuperRepo instances, cache policy, response mapping, stale-cache
     fallback, and the repository result contract.
--   `src/js/background.js` is the extension transport. It validates token/period through `CryptoTokens`,
-    performs the remote request, and returns either `{ data }` or `{ error }`.
+-   `src/js/priceRepositoryClient.js` keeps the UI platform-agnostic. Website requests use an in-page
+    repository factory; extension requests are delegated to the background worker.
+-   `src/js/background.js` owns the extension repository factory and returns serialized repository results.
 -   `src/js/chart.js` owns Chart.js setup and chart rendering.
 -   `src/js/settings.js` abstracts persisted settings.
 -   `src/js/settingsPanel.js` owns settings-panel interactions, but token persistence remains owned by
@@ -93,7 +96,10 @@ from shared UI code when the compatibility layer or `window.browser` should be u
 -   Prices are formatted with `Intl.NumberFormat`; preserve enough fractional precision for low-priced
     assets.
 
-Do not add a second cache in the background worker. SuperRepo is the single cache layer.
+Maintain one authoritative SuperRepo cache per platform. Website pages own their local cache; the extension
+background context owns the shared extension cache, and extension pages must not create a competing cache.
+Persist extension cache state in `browser.storage.local`; treat the worker's in-memory instances as an
+optimization that can be rebuilt after service-worker suspension.
 
 ## Async and UI Invariants
 

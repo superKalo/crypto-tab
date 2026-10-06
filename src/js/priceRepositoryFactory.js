@@ -1,9 +1,10 @@
-window.App = window.App || {};
+globalThis.App = globalThis.App || {};
 
-window.App.PriceRepositoryFactory = class PriceRepositoryFactory {
-    constructor() {
+globalThis.App.PriceRepositoryFactory = class PriceRepositoryFactory {
+    constructor({ storage = 'LOCAL_STORAGE', request = App.PriceApi.getPriceData } = {}) {
         this.repositories = {};
-        this.storage = App.ENV.platform === 'EXTENSION' ? 'BROWSER_STORAGE' : 'LOCAL_STORAGE';
+        this.request = request;
+        this.storage = storage;
     }
 
     getRepositoryKey(cryptoType, period) {
@@ -27,7 +28,7 @@ window.App.PriceRepositoryFactory = class PriceRepositoryFactory {
             storage: this.storage,
             name: `prices-v1:${cryptoType}:${period}`,
             outOfDateAfter: isCurrentPrice ? 3 * 60 * 1000 : 15 * 60 * 1000,
-            request: () => App.PriceApi.getPriceData(period, cryptoType),
+            request: () => this.request(period, cryptoType),
             mapData: isCurrentPrice
                 ? this.mapCurrentPrice
                 : (data) => this.mapChartData(data, period),
@@ -36,6 +37,14 @@ window.App.PriceRepositoryFactory = class PriceRepositoryFactory {
 
     async getData(cryptoType, period) {
         const repositoryKey = this.getRepositoryKey(cryptoType, period);
+
+        if (!App.CryptoTokens.getEndpointPath(cryptoType, period)) {
+            return this.createResult({
+                error: new Error(`Unsupported price request: ${cryptoType}/${period}`),
+                repositoryKey,
+            });
+        }
+
         const repository = this.getRepository(cryptoType, period);
         let cacheStatus;
 

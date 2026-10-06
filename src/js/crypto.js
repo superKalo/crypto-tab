@@ -21,7 +21,7 @@ window.App.Crypto = {
     currentPeriod: '',
     isInitialized: false,
     refreshTimer: null,
-    repositoryFactory: null,
+    repositoryClient: null,
     repositoryStatuses: {},
     requestGeneration: 0,
 
@@ -32,7 +32,7 @@ window.App.Crypto = {
 
         this.isInitialized = true;
         this.chart = new App.Chart(this.$chart);
-        this.repositoryFactory = new App.PriceRepositoryFactory();
+        this.repositoryClient = new App.PriceRepositoryClient();
 
         const settings = await App.Settings.get();
         this.currentCrypto = App.CryptoTokens.isSupportedToken(settings.cryptoType)
@@ -116,7 +116,7 @@ window.App.Crypto = {
     async loadChart(generation) {
         const cryptoType = this.currentCrypto;
         const period = this.currentPeriod;
-        const result = await this.repositoryFactory.getData(cryptoType, period);
+        const result = await this.repositoryClient.getData(cryptoType, period);
 
         if (!this.isCurrentRequest(generation, cryptoType, period)) {
             return;
@@ -128,7 +128,7 @@ window.App.Crypto = {
 
     async loadCurrentPrice(generation) {
         const cryptoType = this.currentCrypto;
-        const result = await this.repositoryFactory.getData(cryptoType, 'NOW');
+        const result = await this.repositoryClient.getData(cryptoType, 'NOW');
 
         if (!this.isCurrentRequest(generation, cryptoType)) {
             return;
@@ -261,7 +261,9 @@ window.App.Crypto = {
         }
 
         this.refreshTimer = window.setInterval(() => {
-            this.refreshActiveData();
+            if (!document.hidden) {
+                this.refreshActiveData();
+            }
         }, this.REFRESH_INTERVAL);
     },
 
