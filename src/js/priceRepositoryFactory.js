@@ -26,7 +26,7 @@ globalThis.App.PriceRepositoryFactory = class PriceRepositoryFactory {
 
         return new SuperRepo({
             storage: this.storage,
-            name: `prices-v1:${cryptoType}:${period}`,
+            name: `prices-v2:${cryptoType}:${period}`,
             outOfDateAfter: isCurrentPrice ? 3 * 60 * 1000 : 15 * 60 * 1000,
             request: () => this.request(period, cryptoType),
             mapData: isCurrentPrice

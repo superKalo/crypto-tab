@@ -69,7 +69,7 @@ from shared UI code when the compatibility layer or `window.browser` should be u
 ## Data and Cache Invariants
 
 -   Repository keys must be unique per token and period and remain versioned, currently
-    `prices-v1:<token>:<period>`.
+    `prices-v2:<token>:<period>`.
 -   Current-price (`NOW`) data expires after 3 minutes.
 -   Historical chart data expires after 15 minutes.
 -   Repository results use this stable contract:
