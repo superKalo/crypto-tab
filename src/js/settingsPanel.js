@@ -5,23 +5,135 @@ window.App.SettingsPanel = (function () {
     let toggleButton;
     let themeToggle;
     let themeOptions;
+    let tokenPicker;
+    let tokenSelect;
 
     const DEFAULT_UP_COLOR = '#61ca00';
     const DEFAULT_DOWN_COLOR = '#ff4949';
 
     function populateTokenDropdown() {
-        const tokenSelect = document.getElementById('token-select');
-
-        tokenSelect.innerHTML = '';
-
+        const tokenOptions = document.getElementById('token-options');
         const tokens = window.App.CryptoTokens.getAllTokens();
 
+        tokenOptions.replaceChildren();
+
         tokens.forEach((token) => {
-            const option = document.createElement('option');
-            option.value = token.id;
-            option.textContent = token.displayName;
-            tokenSelect.appendChild(option);
+            const row = document.createElement('li');
+            row.className = 'token-option-row';
+
+            const option = document.createElement('button');
+            option.type = 'button';
+            option.className = 'token-option';
+            option.dataset.token = token.id;
+            option.appendChild(createTokenIdentity(token));
+
+            option.addEventListener('click', () => {
+                if (window.App.Crypto && window.App.Crypto.changeCryptoType) {
+                    window.App.Crypto.changeCryptoType(token.id);
+                    renderSelectedToken(token.id);
+                    tokenPicker.open = false;
+                    tokenSelect.focus();
+                }
+            });
+
+            const description = document.createElement('span');
+            description.className = 'token-option-description';
+            description.textContent = token.description;
+            option.appendChild(description);
+
+            const link = document.createElement('a');
+            link.className = 'token-link';
+            link.href = token.coinGeckoUrl;
+            link.target = '_blank';
+            link.rel = 'noopener noreferrer';
+            link.textContent = 'Learn more';
+            link.setAttribute('aria-label', `Learn more about ${token.displayName}`);
+
+            row.append(option, link);
+            tokenOptions.appendChild(row);
         });
+
+        renderSelectedToken(window.App.CryptoTokens.getDefaultToken());
+    }
+
+    function createTokenIdentity(token) {
+        const selectionName = token.selectionName || token.displayName;
+        const identity = document.createElement('span');
+        identity.className = 'token-identity';
+
+        const logo = document.createElement('img');
+        logo.className = 'token-logo';
+        logo.src = token.logoPath;
+        logo.alt = '';
+        logo.width = 32;
+        logo.height = 32;
+
+        const name = document.createElement('span');
+        name.className = 'token-name';
+        name.textContent = selectionName;
+
+        identity.append(logo, name);
+
+        if (token.symbol !== selectionName) {
+            const symbol = document.createElement('span');
+            symbol.className = 'token-symbol';
+            symbol.textContent = token.symbol;
+            identity.appendChild(symbol);
+        }
+
+        return identity;
+    }
+
+    function renderSelectedToken(tokenId) {
+        const token = window.App.CryptoTokens.getToken(tokenId);
+
+        if (!token) {
+            return;
+        }
+
+        const selectionName = token.selectionName || token.displayName;
+        document.getElementById('selected-token').replaceChildren(createTokenIdentity(token));
+        tokenSelect.setAttribute('aria-label', `Change token: ${selectionName} (${token.symbol})`);
+        document.getElementById('token-description').textContent = token.description;
+
+        const link = document.getElementById('token-learn-more');
+        link.href = token.coinGeckoUrl;
+        link.setAttribute('aria-label', `Learn more about ${token.displayName}`);
+
+        tokenPicker.querySelectorAll('.token-option').forEach((option) => {
+            const isSelected = option.dataset.token === token.id;
+            option.setAttribute('aria-pressed', String(isSelected));
+            option.closest('.token-option-row').classList.toggle('is-selected', isSelected);
+        });
+    }
+
+    function handleTokenKeydown(event) {
+        const keys = ['ArrowDown', 'ArrowUp', 'Home', 'End'];
+        const option = event.target.closest('.token-option');
+
+        if (!keys.includes(event.key) || (event.target !== tokenSelect && !option)) {
+            return;
+        }
+
+        event.preventDefault();
+        tokenPicker.open = true;
+
+        const options = [...tokenPicker.querySelectorAll('.token-option')];
+        const index = options.indexOf(option);
+        let nextIndex;
+
+        if (event.key === 'Home') {
+            nextIndex = 0;
+        } else if (event.key === 'End') {
+            nextIndex = options.length - 1;
+        } else if (index === -1) {
+            nextIndex = options.findIndex((item) => item.getAttribute('aria-pressed') === 'true');
+        } else {
+            const direction = event.key === 'ArrowDown' ? 1 : -1;
+            nextIndex = (index + direction + options.length) % options.length;
+        }
+
+        options[nextIndex].focus();
     }
 
     function init() {
@@ -29,24 +141,35 @@ window.App.SettingsPanel = (function () {
         toggleButton = document.getElementById('toggle-settings');
         themeToggle = document.getElementById('theme-toggle');
         themeOptions = document.querySelectorAll('.toggle-option');
+        tokenPicker = document.getElementById('token-picker');
+        tokenSelect = document.getElementById('token-select');
 
         populateTokenDropdown();
 
         toggleButton.addEventListener('click', togglePanelVisibility);
 
         document.querySelectorAll('#close-settings').forEach((btn) => {
-            btn.addEventListener('click', hidePanel);
+            btn.addEventListener('click', () => hidePanel(true));
         });
 
         themeOptions.forEach((option) => {
             option.addEventListener('click', handleThemeToggle);
         });
 
-        document.getElementById('token-select').addEventListener('change', (e) => {
-            const cryptoType = e.target.value;
+        tokenPicker.addEventListener('keydown', handleTokenKeydown);
+        tokenPicker.addEventListener('toggle', () => {
+            document.getElementById('appearance-settings').hidden = tokenPicker.open;
+        });
+        settingsPanel.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape') {
+                event.preventDefault();
 
-            if (window.App.Crypto && window.App.Crypto.changeCryptoType) {
-                window.App.Crypto.changeCryptoType(cryptoType);
+                if (tokenPicker.open) {
+                    tokenPicker.open = false;
+                    tokenSelect.focus();
+                } else {
+                    hidePanel(true);
+                }
             }
         });
 
@@ -86,17 +209,33 @@ window.App.SettingsPanel = (function () {
     }
 
     function togglePanelVisibility() {
-        settingsPanel.classList.toggle('hidden');
+        if (settingsPanel.classList.contains('hidden')) {
+            settingsPanel.classList.remove('hidden');
+            toggleButton.setAttribute('aria-expanded', 'true');
+            tokenSelect.focus();
+        } else {
+            hidePanel();
+        }
     }
 
-    function hidePanel() {
+    function hidePanel(restoreFocus = false) {
         settingsPanel.classList.add('hidden');
+        toggleButton.setAttribute('aria-expanded', 'false');
+        tokenPicker.open = false;
+
+        if (restoreFocus) {
+            toggleButton.focus();
+        }
     }
 
     function handleOutsideClick(event) {
         // Don't close if the panel is already hidden
         if (settingsPanel.classList.contains('hidden')) {
             return;
+        }
+
+        if (!tokenPicker.contains(event.target)) {
+            tokenPicker.open = false;
         }
 
         // Don't close if clicking on the toggle button or inside the settings panel
@@ -176,7 +315,7 @@ window.App.SettingsPanel = (function () {
         const cryptoType = window.App.CryptoTokens.isSupportedToken(settings.cryptoType)
             ? settings.cryptoType
             : window.App.CryptoTokens.getDefaultToken();
-        document.getElementById('token-select').value = cryptoType;
+        renderSelectedToken(window.App.Crypto.currentCrypto || cryptoType);
 
         const clockFormat = settings.clockFormat;
         if (clockFormat) {

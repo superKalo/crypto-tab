@@ -147,7 +147,7 @@ window.App.Crypto = {
             return;
         }
 
-        this.chart.init(result.data);
+        this.chart.init(result.data, cryptoType);
 
         if (result.isStale) {
             App.Message.fireError('Showing cached chart data because the latest request failed.');
@@ -198,7 +198,7 @@ window.App.Crypto = {
     },
 
     setPriceNow(price) {
-        this.$priceNow.textContent = App.Utils.formatPrice(price);
+        this.$priceNow.textContent = App.Utils.formatPrice(price, this.currentCrypto);
     },
 
     setPriceChange(changePercent) {

@@ -123,66 +123,100 @@
         </p>
       </footer>
 
-      <div id="settings-panel" class="settings hidden">
+      <div id="settings-panel" class="settings hidden" aria-labelledby="settings-title">
         <div class="settings-header">
-          <h2 class="settings-title">Make It Yours</h2>
-          <button id="close-settings" class="close-button">&times;</button>
+          <h2 id="settings-title" class="settings-title">Preferences</h2>
+          <button
+            id="close-settings"
+            type="button"
+            class="close-button"
+            aria-label="Close preferences"
+          >
+            &times;
+          </button>
         </div>
         <div class="settings-body">
-          <div class="settings-container">
-            <label>Theme</label>
-            <div class="toggle-container">
-              <div id="theme-toggle" class="toggle">
-                <div class="toggle-option active" data-theme="light">☀️ Light</div>
-                <div class="toggle-option" data-theme="system">🌗 System</div>
-                <div class="toggle-option" data-theme="dark">🌙 Dark</div>
-              </div>
+          <section class="settings-section" aria-labelledby="token-heading">
+            <h3 id="token-heading" class="settings-section-title">Token</h3>
+            <details id="token-picker" class="token-picker">
+              <summary id="token-select" class="token-select" aria-label="Change token">
+                <span id="selected-token" class="token-identity"></span>
+                <span class="token-chevron" aria-hidden="true"></span>
+              </summary>
+              <ul id="token-options" class="token-options" aria-label="Available tokens">
+                <!-- Options will be populated from cryptoTokens.js. -->
+              </ul>
+            </details>
+            <div class="token-details">
+              <p id="token-description" class="settings-hint"></p>
+              <a id="token-learn-more" class="token-link" target="_blank" rel="noopener noreferrer">
+                Learn more
+              </a>
             </div>
-          </div>
-          <div class="settings-container">
-            <label for="token-select">Change Token</label>
-            <select id="token-select">
-              <!-- Options will be populated by JavaScript from cryptoTokens.js -->
-            </select>
-          </div>
-          <div class="settings-container">
-            <label for="clock-format">Clock Format</label>
-            <select id="clock-format">
-              <option value="24h">24h</option>
-              <option value="12h">12h (AM/PM)</option>
-            </select>
-          </div>
-          <div class="settings-container">
-            <label for="clock-up-down">Color Vibes</label>
-            <div class="color-picker-row">
-              <div class="color-picker">
-                <div class="color-picker-label">
-                  <span>📈 Up</span>
-                  <div id="circle-up" class="circle-icon"></div>
-                </div>
-                <div class="color-input-wrapper">
-                  <button id="border-up" type="button" class="color-button">Change color</button>
-                  <input type="color" id="color-up" value="#61ca00" />
-                </div>
-              </div>
+          </section>
 
-              <div class="color-picker">
-                <div class="color-picker-label">
-                  <span>📉 Down</span>
-                  <div id="circle-down" class="circle-icon"></div>
-                </div>
-                <div class="color-input-wrapper">
-                  <button id="border-down" type="button" class="color-button">Change color</button>
-                  <input type="color" id="color-down" value="#ff4949" />
+          <section
+            id="appearance-settings"
+            class="settings-section"
+            aria-labelledby="appearance-heading"
+          >
+            <h3 id="appearance-heading" class="settings-section-title">Appearance</h3>
+            <div class="settings-container">
+              <label>Theme</label>
+              <div class="toggle-container">
+                <div id="theme-toggle" class="toggle">
+                  <div class="toggle-option active" data-theme="light">Light</div>
+                  <div class="toggle-option" data-theme="system">System</div>
+                  <div class="toggle-option" data-theme="dark">Dark</div>
                 </div>
               </div>
             </div>
-            <button id="reset-colors" class="btn reset-colors">Reset colors</button>
-          </div>
+            <div class="settings-container">
+              <label for="clock-format">Clock Format</label>
+              <select id="clock-format">
+                <option value="24h">24h</option>
+                <option value="12h">12h (AM/PM)</option>
+              </select>
+            </div>
+            <div class="settings-container">
+              <label>Price Colors</label>
+              <div class="color-picker-row">
+                <div class="color-picker">
+                  <div class="color-picker-label">
+                    <label for="color-up">Up</label>
+                    <div id="circle-up" class="circle-icon"></div>
+                  </div>
+                  <div class="color-input-wrapper">
+                    <button id="border-up" type="button" class="color-button">Change color</button>
+                    <input type="color" id="color-up" value="#61ca00" />
+                  </div>
+                </div>
+
+                <div class="color-picker">
+                  <div class="color-picker-label">
+                    <label for="color-down">Down</label>
+                    <div id="circle-down" class="circle-icon"></div>
+                  </div>
+                  <div class="color-input-wrapper">
+                    <button id="border-down" type="button" class="color-button">
+                      Change color
+                    </button>
+                    <input type="color" id="color-down" value="#ff4949" />
+                  </div>
+                </div>
+              </div>
+              <button id="reset-colors" class="btn reset-colors">Reset colors</button>
+            </div>
+          </section>
         </div>
       </div>
 
-      <button id="toggle-settings" class="btn toggle-settings">
+      <button
+        id="toggle-settings"
+        class="btn toggle-settings"
+        aria-controls="settings-panel"
+        aria-expanded="false"
+      >
         <svg
           viewBox="0 0 600 600"
           width="16"
@@ -197,7 +231,7 @@
             />
           </g>
         </svg>
-        <span>Customize</span>
+        <span>Preferences</span>
       </button>
     </div>
 

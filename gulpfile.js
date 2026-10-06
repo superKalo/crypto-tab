@@ -8,7 +8,7 @@ const distPath = `./dist/${ENV}/`;
 const productDescription =
   "Replace your browser New Tab page with live price charts for Bitcoin, Ethereum, and more.";
 
-const filesArr = ["./src/js/**/*", "./src/css/**/*"];
+const filesArr = ["./src/js/**/*", "./src/css/**/*", "./src/img/tokens/**/*"];
 if (ENV.includes("extension")) {
   filesArr.push("./src/manifest.json", "./src/icons/**/*");
 }
