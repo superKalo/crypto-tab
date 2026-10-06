@@ -113,6 +113,7 @@ gulp.task("preprocess-manifest", function () {
                   "lib/dayjs.min.js",
                   "lib/utc.js",
                   "lib/index.js",
+                  "js/storageMigration.js",
                   "js/cryptoTokens.js",
                   "js/priceApi.js",
                   "js/priceRepositoryFactory.js",

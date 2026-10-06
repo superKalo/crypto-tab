@@ -5,6 +5,7 @@ if (typeof importScripts === 'function') {
         '../lib/dayjs.min.js',
         '../lib/utc.js',
         '../lib/index.js',
+        'storageMigration.js',
         'cryptoTokens.js',
         'priceApi.js',
         'priceRepositoryFactory.js'
@@ -17,10 +18,18 @@ if (typeof importScripts === 'function') {
 
 globalThis.dayjs.extend(globalThis.dayjs_plugin_utc);
 
+const extensionApi = globalThis.browser || globalThis.chrome;
+const callbackExtensionApi = globalThis.chrome || extensionApi;
+const storageMigration = new globalThis.App.StorageMigration({
+    storageArea: callbackExtensionApi.storage.local,
+    runtime: callbackExtensionApi.runtime,
+});
+const storageMigrationPromise = storageMigration.migrate().catch((error) => {
+    console.error('Storage migration failed:', error);
+});
 const repositoryFactory = new globalThis.App.PriceRepositoryFactory({
     storage: 'BROWSER_STORAGE',
 });
-const extensionApi = globalThis.browser || globalThis.chrome;
 
 function serializeRepositoryResult(result) {
     return {
@@ -47,8 +56,8 @@ function createFailureResult(cryptoType, period, error) {
 }
 
 function handleRepositoryRequest(period, cryptoType, sendResponse) {
-    repositoryFactory
-        .getData(cryptoType, period)
+    storageMigrationPromise
+        .then(() => repositoryFactory.getData(cryptoType, period))
         .then((result) => sendResponse(serializeRepositoryResult(result)))
         .catch((error) => sendResponse(createFailureResult(cryptoType, period, error)));
 }

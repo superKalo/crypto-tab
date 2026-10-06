@@ -37,6 +37,7 @@ Extension: Crypto UI -> PriceRepositoryClient -> background worker -> PriceRepos
 -   `src/js/cryptoTokens.js` is the source of truth for supported tokens, periods, display names, defaults,
     validation, and API endpoint paths. It uses `globalThis.App` because it also runs in an extension
     background context.
+-   `src/js/storageMigration.js` owns versioned, idempotent extension storage migrations.
 -   `src/js/priceApi.js` validates requests and API payloads, performs the remote request, and normalizes
     numeric strings into finite numbers.
 -   `src/js/priceRepositoryFactory.js` owns SuperRepo instances, cache policy, response mapping, stale-cache
