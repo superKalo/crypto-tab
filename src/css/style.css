@@ -435,7 +435,7 @@ small {
     background: var(--background-color);
     border-radius: 10px;
     border: 1px solid var(--border-color);
-    width: 360px;
+    width: 420px;
     max-width: calc(100vw - 40px);
     max-height: calc(100vh - 70px);
     max-height: calc(100dvh - 70px);
@@ -563,7 +563,15 @@ small {
     border-top: 1px solid var(--border-color);
     padding: 6px;
     background: var(--background-color);
+}
+.token-request {
+    border-top: 1px solid var(--border-color);
+    padding: 12px 16px;
     border-radius: 0 0 10px 10px;
+    background: var(--background-color);
+    color: var(--text-color);
+    font-size: 12px;
+    line-height: 1.5;
 }
 .token-option-row {
     border: 2px solid transparent;
