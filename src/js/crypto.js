@@ -24,6 +24,7 @@ window.App.Crypto = {
     repositoryClient: null,
     repositoryStatuses: {},
     requestGeneration: 0,
+    tokenPicker: null,
 
     async init() {
         if (this.isInitialized) {
@@ -58,6 +59,15 @@ window.App.Crypto = {
     },
 
     initEvents() {
+        this.tokenPicker = new App.TokenPicker({
+            container: document.getElementById('price-token-picker'),
+            trigger: document.getElementById('price-token-select'),
+            options: document.getElementById('price-token-options'),
+            menu: document.getElementById('price-token-menu'),
+            onSelect: (tokenId) => this.changeCryptoType(tokenId),
+        });
+        this.tokenPicker.renderSelected(this.currentCrypto);
+
         this.$dataPeriods.forEach((element) => {
             element.addEventListener('click', () => {
                 this.changePeriod(element.dataset.period);
@@ -176,7 +186,16 @@ window.App.Crypto = {
     },
 
     updateCryptoTypeLabel() {
-        this.$cryptoTypeLabel.textContent = App.CryptoTokens.getDisplayName(this.currentCrypto);
+        const token = App.CryptoTokens.getToken(this.currentCrypto);
+        this.$cryptoTypeLabel.textContent = token.displayName;
+        document.getElementById('price-token-logo').src = token.logoPath;
+
+        const trigger = document.getElementById('price-token-select');
+        trigger.style.setProperty('--token-color', token.textColor);
+        trigger.style.setProperty('--token-color-dark', token.darkTextColor);
+        trigger.setAttribute('aria-label', `Change token: ${token.displayName} (${token.symbol})`);
+        this.tokenPicker?.renderSelected(this.currentCrypto);
+        App.SettingsPanel?.renderSelectedToken(this.currentCrypto);
     },
 
     updateActivePeriod() {

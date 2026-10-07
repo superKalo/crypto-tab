@@ -83,11 +83,55 @@
         </a>
       </div>
 
-      <h2 class="chart-period mb text-center">
-        <span id="crypto-type">Bitcoin</span> price is
-        <span id="price-now">...</span>
-        <span id="change"></span>
-      </h2>
+      <div id="price-token-picker" class="price-heading mb text-center">
+        <h2 class="chart-period">
+          <button
+            id="price-token-select"
+            class="price-token-select"
+            type="button"
+            aria-label="Change token: Bitcoin (BTC)"
+            aria-expanded="false"
+            aria-controls="price-token-menu"
+            title="Change token"
+          >
+            <span class="price-token-mark" aria-hidden="true">
+              <img
+                id="price-token-logo"
+                class="token-logo"
+                src="img/tokens/bitcoin.svg"
+                alt=""
+                width="20"
+                height="20"
+              />
+              <svg
+                class="price-token-edit"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+                focusable="false"
+              >
+                <path d="m3.5 16.5 12-12a3 3 0 0 1 4.25 4.25l-12 12L3 21l.5-4.5Z" />
+                <path d="m13.75 6.25 4.25 4.25M3.5 16.5l4.25 4.25" />
+              </svg>
+            </span>
+            <span id="crypto-type">Bitcoin</span>
+          </button>
+          price is <span id="price-now">...</span>
+          <span id="change"></span>
+        </h2>
+        <div id="price-token-menu" class="price-token-menu" hidden>
+          <p class="price-token-menu-title">Choose a token</p>
+          <ul id="price-token-options" class="token-options" aria-label="Available tokens">
+            <!-- Options share the Preferences picker. -->
+          </ul>
+        </div>
+      </div>
 
       <p id="periods" class="text-center mb+">
         <button data-period="ONE_HOUR" type="button" class="btn js-period">1H</button>
@@ -259,6 +303,7 @@
     <script src="env/env.js"></script>
     <script src="js/utils.js"></script>
     <script src="js/cryptoTokens.js"></script>
+    <script src="js/tokenPicker.js"></script>
     <script src="js/settings.js"></script>
     <script src="js/message.js"></script>
     @@priceRepositoryScripts

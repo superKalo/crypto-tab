@@ -21,6 +21,7 @@ small {
 
 .wrapper {
     width: 700px;
+    max-width: calc(100% - 40px);
     padding: 0 20px;
     margin: 0 auto;
     display: flex;
@@ -79,6 +80,7 @@ small {
 
 .install {
     width: 500px;
+    max-width: 100%;
     display: flex;
     margin-top: -15px;
 }
@@ -427,6 +429,131 @@ small {
     margin-left: 5px;
 }
 
+/* Token selection beside the price */
+.price-heading {
+    position: relative;
+    width: 100%;
+    line-height: 1.5;
+}
+.price-token-select {
+    display: inline-block;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 3px;
+    background: transparent;
+    color: var(--token-color, #b85e00);
+    font: inherit;
+    vertical-align: baseline;
+    white-space: nowrap;
+    cursor: pointer;
+}
+#crypto-type {
+    font-weight: 600;
+}
+#price-now {
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+}
+.price-token-mark {
+    position: relative;
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    margin-right: 2px;
+    vertical-align: -0.25em;
+    border-radius: 50%;
+    transition: background-color 180ms ease;
+}
+.price-token-mark .token-logo {
+    display: block;
+    width: 20px;
+    height: 20px;
+    transform: scale(1) rotate(0deg);
+    transform-origin: center;
+    transition:
+        opacity 180ms ease,
+        transform 180ms cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.price-token-edit {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(2px) scale(0.8) rotate(-12deg);
+    transform-origin: center;
+    transition:
+        opacity 180ms ease,
+        transform 180ms cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.price-token-select:hover .price-token-mark,
+.price-token-select:focus-visible .price-token-mark,
+.price-token-select[aria-expanded='true'] .price-token-mark {
+    background: var(--input-bg);
+}
+.price-token-select:hover .token-logo,
+.price-token-select:focus-visible .token-logo,
+.price-token-select[aria-expanded='true'] .token-logo {
+    opacity: 0;
+    transform: translateY(1px) scale(0.78) rotate(-8deg);
+}
+.price-token-select:hover .price-token-edit,
+.price-token-select:focus-visible .price-token-edit,
+.price-token-select[aria-expanded='true'] .price-token-edit {
+    opacity: 1;
+    transform: translateY(0) scale(1) rotate(0deg);
+}
+@media (prefers-reduced-motion: reduce) {
+    .price-token-mark {
+        transition: none;
+    }
+    #price-token-select .token-logo,
+    #price-token-select .price-token-edit {
+        transition: none;
+        transform: none;
+    }
+}
+.price-token-menu {
+    position: absolute;
+    top: calc(100% + 10px);
+    left: 50%;
+    transform: translateX(-50%);
+    width: 380px;
+    max-width: 100%;
+    max-height: 50vh;
+    overflow-y: auto;
+    box-sizing: border-box;
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    background: var(--background-color);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.16);
+    text-align: left;
+    font-size: 14px;
+    line-height: 1.5;
+    z-index: 10;
+}
+.price-token-menu[hidden] {
+    display: none;
+}
+.price-token-menu-title {
+    padding: 12px 16px;
+    font-size: 12px;
+    font-weight: bold;
+    color: var(--text-color-secondary);
+}
+.price-heading :focus-visible {
+    outline: 2px solid var(--text-color);
+    outline-offset: 3px;
+}
+body.dark-theme .price-token-select {
+    color: var(--token-color-dark, #f7931a);
+}
+@media (prefers-color-scheme: dark) {
+    body:not(.light-theme) .price-token-select {
+        color: var(--token-color-dark, #f7931a);
+    }
+}
 /* Settings Panel */
 .settings {
     position: fixed;
