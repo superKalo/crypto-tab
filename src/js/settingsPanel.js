@@ -43,6 +43,7 @@ window.App.SettingsPanel = (function () {
             trigger: tokenSelect,
             options: document.getElementById('token-options'),
             onSelect: (tokenId) => window.App.Crypto.changeCryptoType(tokenId),
+            onOpen: () => window.App.TokenPickerIntro.dismiss(),
         });
         renderSelectedToken(
             window.App.Crypto.currentCrypto || window.App.CryptoTokens.getDefaultToken()

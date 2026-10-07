@@ -4,12 +4,13 @@ window.App.TokenPicker = (function () {
     const instances = [];
 
     return class TokenPicker {
-        constructor({ container, trigger, options, menu = container, onSelect }) {
+        constructor({ container, trigger, options, menu = container, onSelect, onOpen }) {
             this.container = container;
             this.trigger = trigger;
             this.options = options;
             this.menu = menu;
             this.onSelect = onSelect;
+            this.onOpen = onOpen;
             this.isDetails = container.tagName === 'DETAILS';
 
             this.populateOptions();
@@ -21,6 +22,7 @@ window.App.TokenPicker = (function () {
                 container.addEventListener('toggle', () => {
                     if (this.isOpen()) {
                         this.closeOtherPickers();
+                        this.onOpen?.();
                     }
                 });
             } else {
@@ -129,6 +131,8 @@ window.App.TokenPicker = (function () {
         }
 
         setOpen(open, restoreFocus = false) {
+            const wasOpen = this.isOpen();
+
             if (this.isDetails) {
                 this.container.open = open;
             } else {
@@ -138,6 +142,9 @@ window.App.TokenPicker = (function () {
 
             if (open) {
                 this.closeOtherPickers();
+                if (!wasOpen && !this.isDetails) {
+                    this.onOpen?.();
+                }
             }
 
             if (restoreFocus) {

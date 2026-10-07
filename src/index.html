@@ -125,6 +125,23 @@
           price is <span id="price-now">...</span>
           <span id="change"></span>
         </h2>
+        <aside
+          id="token-picker-intro"
+          class="token-picker-intro"
+          aria-labelledby="token-intro-title"
+          hidden
+        >
+          <button
+            id="dismiss-token-intro"
+            class="token-intro-close"
+            type="button"
+            aria-label="Dismiss token introduction"
+          >
+            &times;
+          </button>
+          <h3 id="token-intro-title">Choose your token</h3>
+          <p id="token-intro-description">Click the token name above to switch tokens.</p>
+        </aside>
         <div id="price-token-menu" class="price-token-menu" hidden>
           <p class="price-token-menu-title">Choose a token</p>
           <ul id="price-token-options" class="token-options" aria-label="Available tokens">
@@ -305,6 +322,7 @@
     <script src="js/cryptoTokens.js"></script>
     <script src="js/tokenPicker.js"></script>
     <script src="js/settings.js"></script>
+    <script src="js/tokenPickerIntro.js"></script>
     <script src="js/message.js"></script>
     @@priceRepositoryScripts
     <script src="js/priceRepositoryClient.js"></script>

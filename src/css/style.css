@@ -542,6 +542,81 @@ small {
     font-weight: bold;
     color: var(--text-color-secondary);
 }
+.token-picker-intro {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    z-index: 10;
+    width: 280px;
+    max-width: 100%;
+    box-sizing: border-box;
+    padding: 16px;
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    background: var(--background-color);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+    text-align: left;
+    font-size: 13px;
+    line-height: 1.5;
+    animation: token-intro-appear 160ms ease-out;
+}
+.token-picker-intro[hidden] {
+    display: none;
+}
+.token-picker-intro::before {
+    content: '';
+    position: absolute;
+    top: -5px;
+    left: var(--intro-arrow-left, 50%);
+    width: 8px;
+    height: 8px;
+    background: var(--background-color);
+    border-top: 1px solid var(--border-color);
+    border-left: 1px solid var(--border-color);
+    transform: translateX(-50%) rotate(45deg);
+}
+.token-picker-intro h3 {
+    padding-right: 24px;
+    margin-bottom: 4px;
+    font-size: 14px;
+    font-weight: 600;
+}
+.token-picker-intro p {
+    color: var(--text-color-secondary);
+}
+.token-intro-close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border: 0;
+    border-radius: 4px;
+    background: transparent;
+    color: var(--text-color-secondary);
+    font: inherit;
+    font-size: 20px;
+    line-height: 1;
+    cursor: pointer;
+}
+.token-intro-close:hover {
+    background: var(--input-bg);
+    color: var(--text-color);
+}
+@keyframes token-intro-appear {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+@media (prefers-reduced-motion: reduce) {
+    .token-picker-intro {
+        animation: none;
+    }
+}
 .price-heading :focus-visible {
     outline: 2px solid var(--text-color);
     outline-offset: 3px;

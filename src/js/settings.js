@@ -5,6 +5,24 @@ window.App.Settings = {
         period: '',
     },
 
+    async isHintDismissed(id) {
+        if (App.ENV.platform === 'EXTENSION') {
+            const stored = await window.browser.storage.local.get(id);
+            return stored[id] === true;
+        }
+
+        return window.localStorage.getItem(id) === 'true';
+    },
+
+    async dismissHint(id) {
+        // Keep hint flags separate so concurrent preference writes cannot overwrite them.
+        if (App.ENV.platform === 'EXTENSION') {
+            await window.browser.storage.local.set({ [id]: true });
+        } else {
+            window.localStorage.setItem(id, 'true');
+        }
+    },
+
     set(_item, _value) {
         if (App.ENV.platform === 'EXTENSION') {
             window.browser.storage.local.get('settings', (_res) => {

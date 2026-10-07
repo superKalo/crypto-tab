@@ -65,8 +65,10 @@ window.App.Crypto = {
             options: document.getElementById('price-token-options'),
             menu: document.getElementById('price-token-menu'),
             onSelect: (tokenId) => this.changeCryptoType(tokenId),
+            onOpen: () => App.TokenPickerIntro.dismiss(),
         });
         this.tokenPicker.renderSelected(this.currentCrypto);
+        App.TokenPickerIntro.init();
 
         this.$dataPeriods.forEach((element) => {
             element.addEventListener('click', () => {
