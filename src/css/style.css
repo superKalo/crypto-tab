@@ -515,6 +515,8 @@ small {
     }
 }
 .price-token-menu {
+    display: flex;
+    flex-direction: column;
     position: absolute;
     top: calc(100% + 10px);
     left: 50%;
@@ -522,7 +524,7 @@ small {
     width: 380px;
     max-width: 100%;
     max-height: 50vh;
-    overflow-y: auto;
+    overflow: hidden;
     box-sizing: border-box;
     border: 1px solid var(--border-color);
     border-radius: 12px;
@@ -537,10 +539,15 @@ small {
     display: none;
 }
 .price-token-menu-title {
+    flex-shrink: 0;
     padding: 12px 16px;
     font-size: 12px;
     font-weight: bold;
     color: var(--text-color-secondary);
+}
+.price-token-menu .token-options {
+    min-height: 0;
+    overflow-y: auto;
 }
 .token-picker-intro {
     position: absolute;
@@ -767,13 +774,40 @@ body.dark-theme .price-token-select {
     background: var(--background-color);
 }
 .token-request {
+    flex-shrink: 0;
     border-top: 1px solid var(--border-color);
     padding: 12px 16px;
     border-radius: 0 0 10px 10px;
-    background: var(--background-color);
+    background: var(--token-selected-bg);
     color: var(--text-color);
-    font-size: 12px;
     line-height: 1.5;
+    -webkit-user-select: none;
+    user-select: none;
+}
+.token-request-title {
+    font-size: 13px;
+    font-weight: bold;
+}
+.token-request-link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-top: 8px;
+    padding: 8px 12px;
+    border-radius: 6px;
+    background: var(--token-selected-border);
+    color: var(--background-color);
+    font-size: 13px;
+    font-weight: bold;
+    text-decoration: none;
+    -webkit-user-drag: none;
+}
+.token-request-link svg {
+    flex-shrink: 0;
+}
+.token-request-link:hover {
+    background: var(--token-selected-text);
 }
 .token-option-row {
     border: 2px solid transparent;

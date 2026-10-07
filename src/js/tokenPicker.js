@@ -32,6 +32,13 @@ window.App.TokenPicker = (function () {
             container.addEventListener('keydown', (event) => this.handleKeydown(event));
             container.addEventListener('focusout', (event) => this.handleFocusout(event));
 
+            // Keep the GitHub action clickable without starting a native new-tab link drag.
+            menu.addEventListener('dragstart', (event) => {
+                if (event.target.closest('.token-request-link')) {
+                    event.preventDefault();
+                }
+            });
+
             if (!container.contains(menu)) {
                 menu.addEventListener('keydown', (event) => this.handleKeydown(event));
                 menu.addEventListener('focusout', (event) => this.handleFocusout(event));
