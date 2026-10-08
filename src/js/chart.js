@@ -7,6 +7,7 @@ window.App = window.App || {};
  */
 window.App.Chart = function (el) {
     this.el = el;
+    this.cryptoType = App.CryptoTokens.getDefaultToken();
 
     this.config = {
         type: 'line',
@@ -56,7 +57,8 @@ window.App.Chart = function (el) {
                     caretSize: 11,
                     callbacks: {
                         title: () => '',
-                        label: (tooltipItem) => App.Utils.formatPrice(tooltipItem.parsed.y),
+                        label: (tooltipItem) =>
+                            App.Utils.formatPrice(tooltipItem.parsed.y, this.cryptoType),
                     },
                     displayColors: false,
                 },
@@ -93,8 +95,7 @@ window.App.Chart = function (el) {
                         display: false,
                     },
                     ticks: {
-                        // Include a dollar sign in the ticks
-                        callback: (value) => `$${value}`,
+                        callback: (value) => App.Utils.formatPrice(value, this.cryptoType),
                     },
                 },
             },
@@ -180,7 +181,7 @@ window.App.Chart.prototype.alwaysVisibleTooltipsPlugin = function () {
             permanentTooltips.forEach(({ datasetIndex, index, element }) => {
                 const tooltipPosition = element.tooltipPosition();
                 const value = chart.config.data.datasets[datasetIndex].data[index];
-                const formattedValue = App.Utils.formatPrice(value);
+                const formattedValue = App.Utils.formatPrice(value, this.cryptoType);
 
                 // Calculate tooltip dimensions
                 ctx.font = '12px Arial';
@@ -251,7 +252,11 @@ window.App.Chart.prototype.alwaysVisibleTooltipsPlugin = function () {
     Chart.register(plugin);
 };
 
-window.App.Chart.prototype.init = function (_data) {
+window.App.Chart.prototype.init = function (
+    _data,
+    cryptoType = App.CryptoTokens.getDefaultToken()
+) {
+    this.cryptoType = cryptoType;
     const { labels, values } = this.prepareData(_data);
 
     // If already initiated - do not init twice! Update data only.
@@ -275,4 +280,5 @@ window.App.Chart.prototype.destroy = function () {
     }
 
     this.chartInstance.destroy();
+    this.chartInstance = null;
 };

@@ -1,13 +1,31 @@
 window.App = window.App || {};
 
-window.App.Utils = {
-    /**
-     * Beautify the price number.
-     * https://stackoverflow.com/a/14467460/1333836
-     */
-    formatPrice(_p) {
-        const price = _p.toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,");
+window.App.Utils = (function () {
+    const priceFormatters = new Map();
 
-        return `$${price}`;
-    }
-}
+    return {
+        formatPrice(price, tokenId) {
+            const numericPrice = Number(price);
+
+            if (!Number.isFinite(numericPrice)) {
+                return '$—';
+            }
+
+            const fractionDigits = App.CryptoTokens.getToken(tokenId)?.priceFractionDigits ?? 8;
+
+            if (!priceFormatters.has(fractionDigits)) {
+                priceFormatters.set(
+                    fractionDigits,
+                    new Intl.NumberFormat('en-US', {
+                        style: 'currency',
+                        currency: 'USD',
+                        minimumFractionDigits: 0,
+                        maximumFractionDigits: fractionDigits,
+                    })
+                );
+            }
+
+            return priceFormatters.get(fractionDigits).format(numericPrice);
+        },
+    };
+})();

@@ -9,7 +9,7 @@
 
     <meta
       name="description"
-      content="Replace your browser New Tab page with a Bitcoin price chart"
+      content="Replace your browser New Tab page with live price charts for Bitcoin, Ethereum, and more."
     />
     <meta name="image" content="https://i.imgur.com/pHG5fBk.jpg" />
     @@socialMediaTags
@@ -83,11 +83,99 @@
         </a>
       </div>
 
-      <h2 class="chart-period mb text-center">
-        Bitcoin price is
-        <span id="price-now">...</span>
-        <span id="change"></span>
-      </h2>
+      <div id="price-token-picker" class="price-heading mb text-center">
+        <h2 class="chart-period">
+          <button
+            id="price-token-select"
+            class="price-token-select"
+            type="button"
+            aria-label="Change token: Bitcoin (BTC)"
+            aria-expanded="false"
+            aria-controls="price-token-menu"
+            title="Change token"
+          >
+            <span class="price-token-mark" aria-hidden="true">
+              <img
+                id="price-token-logo"
+                class="token-logo"
+                src="img/tokens/bitcoin.svg"
+                alt=""
+                width="20"
+                height="20"
+              />
+              <svg
+                class="price-token-edit"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+                focusable="false"
+              >
+                <path d="m3.5 16.5 12-12a3 3 0 0 1 4.25 4.25l-12 12L3 21l.5-4.5Z" />
+                <path d="m13.75 6.25 4.25 4.25M3.5 16.5l4.25 4.25" />
+              </svg>
+            </span>
+            <span id="crypto-type">Bitcoin</span>
+          </button>
+          price is <span id="price-now">...</span>
+          <span id="change"></span>
+        </h2>
+        <aside
+          id="token-picker-intro"
+          class="token-picker-intro"
+          aria-labelledby="token-intro-title"
+          hidden
+        >
+          <button
+            id="dismiss-token-intro"
+            class="token-intro-close"
+            type="button"
+            aria-label="Dismiss token introduction"
+          >
+            &times;
+          </button>
+          <h3 id="token-intro-title">Choose your token</h3>
+          <p id="token-intro-description">Click the token name above to switch tokens.</p>
+        </aside>
+        <div id="price-token-menu" class="price-token-menu" hidden>
+          <p class="price-token-menu-title">Choose a token</p>
+          <ul id="price-token-options" class="token-options" aria-label="Available tokens">
+            <!-- Options share the Preferences picker. -->
+          </ul>
+          <div class="token-request">
+            <p class="token-request-title">Missing a token?</p>
+            <a
+              class="token-request-link"
+              href="https://github.com/superKalo/crypto-tab/issues"
+              target="_blank"
+              rel="noopener noreferrer"
+              draggable="false"
+            >
+              Request it on GitHub
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+                focusable="false"
+              >
+                <path d="M15 3h6v6M10 14 21 3" />
+                <path d="M21 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h6" />
+              </svg>
+            </a>
+          </div>
+        </div>
+      </div>
 
       <p id="periods" class="text-center mb+">
         <button data-period="ONE_HOUR" type="button" class="btn js-period">1H</button>
@@ -100,12 +188,6 @@
 
       <div class="chart-container mb+">
         <canvas id="chart" width="700" height="200"></canvas>
-
-        <div id="loader" class="la-ball-pulse-sync">
-          <div></div>
-          <div></div>
-          <div></div>
-        </div>
 
         <span id="message" class="message"></span>
       </div>
@@ -124,75 +206,132 @@
               <a href="https://www.producthunt.com/posts/crypto-tab/">About</a>
               |
               <a href="https://github.com/superKalo/crypto-tab">Open Source</a>
-              |
-              <a href="https://github.com/cmihaylov/bitcoin-price-api">API</a>
             </small>
           </small>
         </p>
       </footer>
 
-      <div id="settings-panel" class="settings hidden">
+      <div id="settings-panel" class="settings hidden" aria-labelledby="settings-title">
         <div class="settings-header">
-          <h2 class="settings-title">Make It Yours</h2>
-          <button id="close-settings" class="close-button">&times;</button>
+          <h2 id="settings-title" class="settings-title">Preferences</h2>
+          <button
+            id="close-settings"
+            type="button"
+            class="close-button"
+            aria-label="Close preferences"
+          >
+            &times;
+          </button>
         </div>
         <div class="settings-body">
-          <div class="settings-container">
-            <label>Theme</label>
-            <div class="toggle-container">
-              <div id="theme-toggle" class="toggle">
-                <div class="toggle-option active" data-theme="light">☀️ Light</div>
-                <div class="toggle-option" data-theme="system">🌗 System</div>
-                <div class="toggle-option" data-theme="dark">🌙 Dark</div>
+          <section class="settings-section" aria-labelledby="token-heading">
+            <h3 id="token-heading" class="settings-section-title">Token</h3>
+            <details id="token-picker" class="token-picker">
+              <summary id="token-select" class="token-select" aria-label="Change token">
+                <span id="selected-token" class="token-identity"></span>
+                <span class="token-chevron" aria-hidden="true"></span>
+              </summary>
+              <ul id="token-options" class="token-options" aria-label="Available tokens">
+                <!-- Options will be populated from cryptoTokens.js. -->
+              </ul>
+              <div class="token-request">
+                <p class="token-request-title">Missing a token?</p>
+                <a
+                  class="token-request-link"
+                  href="https://github.com/superKalo/crypto-tab/issues"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  draggable="false"
+                >
+                  Request it on GitHub
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    aria-hidden="true"
+                    focusable="false"
+                  >
+                    <path d="M15 3h6v6M10 14 21 3" />
+                    <path d="M21 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h6" />
+                  </svg>
+                </a>
               </div>
+            </details>
+            <div class="token-details">
+              <p id="token-description" class="settings-hint"></p>
+              <a id="token-learn-more" class="token-link" target="_blank" rel="noopener noreferrer">
+                Learn more
+              </a>
             </div>
-          </div>
-          <div class="settings-container">
-            <label for="token-select">Change Token (coming soon 🤞)</label>
-            <!-- Disabled until we have more token support. -->
-            <select id="token-select" disabled>
-              <option value="bitcoin">Bitcoin</option>
-              <option value="ethereum">Ethereum</option>
-            </select>
-          </div>
-          <div class="settings-container">
-            <label for="clock-format">Clock Format</label>
-            <select id="clock-format">
-              <option value="24h">24h</option>
-              <option value="12h">12h (AM/PM)</option>
-            </select>
-          </div>
-          <div class="settings-container">
-            <label for="clock-up-down">Color Vibes</label>
-            <div class="color-picker-row">
-              <div class="color-picker">
-                <div class="color-picker-label">
-                  <span>📈 Up</span>
-                  <div id="circle-up" class="circle-icon"></div>
-                </div>
-                <div class="color-input-wrapper">
-                  <button id="border-up" type="button" class="color-button">Change color</button>
-                  <input type="color" id="color-up" value="#61ca00" />
-                </div>
-              </div>
+          </section>
 
-              <div class="color-picker">
-                <div class="color-picker-label">
-                  <span>📉 Down</span>
-                  <div id="circle-down" class="circle-icon"></div>
-                </div>
-                <div class="color-input-wrapper">
-                  <button id="border-down" type="button" class="color-button">Change color</button>
-                  <input type="color" id="color-down" value="#ff4949" />
+          <section
+            id="appearance-settings"
+            class="settings-section"
+            aria-labelledby="appearance-heading"
+          >
+            <h3 id="appearance-heading" class="settings-section-title">Appearance</h3>
+            <div class="settings-container">
+              <label>Theme</label>
+              <div class="toggle-container">
+                <div id="theme-toggle" class="toggle">
+                  <div class="toggle-option active" data-theme="light">Light</div>
+                  <div class="toggle-option" data-theme="system">System</div>
+                  <div class="toggle-option" data-theme="dark">Dark</div>
                 </div>
               </div>
             </div>
-            <button id="reset-colors" class="btn reset-colors">Reset colors</button>
-          </div>
+            <div class="settings-container">
+              <label for="clock-format">Clock Format</label>
+              <select id="clock-format">
+                <option value="24h">24h</option>
+                <option value="12h">12h (AM/PM)</option>
+              </select>
+            </div>
+            <div class="settings-container">
+              <label>Price Colors</label>
+              <div class="color-picker-row">
+                <div class="color-picker">
+                  <div class="color-picker-label">
+                    <label for="color-up">Up</label>
+                    <div id="circle-up" class="circle-icon"></div>
+                  </div>
+                  <div class="color-input-wrapper">
+                    <button id="border-up" type="button" class="color-button">Change color</button>
+                    <input type="color" id="color-up" value="#61ca00" />
+                  </div>
+                </div>
+
+                <div class="color-picker">
+                  <div class="color-picker-label">
+                    <label for="color-down">Down</label>
+                    <div id="circle-down" class="circle-icon"></div>
+                  </div>
+                  <div class="color-input-wrapper">
+                    <button id="border-down" type="button" class="color-button">
+                      Change color
+                    </button>
+                    <input type="color" id="color-down" value="#ff4949" />
+                  </div>
+                </div>
+              </div>
+              <button id="reset-colors" class="btn reset-colors">Reset colors</button>
+            </div>
+          </section>
         </div>
       </div>
 
-      <button id="toggle-settings" class="btn toggle-settings">
+      <button
+        id="toggle-settings"
+        class="btn toggle-settings"
+        aria-controls="settings-panel"
+        aria-expanded="false"
+      >
         <svg
           viewBox="0 0 600 600"
           width="16"
@@ -207,7 +346,7 @@
             />
           </g>
         </svg>
-        <span>Customize</span>
+        <span>Preferences</span>
       </button>
     </div>
 
@@ -217,18 +356,21 @@
     <script src="lib/localizedFormat.js"></script>
     <script src="lib/relativeTime.js"></script>
     <script src="lib/calendar.js"></script>
-    <script src="lib/index.js"></script>
+    @@superRepoScript
 
     <script src="js/browser-extension-api.js"></script>
     <script src="env/env.js"></script>
     <script src="js/utils.js"></script>
+    <script src="js/cryptoTokens.js"></script>
+    <script src="js/tokenPicker.js"></script>
     <script src="js/settings.js"></script>
+    <script src="js/tokenPickerIntro.js"></script>
     <script src="js/message.js"></script>
-    <script src="js/apiCecoAdapter.js"></script>
-    <script src="js/api.js"></script>
+    @@priceRepositoryScripts
+    <script src="js/priceRepositoryClient.js"></script>
     <script src="js/chart.js"></script>
     <script src="js/clock.js"></script>
-    <script src="js/bitcoin.js"></script>
+    <script src="js/crypto.js"></script>
     <script src="js/script.js"></script>
     <script src="js/settingsPanel.js"></script>
     <script src="js/themeManager.js"></script>
