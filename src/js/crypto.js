@@ -15,6 +15,7 @@ window.App.Crypto = {
     $dataPeriods: document.querySelectorAll('.js-period'),
     $lastUpdated: document.getElementById('last-updated'),
     $priceNow: document.getElementById('price-now'),
+    $retryPrice: document.getElementById('retry-price'),
 
     chart: null,
     currentCrypto: '',
@@ -76,6 +77,10 @@ window.App.Crypto = {
             });
         });
 
+        this.$retryPrice.addEventListener('click', () => {
+            this.loadCurrentPrice(this.requestGeneration);
+        });
+
         this.handleVisibilityChange = () => {
             if (!document.hidden) {
                 this.refreshActiveData();
@@ -90,6 +95,10 @@ window.App.Crypto = {
     async changePeriod(period) {
         if (!App.CryptoTokens.isChartPeriod(period)) {
             return;
+        }
+
+        if (period !== this.currentPeriod) {
+            this.chart.destroy();
         }
 
         this.currentPeriod = period;
@@ -111,8 +120,10 @@ window.App.Crypto = {
         this.requestGeneration += 1;
 
         this.chart.destroy();
-        this.$priceNow.textContent = '...';
+        this.setRepositoryStatus(cryptoType, 'NOW', null);
+        this.$priceNow.textContent = 'Loading…';
         this.$change.textContent = '';
+        this.$retryPrice.classList.add('hidden');
         this.updateCryptoTypeLabel();
         this.updateLastUpdated();
         App.Message.clear();
@@ -128,6 +139,13 @@ window.App.Crypto = {
     async loadChart(generation) {
         const cryptoType = this.currentCrypto;
         const period = this.currentPeriod;
+
+        if (!this.chart.isInitiated()) {
+            this.setRepositoryStatus(cryptoType, period, null);
+            App.Message.show('Loading chart…');
+            this.updateLastUpdated();
+        }
+
         const result = await this.repositoryClient.getData(cryptoType, period);
 
         if (!this.isCurrentRequest(generation, cryptoType, period)) {
@@ -140,6 +158,9 @@ window.App.Crypto = {
 
     async loadCurrentPrice(generation) {
         const cryptoType = this.currentCrypto;
+        this.$retryPrice.disabled = true;
+        this.$retryPrice.textContent = 'Retrying…';
+
         const result = await this.repositoryClient.getData(cryptoType, 'NOW');
 
         if (!this.isCurrentRequest(generation, cryptoType)) {
@@ -153,7 +174,7 @@ window.App.Crypto = {
     renderChartResult(result, cryptoType) {
         if (!result.ok) {
             App.Message.fireError(
-                `Unable to load ${cryptoType} chart data. ${result.error?.message || ''}`.trim()
+                `Unable to load ${App.CryptoTokens.getDisplayName(cryptoType)} chart data. Will retry automatically.`
             );
             this.updateLastUpdated();
             return;
@@ -171,9 +192,16 @@ window.App.Crypto = {
     },
 
     renderCurrentPriceResult(result) {
+        this.$retryPrice.disabled = false;
+        this.$retryPrice.textContent = 'Retry price';
+        this.$retryPrice.classList.toggle('hidden', result.ok);
+
         if (result.ok) {
             this.setPriceNow(result.data.price);
             this.setPriceChange(result.data.changePercent);
+        } else {
+            this.$priceNow.textContent = 'unavailable';
+            this.$change.textContent = '';
         }
 
         this.updateLastUpdated();
@@ -247,33 +275,61 @@ window.App.Crypto = {
     },
 
     updateLastUpdated() {
-        const chartStatus = this.getRepositoryStatus(this.currentCrypto, this.currentPeriod);
-        const currentPriceStatus = this.getRepositoryStatus(this.currentCrypto, 'NOW');
-        const statuses = [chartStatus, currentPriceStatus].filter(Boolean);
-        const lastFetched = currentPriceStatus?.lastFetched || chartStatus?.lastFetched;
-        const hasError = statuses.some((status) => !status.ok);
-        const hasStaleData = statuses.some((status) => status.isStale);
+        const entries = [
+            { label: 'Price', status: this.getRepositoryStatus(this.currentCrypto, 'NOW') },
+            {
+                label: 'Chart',
+                status: this.getRepositoryStatus(this.currentCrypto, this.currentPeriod),
+            },
+        ];
+        const details = entries.map(({ label, status }) => {
+            if (!status) {
+                return `${label}: loading…`;
+            }
 
+            if (!status.ok) {
+                return `${label}: unavailable. Will retry automatically.`;
+            }
+
+            const updated = status.lastFetched
+                ? `${dayjs(status.lastFetched).fromNow()} (${dayjs(status.lastFetched).calendar()})`
+                : 'update time unavailable';
+            return `${label}: ${updated}${status.isStale ? ' · Cached data' : ''}`;
+        });
+
+        this.$lastUpdated.setAttribute('title', details.join('\n'));
         this.$lastUpdated.textContent = '';
 
-        if (!lastFetched) {
-            this.$lastUpdated.textContent = hasError ? 'unavailable. Data request failed.' : '...';
-            this.$lastUpdated.removeAttribute('data-tooltip');
+        const unavailable = entries.filter(({ status }) => status && !status.ok);
+        if (unavailable.length) {
+            this.$lastUpdated.textContent =
+                unavailable.length === entries.length
+                    ? 'Data unavailable'
+                    : `${unavailable[0].label} unavailable`;
             return;
         }
 
-        const lastUpdatedSpan = document.createElement('span');
-        lastUpdatedSpan.className = hasError || hasStaleData ? 'negative' : 'positive';
-        lastUpdatedSpan.textContent = dayjs(lastFetched).fromNow();
+        if (entries.some(({ status }) => !status)) {
+            this.$lastUpdated.textContent = 'Updating…';
+            return;
+        }
 
+        if (entries.some(({ status }) => !status.lastFetched)) {
+            this.$lastUpdated.textContent = 'Update time unavailable';
+            return;
+        }
+
+        const oldestFetched = Math.min(...entries.map(({ status }) => status.lastFetched));
+        const hasStaleData = entries.some(({ status }) => status.isStale);
+        const lastUpdatedSpan = document.createElement('span');
+        lastUpdatedSpan.className = hasStaleData ? 'negative' : 'positive';
+        lastUpdatedSpan.textContent = dayjs(oldestFetched).fromNow();
+
+        this.$lastUpdated.appendChild(document.createTextNode('Updated '));
         this.$lastUpdated.appendChild(lastUpdatedSpan);
-        const statusMessage = hasError
-            ? '. Some data could not be refreshed.'
-            : hasStaleData
-              ? '. Showing cached data.'
-              : '.';
-        this.$lastUpdated.appendChild(document.createTextNode(statusMessage));
-        this.$lastUpdated.setAttribute('data-tooltip', dayjs(lastFetched).calendar());
+        if (hasStaleData) {
+            this.$lastUpdated.appendChild(document.createTextNode(' · Cached data'));
+        }
     },
 
     startRefreshTimer() {
