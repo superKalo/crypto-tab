@@ -55,6 +55,45 @@ small {
     background: #4f78e2;
 }
 
+.retry-price {
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 92px;
+    min-height: 30px;
+    margin-left: 8px;
+    padding: 5px 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    color: var(--text-color-secondary);
+    font-size: 12px;
+    line-height: 1.2;
+    vertical-align: middle;
+}
+
+.retry-price:hover:not(:disabled) {
+    background: var(--toggle-bg);
+    border-color: var(--toggle-inactive-color);
+    color: var(--text-color);
+    text-decoration: none;
+}
+
+.retry-price:active:not(:disabled) {
+    background: var(--border-color);
+}
+
+.retry-price:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 2px;
+}
+
+.retry-price:disabled {
+    cursor: wait;
+    opacity: 0.6;
+    text-decoration: none;
+}
+
 .positive {
     color: var(--color-up, #61ca00);
 }

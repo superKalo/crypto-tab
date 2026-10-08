@@ -122,8 +122,9 @@
             </span>
             <span id="crypto-type">Bitcoin</span>
           </button>
-          price is <span id="price-now">...</span>
+          price is <span id="price-now">Loading…</span>
           <span id="change"></span>
+          <button id="retry-price" type="button" class="btn retry-price hidden">Retry price</button>
         </h2>
         <aside
           id="token-picker-intro"
@@ -189,15 +190,13 @@
       <div class="chart-container mb+">
         <canvas id="chart" width="700" height="200"></canvas>
 
-        <span id="message" class="message"></span>
+        <span id="message" class="message" role="status"></span>
       </div>
 
       <footer class="footer text-center mb">
         <p class="mb--">
           <small>
-            Last updated
-            <span id="last-updated" class="tooltip-right" data-tooltip="">...</span>
-            <!-- Manage updates frequency. -->
+            <span id="last-updated">Updating…</span>
           </small>
         </p>
         <p>

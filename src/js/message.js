@@ -3,8 +3,12 @@ window.App = window.App || {};
 window.App.Message = {
     messageEl: document.getElementById('message'),
 
-    fireError(text) {
+    show(text) {
         this.messageEl.textContent = text;
+    },
+
+    fireError(text) {
+        this.show(text);
     },
 
     clear() {
