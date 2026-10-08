@@ -2,9 +2,7 @@
 
 <p align="center">Live crypto prices, every new tab.</p>
 
-Crypto Tab is a browser extension that replaces your New Tab page with live cryptocurrency price charts and a clock.
-
-It's open source, free, lightweight and comes with light and dark themes.
+Crypto Tab is a browser extension that replaces your New Tab page with live cryptocurrency price charts and a clock. It's open source, free, lightweight and comes with light and dark themes.
 
 <p align="center">
     <a href="https://crypto-tab.com">
@@ -17,7 +15,7 @@ It's open source, free, lightweight and comes with light and dark themes.
 -   Google Chrome: [**Available on Chrome Store**](https://chromewebstore.google.com/detail/crypto-tab/hmbkmkdhhlgemdgeefnhfaffdpddohpa).
 -   Mozilla Firefox: [**Available on Firefox Add-ons (AMO)**](https://addons.mozilla.org/en-US/firefox/addon/crypto-tab/).
 
-[**Try it in your browser**](https://crypto-tab.com) · [**Report a bug**](https://github.com/superKalo/crypto-tab/issues/new?template=bug-report.yml)
+... or just [**try it in your browser**](https://crypto-tab.com)
 
 ## Features
 
