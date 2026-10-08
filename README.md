@@ -11,13 +11,10 @@ Free and open source, with light and dark themes.
     </a>
 </p>
 
-## Install Crypto Tab
+## 📦 Install
 
-| Google Chrome                                                                                             | Mozilla Firefox                                                                  |
-| --------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
-| [**Add to Chrome**](https://chromewebstore.google.com/detail/crypto-tab/hmbkmkdhhlgemdgeefnhfaffdpddohpa) | [**Add to Firefox**](https://addons.mozilla.org/en-US/firefox/addon/crypto-tab/) |
-
-Install from your browser's store, confirm the installation, and open a new tab to get started.
+-   Google Chrome: [**Available on Chrome Store**](https://chromewebstore.google.com/detail/crypto-tab/hmbkmkdhhlgemdgeefnhfaffdpddohpa).
+-   Mozilla Firefox: [**Available on Firefox Add-ons (AMO)**](https://addons.mozilla.org/en-US/firefox/addon/crypto-tab/).
 
 [**Try it in your browser**](https://crypto-tab.com) · [**Report a bug**](https://github.com/superKalo/crypto-tab/issues/new?template=bug-report.yml)
 
