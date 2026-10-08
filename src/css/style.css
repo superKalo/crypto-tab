@@ -88,9 +88,9 @@ small {
     align-self: flex-end;
     width: 280px;
     color: inherit;
-    background: rgba(255, 255, 255, 0.8);
+    background: var(--background-color);
     border-radius: 6px;
-    border: 1px solid var(--toggle-bg);
+    border: 1px solid var(--border-color);
     box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
     display: flex;
     flex-flow: row;
@@ -104,9 +104,14 @@ small {
     position: relative;
     right: 0;
 }
-.install__link:hover {
+.install__link:hover,
+.install__link:focus-visible {
     background-color: var(--toggle-bg);
     border-color: var(--toggle-inactive-color);
+}
+.install__link:focus-visible {
+    outline: 2px solid var(--theme-color);
+    outline-offset: 3px;
 }
 .install__link:nth-child(1) {
     border-top-right-radius: 0;
@@ -120,11 +125,13 @@ small {
     border-bottom-left-radius: 0;
 }
 
-.install__link svg path {
-    transition: 0.3s;
+.install__icon svg path,
+.install__icon svg polygon {
+    fill: currentColor;
 }
-.install__link:hover svg path {
-    fill: var(--theme-color);
+.install__link:hover .install__icon,
+.install__link:focus-visible .install__icon {
+    color: var(--theme-color);
 }
 .install__link svg {
     transition: ease-in all 0.3s;
@@ -138,6 +145,8 @@ small {
     display: flex;
     align-items: center;
     justify-content: center;
+    color: var(--text-color-secondary);
+    transition: color 0.3s;
 }
 
 .install_side {
@@ -155,6 +164,7 @@ small {
 }
 .install__descr {
     display: block;
+    color: var(--text-color-secondary);
     max-width: 90%;
     overflow: hidden;
     text-overflow: ellipsis;
