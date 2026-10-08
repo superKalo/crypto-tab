@@ -15,7 +15,7 @@ Crypto Tab is a browser extension that replaces your New Tab page with live cryp
 -   Google Chrome: [**Available on Chrome Store**](https://chromewebstore.google.com/detail/crypto-tab/hmbkmkdhhlgemdgeefnhfaffdpddohpa).
 -   Mozilla Firefox: [**Available on Firefox Add-ons (AMO)**](https://addons.mozilla.org/en-US/firefox/addon/crypto-tab/).
 
-... or just [**try it in your browser**](https://crypto-tab.com)
+... or just [**try it in your browser**](https://crypto-tab.com) 👀
 
 ## Features
 
