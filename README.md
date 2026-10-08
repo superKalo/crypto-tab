@@ -5,6 +5,12 @@
 Crypto Tab replaces your browser's New Tab page with cryptocurrency price charts and a clock.
 Free and open source, with light and dark themes.
 
+<p align="center">
+    <a href="https://crypto-tab.com">
+        <img src="https://i.imgur.com/E0N5eM0.gif" alt="Crypto Tab preview" width="526" height="381" />
+    </a>
+</p>
+
 ## Install Crypto Tab
 
 | Google Chrome                                                                                             | Mozilla Firefox                                                                  |
@@ -14,12 +20,6 @@ Free and open source, with light and dark themes.
 Install from your browser's store, confirm the installation, and open a new tab to get started.
 
 [**Try it in your browser**](https://crypto-tab.com) · [**Report a bug**](https://github.com/superKalo/crypto-tab/issues/new?template=bug-report.yml)
-
-<p align="center">
-    <a href="https://crypto-tab.com">
-        <img src="https://i.imgur.com/E0N5eM0.gif" alt="Crypto Tab preview" width="526" height="381" />
-    </a>
-</p>
 
 ## Features
 
@@ -43,8 +43,7 @@ For other ideas, [open an issue](https://github.com/superKalo/crypto-tab/issues)
 Ideas, fixes, and pull requests are welcome. Crypto Tab uses one codebase for the website and browser
 extensions, built with vanilla JavaScript.
 
-<details>
-<summary><strong>Build and run locally</strong></summary>
+### Build and run locally
 
 Use **Node.js 22 or newer** and npm. Clone this repository, then install dependencies:
 
@@ -79,8 +78,6 @@ Open a new tab to see Crypto Tab. After rebuilding, reload the extension and ope
 For the website, serve `dist/website/` with a local static web server.
 
 Edit files in `src/`; the generated `dist/` directories are replaced on each build.
-
-</details>
 
 ## License
 
