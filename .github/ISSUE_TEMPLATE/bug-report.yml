@@ -1,0 +1,35 @@
+name: Report a bug
+description: Report a problem with the Crypto Tab extension or website.
+title: 'Bug: '
+body:
+    - type: input
+      id: browser
+      attributes:
+          label: Browser and version
+          placeholder: e.g. Chrome 140 or Firefox 143
+      validations:
+          required: true
+    - type: dropdown
+      id: platform
+      attributes:
+          label: Where does the problem happen?
+          options:
+              - Browser extension
+              - Website (crypto-tab.com)
+              - Both
+      validations:
+          required: true
+    - type: textarea
+      id: problem
+      attributes:
+          label: What happened?
+          description: Describe what you expected and what happened instead. Include the selected token and chart period if relevant.
+      validations:
+          required: true
+    - type: textarea
+      id: steps
+      attributes:
+          label: Steps to reproduce
+          description: Tell us how to reproduce the problem. You can also attach screenshots here.
+      validations:
+          required: false

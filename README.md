@@ -1,6 +1,6 @@
 <h1 align="center"><a href="https://crypto-tab.com"><img src="https://user-images.githubusercontent.com/2548061/31789747-cc1d44ae-b51b-11e7-81a0-0a4ef84244ff.png" height="70" width="70" alt="Crypto Tab Logo" /></a><br />Crypto Tab</h1>
 
-<p align="center">Browser extension that replaces your New Tab page with live cryptocurrency price charts:</p>
+<p align="center">Crypto Tab is a browser extension that replaces your New Tab page with live cryptocurrency price charts and a clock. It's open source, free, lightweight and comes with light and dark themes.</p>
 
 <p align="center">
     <a href="https://crypto-tab.com">
@@ -10,60 +10,69 @@
 
 ## 📦 Install
 
-- Google Chrome: [**Available on Chrome Store**](https://chrome.google.com/webstore/detail/crypto-tab/hmbkmkdhhlgemdgeefnhfaffdpddohpa).
-- Mozilla Firefox: [**Available on Firefox Add-ons (AMO)**](https://addons.mozilla.org/en-US/firefox/addon/crypto-tab/).
+-   Google Chrome: [**Available on Chrome Store**](https://chromewebstore.google.com/detail/crypto-tab/hmbkmkdhhlgemdgeefnhfaffdpddohpa).
+-   Mozilla Firefox: [**Available on Firefox Add-ons (AMO)**](https://addons.mozilla.org/en-US/firefox/addon/crypto-tab/).
 
-## 👍 Contributing
+... or just [**try it in your browser**](https://crypto-tab.com) 👀
 
-I'm open to ideas and suggestions! If you want to contribute or simply you've caught a bug - you can either open an issue or clone the repository, and fire a Pull Request.
+## Features
 
-Its a **single code base** website and new tab (cross-)browser extension.
+-   Follow Bitcoin (BTC), Ether (ETH), Ambire Wallet (WALLET), and Hedera (HBAR), with prices in USD.
+-   Explore charts for the past hour, day, week, month, year, or all time.
+-   Choose a light, dark, or system theme and customize price colors.
+-   Switch between a 12-hour and 24-hour clock.
+-   Keep your selected token, chart period, and preferences between tabs.
 
-To install the project, first make sure you have NodeJS and NPM installed. Preferably, the latest versions, but anything not extremely old should work too. Then, simply run `npm install`. Then:
+## Report a bug or request a token
 
-1. To build the extension distribution files, run:
-    ```bash
-    npm run build:extension:webkit
-    ```
+[**Report a bug on GitHub**](https://github.com/superKalo/crypto-tab/issues/new?template=bug-report.yml).
+Include your browser, whether you're using the extension or website, and steps to reproduce the problem.
+Screenshots help too.
 
-    or
+Missing a token? [Request it here](https://github.com/superKalo/crypto-tab/issues/new?template=request-token.yml).
+For other ideas, [open an issue](https://github.com/superKalo/crypto-tab/issues).
 
-    ```bash
-    npm run build:extension:gecko
-    ```
+## Contributing
 
-1. To build the extension distribution files and re-build (watch) in case of changes, run:
-    ```bash
-    npm run build:extension:watch:webkit
-    ```
+Ideas, fixes, and pull requests are welcome. Crypto Tab uses one codebase for the website and browser
+extensions, built with vanilla JavaScript.
 
-    or
+### Build and run locally
 
-    ```bash
-    npm run build:extension:watch:gecko
-    ```
+Use **Node.js 22 or newer** and npm. Clone this repository, then install dependencies:
 
-1. To build the website distribution files, run:
-    ```bash
-    npm run build:website
-    ```
+```bash
+npm install
+```
 
-1. To build the website distribution files and re-build (watch) in case of changes, run:
-    ```bash
-    npm run build:website:watch
-    ```
+Build the target you want to work on:
 
-Finally, load the extension:
+| Target                      | Build command                    | Output                   |
+| --------------------------- | -------------------------------- | ------------------------ |
+| Chrome / Chromium extension | `npm run build:extension:webkit` | `dist/extension-webkit/` |
+| Firefox extension           | `npm run build:extension:gecko`  | `dist/extension-gecko/`  |
+| Website                     | `npm run build:website`          | `dist/website/`          |
 
-- In Chrome:
-    - Navigate to chrome://extensions
-    - Select "Developer Mode" and then click "Load unpacked extension..."
-    - From the file browser, choose the `dist/extension-webkit/` directory
+To rebuild automatically when source files change:
 
-- In Firefox:
-    - Navigate to `about:debugging`
-    - Click "Load Temporary Add-on" and from the file browser, choose the `manifest.json` file in the `dist/extension-gecko/` directory
+```bash
+npm run build:extension:watch:webkit
+npm run build:extension:watch:gecko
+npm run build:website:watch
+```
 
-# 🚔 License
+Load a local extension build:
 
-The code and the documentation are released under the [GPL-3.0 License](https://github.com/superKalo/crypto-tab/blob/master/LICENSE).
+-   **Chrome:** Open `chrome://extensions`, enable **Developer mode**, click **Load unpacked**, and select
+    `dist/extension-webkit/`.
+-   **Firefox:** Open `about:debugging`, select **This Firefox**, click **Load Temporary Add-on**, and select
+    `dist/extension-gecko/manifest.json`. This installation lasts until Firefox restarts.
+
+Open a new tab to see Crypto Tab. After rebuilding, reload the extension and open a fresh tab.
+For the website, serve `dist/website/` with a local static web server.
+
+Edit files in `src/`; the generated `dist/` directories are replaced on each build.
+
+## License
+
+Code and documentation are released under the [GPL-3.0 License](LICENSE).
