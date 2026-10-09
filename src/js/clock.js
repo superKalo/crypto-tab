@@ -40,6 +40,11 @@ window.App.Clock = {
         window.addEventListener('focus', this.handleFocus);
         window.addEventListener('pagehide', this.handlePageHide);
         window.addEventListener('pageshow', this.handlePageShow);
+        this.unsubscribeSettings = window.App.Settings.subscribe((settings, changedKeys) => {
+            if (changedKeys.includes('clockFormat')) {
+                this.updateFormat(settings.clockFormat);
+            }
+        });
         this.update();
 
         const generation = ++this.settingsGeneration;
@@ -114,6 +119,7 @@ window.App.Clock = {
         window.removeEventListener('focus', this.handleFocus);
         window.removeEventListener('pagehide', this.handlePageHide);
         window.removeEventListener('pageshow', this.handlePageShow);
+        this.unsubscribeSettings();
         this.isInitialized = false;
         this.isPageActive = false;
         this.settingsGeneration += 1;

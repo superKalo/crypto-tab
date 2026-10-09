@@ -20,6 +20,14 @@ window.App.ThemeManager = (function () {
         themeOptions.forEach((option) => {
             option.addEventListener('change', handleThemeToggle);
         });
+        window.App.Settings.subscribe((settings, changedKeys) => {
+            if (changedKeys.includes('theme')) {
+                themeChanged = true;
+                const theme = normalizeTheme(settings.theme);
+                updateActiveOption(theme);
+                applyTheme(theme);
+            }
+        });
 
         try {
             const settings = await window.App.Settings.get();

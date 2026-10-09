@@ -21,7 +21,7 @@
 -   Explore charts for the past hour, day, week, month, year, or all time.
 -   Choose a light, dark, or system theme and customize price colors.
 -   Switch between a 12-hour and 24-hour clock.
--   Keep your selected token, chart period, and preferences between tabs.
+-   Keep your selected token, chart period, and preferences, with changes synced across open tabs.
 
 ## Report a bug or request a token
 

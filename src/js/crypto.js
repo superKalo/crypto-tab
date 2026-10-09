@@ -54,6 +54,9 @@ window.App.Crypto = {
         this.updateCryptoTypeLabel();
         this.updateActivePeriod();
         this.initEvents();
+        this.unsubscribeSettings = App.Settings.subscribe((updated, changedKeys) => {
+            this.applySettings(updated, changedKeys);
+        });
         this.startRefreshTimer();
 
         await this.loadActiveData(this.requestGeneration);
@@ -86,10 +89,15 @@ window.App.Crypto = {
                 this.refreshActiveData();
             }
         };
-        this.handlePageHide = () => this.destroy();
+        this.handlePageHide = (event) => {
+            // A cached page keeps its settings subscription; the browser pauses its timers.
+            if (!event.persisted) {
+                this.destroy();
+            }
+        };
 
         document.addEventListener('visibilitychange', this.handleVisibilityChange);
-        window.addEventListener('pagehide', this.handlePageHide, { once: true });
+        window.addEventListener('pagehide', this.handlePageHide);
     },
 
     async changePeriod(period) {
@@ -130,6 +138,43 @@ window.App.Crypto = {
         App.Settings.set('cryptoType', cryptoType);
 
         await this.loadActiveData(this.requestGeneration);
+    },
+
+    applySettings(settings, changedKeys) {
+        const cryptoType = changedKeys.includes('cryptoType')
+            ? App.CryptoTokens.isSupportedToken(settings.cryptoType)
+                ? settings.cryptoType
+                : App.CryptoTokens.getDefaultToken()
+            : this.currentCrypto;
+        const period = changedKeys.includes('period')
+            ? App.CryptoTokens.isChartPeriod(settings.period)
+                ? settings.period
+                : App.CryptoTokens.getDefaultPeriod()
+            : this.currentPeriod;
+
+        if (cryptoType === this.currentCrypto && period === this.currentPeriod) {
+            return;
+        }
+
+        const tokenChanged = cryptoType !== this.currentCrypto;
+        this.currentCrypto = cryptoType;
+        this.currentPeriod = period;
+        this.requestGeneration += 1;
+        this.chart.destroy();
+        this.$change.textContent = '';
+
+        if (tokenChanged) {
+            this.setRepositoryStatus(cryptoType, 'NOW', null);
+            this.$priceNow.textContent = 'Loading…';
+            this.$retryPrice.classList.add('hidden');
+            this.updateCryptoTypeLabel();
+        }
+
+        this.updateActivePeriod();
+        this.updateLastUpdated();
+        App.Message.clear();
+        // Apply the complete context once without persisting the received change again.
+        this.loadActiveData(this.requestGeneration);
     },
 
     async loadActiveData(generation) {
@@ -358,5 +403,9 @@ window.App.Crypto = {
         if (this.handleVisibilityChange) {
             document.removeEventListener('visibilitychange', this.handleVisibilityChange);
         }
+        if (this.handlePageHide) {
+            window.removeEventListener('pagehide', this.handlePageHide);
+        }
+        this.unsubscribeSettings?.();
     },
 };

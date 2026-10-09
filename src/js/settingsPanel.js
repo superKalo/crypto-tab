@@ -6,7 +6,7 @@ window.App.SettingsPanel = (function () {
     let tokenPicker;
     let tokenSelect;
     let tokenPickerControl;
-    let clockFormatChanged = false;
+    const changedPreferences = new Set();
 
     const DEFAULT_UP_COLOR = '#61ca00';
     const DEFAULT_DOWN_COLOR = '#ff4949';
@@ -68,7 +68,7 @@ window.App.SettingsPanel = (function () {
                 return;
             }
 
-            clockFormatChanged = true;
+            changedPreferences.add('clockFormat');
             const newFormat = window.App.Clock.normalizeFormat(e.target.value);
             window.App.Settings.set('clockFormat', newFormat);
             window.App.Clock.updateFormat(newFormat);
@@ -76,17 +76,15 @@ window.App.SettingsPanel = (function () {
 
         document.getElementById('color-up').addEventListener('input', (e) => {
             const color = e.target.value;
-            document.documentElement.style.setProperty('--color-up', color);
-            updateCircleColor('circle-up', color);
-            updateBorderColor('border-up', color);
+            changedPreferences.add('colorup');
+            applyColor('up', color);
             window.App.Settings.set('colorup', color);
         });
 
         document.getElementById('color-down').addEventListener('input', (e) => {
             const color = e.target.value;
-            document.documentElement.style.setProperty('--color-down', color);
-            updateCircleColor('circle-down', color);
-            updateBorderColor('border-down', color);
+            changedPreferences.add('colordown');
+            applyColor('down', color);
             window.App.Settings.set('colordown', color);
         });
 
@@ -97,6 +95,19 @@ window.App.SettingsPanel = (function () {
         // Close settings panel when clicking outside of it
         document.addEventListener('click', handleOutsideClick);
 
+        window.App.Settings.subscribe((settings, changedKeys) => {
+            if (changedKeys.includes('clockFormat')) {
+                changedPreferences.add('clockFormat');
+                renderClockFormat(settings.clockFormat);
+            }
+            ['up', 'down'].forEach((direction) => {
+                const key = `color${direction}`;
+                if (changedKeys.includes(key)) {
+                    changedPreferences.add(key);
+                    applyColor(direction, settings[key]);
+                }
+            });
+        });
         loadSettings();
     }
 
@@ -136,17 +147,10 @@ window.App.SettingsPanel = (function () {
     }
 
     function resetColors() {
-        document.documentElement.style.setProperty('--color-up', DEFAULT_UP_COLOR);
-        document.documentElement.style.setProperty('--color-down', DEFAULT_DOWN_COLOR);
-
-        document.getElementById('color-up').value = DEFAULT_UP_COLOR;
-        document.getElementById('color-down').value = DEFAULT_DOWN_COLOR;
-
-        updateCircleColor('circle-up', DEFAULT_UP_COLOR);
-        updateCircleColor('circle-down', DEFAULT_DOWN_COLOR);
-
-        updateBorderColor('border-up', DEFAULT_UP_COLOR);
-        updateBorderColor('border-down', DEFAULT_DOWN_COLOR);
+        changedPreferences.add('colorup');
+        changedPreferences.add('colordown');
+        applyColor('up', DEFAULT_UP_COLOR);
+        applyColor('down', DEFAULT_DOWN_COLOR);
 
         window.App.Settings.setMultiple({
             colorup: DEFAULT_UP_COLOR,
@@ -155,34 +159,43 @@ window.App.SettingsPanel = (function () {
     }
 
     async function loadSettings() {
-        const settings = await window.App.Settings.get();
+        try {
+            const settings = await window.App.Settings.get();
 
-        const upColor = settings.colorup || DEFAULT_UP_COLOR;
-        const downColor = settings.colordown || DEFAULT_DOWN_COLOR;
-
-        document.documentElement.style.setProperty('--color-up', upColor);
-        document.documentElement.style.setProperty('--color-down', downColor);
-
-        document.getElementById('color-up').value = upColor;
-        document.getElementById('color-down').value = downColor;
-
-        updateCircleColor('circle-up', upColor);
-        updateCircleColor('circle-down', downColor);
-
-        updateBorderColor('border-up', upColor);
-        updateBorderColor('border-down', downColor);
-
-        const cryptoType = window.App.CryptoTokens.isSupportedToken(settings.cryptoType)
-            ? settings.cryptoType
-            : window.App.CryptoTokens.getDefaultToken();
-        renderSelectedToken(window.App.Crypto.currentCrypto || cryptoType);
-
-        if (!clockFormatChanged) {
-            const format = window.App.Clock.normalizeFormat(settings.clockFormat);
-            document.querySelectorAll('input[name="clockFormat"]').forEach((option) => {
-                option.checked = option.value === format;
+            ['up', 'down'].forEach((direction) => {
+                const key = `color${direction}`;
+                if (!changedPreferences.has(key)) {
+                    applyColor(direction, settings[key]);
+                }
             });
+
+            const cryptoType = window.App.CryptoTokens.isSupportedToken(settings.cryptoType)
+                ? settings.cryptoType
+                : window.App.CryptoTokens.getDefaultToken();
+            renderSelectedToken(window.App.Crypto.currentCrypto || cryptoType);
+
+            if (!changedPreferences.has('clockFormat')) {
+                renderClockFormat(settings.clockFormat);
+            }
+        } catch (error) {
+            console.warn('Unable to load preferences. Keeping the current appearance.', error);
         }
+    }
+
+    function renderClockFormat(value) {
+        const format = window.App.Clock.normalizeFormat(value);
+        document.querySelectorAll('input[name="clockFormat"]').forEach((option) => {
+            option.checked = option.value === format;
+        });
+    }
+
+    function applyColor(direction, value) {
+        const fallback = direction === 'up' ? DEFAULT_UP_COLOR : DEFAULT_DOWN_COLOR;
+        const color = /^#[\da-f]{6}$/i.test(value) ? value : fallback;
+        document.documentElement.style.setProperty(`--color-${direction}`, color);
+        document.getElementById(`color-${direction}`).value = color;
+        updateCircleColor(`circle-${direction}`, color);
+        updateBorderColor(`border-${direction}`, color);
     }
 
     function updateCircleColor(circleId, color) {
