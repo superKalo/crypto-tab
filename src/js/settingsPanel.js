@@ -8,6 +8,7 @@ window.App.SettingsPanel = (function () {
     let tokenPicker;
     let tokenSelect;
     let tokenPickerControl;
+    let clockFormatChanged = false;
 
     const DEFAULT_UP_COLOR = '#61ca00';
     const DEFAULT_DOWN_COLOR = '#ff4949';
@@ -71,12 +72,10 @@ window.App.SettingsPanel = (function () {
         });
 
         document.getElementById('clock-format').addEventListener('change', (e) => {
-            const newFormat = e.target.value;
+            clockFormatChanged = true;
+            const newFormat = window.App.Clock.normalizeFormat(e.target.value);
             window.App.Settings.set('clockFormat', newFormat);
-
-            if (window.App.ClockInstance) {
-                window.App.ClockInstance.updateFormat(newFormat);
-            }
+            window.App.Clock.updateFormat(newFormat);
         });
 
         document.getElementById('color-up').addEventListener('input', (e) => {
@@ -210,9 +209,10 @@ window.App.SettingsPanel = (function () {
             : window.App.CryptoTokens.getDefaultToken();
         renderSelectedToken(window.App.Crypto.currentCrypto || cryptoType);
 
-        const clockFormat = settings.clockFormat;
-        if (clockFormat) {
-            document.getElementById('clock-format').value = clockFormat;
+        if (!clockFormatChanged) {
+            document.getElementById('clock-format').value = window.App.Clock.normalizeFormat(
+                settings.clockFormat
+            );
         }
     }
 
