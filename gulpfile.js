@@ -2,13 +2,19 @@ const fs = require("node:fs");
 const gulp = require("gulp");
 const rename = require("gulp-rename");
 const replace = require("gulp-replace-task");
+const { version: productVersion } = require("./package.json");
 
 const { ENV } = process.env;
 const distPath = `./dist/${ENV}/`;
 const productDescription =
   "Replace your browser New Tab page with live price charts for Bitcoin, Ethereum, and more.";
 
-const filesArr = ["./src/js/**/*", "./src/css/**/*", "./src/img/tokens/**/*"];
+const filesArr = [
+  "./src/js/**/*",
+  "./src/css/**/*",
+  "./src/img/tokens/**/*",
+  "./src/img/contributors/**/*",
+];
 if (ENV.includes("extension")) {
   filesArr.push("./src/manifest.json", "./src/icons/**/*");
 }
@@ -40,6 +46,10 @@ gulp.task("preprocess-index", function () {
           {
             match: "title",
             replacement: ENV.includes("extension") ? "New Tab" : "Crypto Tab",
+          },
+          {
+            match: "version",
+            replacement: productVersion,
           },
           {
             match: "favicons",

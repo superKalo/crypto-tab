@@ -6,6 +6,8 @@ window.App.SettingsPanel = (function () {
     let tokenPicker;
     let tokenSelect;
     let tokenPickerControl;
+    let aboutDialog;
+    let aboutButton;
     const changedPreferences = new Set();
 
     const DEFAULT_UP_COLOR = '#61ca00';
@@ -34,6 +36,8 @@ window.App.SettingsPanel = (function () {
         toggleButton = document.getElementById('toggle-settings');
         tokenPicker = document.getElementById('token-picker');
         tokenSelect = document.getElementById('token-select');
+        aboutDialog = document.getElementById('about-dialog');
+        aboutButton = document.getElementById('open-about');
 
         tokenPickerControl = new window.App.TokenPicker({
             container: tokenPicker,
@@ -47,6 +51,27 @@ window.App.SettingsPanel = (function () {
         );
 
         toggleButton.addEventListener('click', togglePanelVisibility);
+        aboutButton.addEventListener('click', showAbout);
+        document.getElementById('close-about').addEventListener('click', () => aboutDialog.close());
+        aboutDialog.addEventListener('close', () => {
+            document.body.classList.remove('about-open');
+            aboutButton.focus();
+        });
+        aboutDialog.addEventListener('click', (event) => {
+            if (event.target !== aboutDialog) {
+                return;
+            }
+
+            const bounds = aboutDialog.getBoundingClientRect();
+            if (
+                event.clientX < bounds.left ||
+                event.clientX > bounds.right ||
+                event.clientY < bounds.top ||
+                event.clientY > bounds.bottom
+            ) {
+                aboutDialog.close();
+            }
+        });
 
         document.querySelectorAll('#close-settings').forEach((btn) => {
             btn.addEventListener('click', () => hidePanel(true));
@@ -113,12 +138,22 @@ window.App.SettingsPanel = (function () {
 
     function togglePanelVisibility() {
         if (settingsPanel.classList.contains('hidden')) {
-            settingsPanel.classList.remove('hidden');
-            toggleButton.setAttribute('aria-expanded', 'true');
-            tokenSelect.focus();
+            showPanel();
         } else {
             hidePanel();
         }
+    }
+
+    function showPanel() {
+        settingsPanel.classList.remove('hidden');
+        toggleButton.setAttribute('aria-expanded', 'true');
+        tokenSelect.focus();
+    }
+
+    function showAbout() {
+        hidePanel();
+        document.body.classList.add('about-open');
+        aboutDialog.showModal();
     }
 
     function hidePanel(restoreFocus = false) {

@@ -146,7 +146,7 @@
         <div id="price-token-menu" class="price-token-menu" hidden>
           <p class="price-token-menu-title">Choose a token</p>
           <ul id="price-token-options" class="token-options" aria-label="Available tokens">
-            <!-- Options share the Preferences picker. -->
+            <!-- Options share the Customize picker. -->
           </ul>
           <div class="token-request">
             <p class="token-request-title">Missing a token?</p>
@@ -193,35 +193,18 @@
         <span id="message" class="message" role="status"></span>
       </div>
 
-      <footer class="footer text-center mb">
-        <p class="mb--">
-          <small>
-            <span id="last-updated">Updating…</span>
-          </small>
-        </p>
-        <p>
-          <small>
-            <small>
-              <a
-                href="https://github.com/superKalo/crypto-tab"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Open Source
-              </a>
-            </small>
-          </small>
-        </p>
-      </footer>
+      <p class="text-center mb">
+        <small><span id="last-updated">Updating…</span></small>
+      </p>
 
       <div id="settings-panel" class="settings hidden" aria-labelledby="settings-title">
         <div class="settings-header">
-          <h2 id="settings-title" class="settings-title">Preferences</h2>
+          <h2 id="settings-title" class="settings-title">Customize</h2>
           <button
             id="close-settings"
             type="button"
             class="close-button"
-            aria-label="Close preferences"
+            aria-label="Close customization panel"
           >
             &times;
           </button>
@@ -342,29 +325,186 @@
         </div>
       </div>
 
-      <button
-        id="toggle-settings"
-        class="btn toggle-settings"
-        aria-controls="settings-panel"
-        aria-expanded="false"
-      >
-        <svg
-          viewBox="0 0 600 600"
-          width="16"
-          height="16"
-          xmlns="http://www.w3.org/2000/svg"
-          fill="currentColor"
-          aria-hidden="true"
+      <footer class="footer">
+        <button
+          id="open-about"
+          class="footer-action"
+          type="button"
+          aria-haspopup="dialog"
+          aria-controls="about-dialog"
         >
-          <g>
-            <path
-              d="M 447.70881 -12.781343 A 42.041451 42.041451 0 0 0 405.66786 29.260344 L 405.66786 50.301721 L 27.434765 50.301721 A 42.041302 42.041302 0 0 0 -14.606185 92.341354 A 42.041302 42.041302 0 0 0 27.434765 134.38304 L 405.66786 134.38304 L 405.66786 155.44906 A 42.041451 42.041451 0 0 0 447.70881 197.49075 A 42.041451 42.041451 0 0 0 489.74976 155.44906 L 489.74976 134.38304 L 573.78036 134.38304 A 42.041302 42.041302 0 0 0 615.82336 92.341354 A 42.041302 42.041302 0 0 0 573.78036 50.301721 L 489.74976 50.301721 L 489.74976 29.260344 A 42.041451 42.041451 0 0 0 447.70881 -12.781343 z M 143.0012 197.48869 A 42.041451 42.041451 0 0 0 100.9582 239.53038 L 100.9582 260.5697 L 27.447078 260.5697 A 42.041302 42.041302 0 0 0 -14.593872 302.61139 A 42.041302 42.041302 0 0 0 27.447078 344.65308 L 100.9582 344.65308 L 100.9582 365.7191 A 42.041451 42.041451 0 0 0 143.0012 407.76078 A 42.041451 42.041451 0 0 0 185.04215 365.7191 L 185.04215 344.65308 L 573.79472 344.65308 A 42.041302 42.041302 0 0 0 615.83567 302.61139 A 42.041302 42.041302 0 0 0 573.79472 260.5697 L 185.04215 260.5697 L 185.04215 239.53038 A 42.041451 42.041451 0 0 0 143.0012 197.48869 z M 279.59427 407.76078 A 42.041451 42.041451 0 0 0 237.55332 449.80042 L 237.55332 470.83974 L 27.447078 470.83974 A 42.041302 42.041302 0 0 0 -14.593872 512.88143 A 42.041302 42.041302 0 0 0 27.447078 554.92106 L 237.55332 554.92106 L 237.55332 575.98913 A 42.041451 42.041451 0 0 0 279.59427 618.02877 A 42.041451 42.041451 0 0 0 321.63522 575.98913 L 321.63522 554.92106 L 573.79472 554.92106 A 42.041302 42.041302 0 0 0 615.83567 512.88143 A 42.041302 42.041302 0 0 0 573.79472 470.83974 L 321.63522 470.83974 L 321.63522 449.80042 A 42.041451 42.041451 0 0 0 279.59427 407.76078 z"
-            />
-          </g>
-        </svg>
-        <span>Preferences</span>
-      </button>
+          <svg viewBox="0 0 660 660" width="16" height="16" aria-hidden="true" focusable="false">
+            <g
+              transform="translate(0.000000,660.000000) scale(0.100000,-0.100000)"
+              fill="currentColor"
+              stroke="none"
+            >
+              <path
+                d="M3080 6594 c-720 -65 -1308 -294 -1845 -721 -141 -112 -396 -367
+-508 -508 -389 -490 -620 -1039 -704 -1670 -24 -181 -24 -609 0 -790 84 -631
+315 -1180 704 -1670 112 -141 367 -396 508 -508 490 -389 1039 -620 1670 -704
+181 -24 609 -24 790 0 631 84 1180 315 1670 704 141 112 396 367 508 508 389
+490 620 1039 704 1670 12 95 17 201 17 395 0 194 -5 300 -17 395 -84 631 -315
+1180 -704 1670 -112 141 -367 396 -508 508 -488 388 -1047 623 -1665 702 -119
+16 -522 28 -620 19z m605 -1013 c879 -147 1587 -760 1849 -1602 151 -484 136
+-1029 -40 -1506 l-37 -101 -56 48 c-31 26 -82 62 -113 80 -32 17 -58 34 -58
+37 0 3 13 44 29 92 144 430 145 874 5 1300 -193 586 -646 1060 -1219 1276
+-246 93 -442 128 -710 129 -354 1 -643 -69 -961 -234 l-132 -67 -52 59 c-29
+33 -75 77 -101 98 l-49 39 85 51 c293 172 634 285 970 320 141 14 451 4 590
+-19z m-1903 -531 c129 -40 228 -139 268 -268 66 -212 -54 -436 -268 -502 -212
+-66 -436 54 -502 268 -95 306 196 597 502 502z m1818 -275 c614 -119 1083
+-590 1206 -1210 28 -137 25 -425 -5 -565 -66 -311 -201 -561 -426 -786 -276
+-276 -603 -422 -990 -440 -872 -41 -1622 709 -1581 1581 13 285 93 528 253
+770 84 127 272 316 398 402 210 141 447 232 687 263 103 13 357 4 458 -15z
+m-2257 -705 c31 -17 57 -36 57 -41 0 -4 -9 -31 -20 -59 -29 -74 -77 -262 -95
+-370 -98 -609 109 -1256 550 -1719 572 -600 1419 -804 2175 -524 52 19 159 68
+236 108 l142 72 52 -59 c29 -33 74 -77 101 -98 l49 -39 -82 -49 c-260 -156
+-550 -260 -858 -309 -159 -24 -499 -24 -660 1 -943 146 -1700 829 -1931 1742
+-49 196 -63 317 -63 554 -1 305 42 552 140 817 l37 101 56 -48 c31 -26 82 -62
+114 -80z m3739 -1780 c129 -40 228 -139 268 -268 66 -212 -54 -436 -268 -502
+-212 -66 -436 54 -502 268 -95 306 196 597 502 502z"
+              />
+              <path
+                d="M3253 4230 c-49 -29 -63 -66 -63 -165 l0 -85 -223 0 c-260 0 -278 -5
+-311 -82 -23 -57 -16 -107 22 -149 31 -34 80 -48 175 -49 l57 0 0 -410 0 -410
+-87 0 c-71 0 -95 -4 -121 -20 -58 -36 -78 -116 -44 -180 34 -64 59 -70 309
+-70 l221 0 4 -100 c3 -97 4 -101 35 -131 60 -61 169 -48 213 24 16 25 20 50
+20 120 l0 87 93 0 c150 1 231 28 321 111 90 82 144 217 132 330 -7 70 -38 155
+-75 206 l-28 39 19 24 c65 80 98 205 81 305 -38 224 -206 355 -455 355 l-88 0
+0 88 c0 69 -4 94 -20 119 -37 62 -124 82 -187 43z m397 -528 c39 -19 70 -71
+70 -117 0 -46 -31 -98 -70 -117 -30 -16 -65 -18 -252 -18 l-218 0 0 135 0 135
+218 0 c187 0 222 -2 252 -18z m0 -570 c39 -19 70 -71 70 -117 0 -46 -31 -98
+-70 -117 -30 -16 -65 -18 -252 -18 l-218 0 0 135 0 135 218 0 c187 0 222 -2
+252 -18z"
+              />
+            </g>
+          </svg>
+          <span>About</span>
+        </button>
+        <span class="footer-separator" aria-hidden="true"></span>
+        <button
+          id="toggle-settings"
+          class="footer-action"
+          type="button"
+          aria-controls="settings-panel"
+          aria-expanded="false"
+        >
+          <svg
+            viewBox="0 0 24 24"
+            width="16"
+            height="16"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+            focusable="false"
+          >
+            <path d="M3 7h3m6 0h9M3 17h9m6 0h3" />
+            <circle cx="9" cy="7" r="3" />
+            <circle cx="15" cy="17" r="3" />
+          </svg>
+          <span>Customize</span>
+        </button>
+      </footer>
     </div>
+
+    <dialog
+      id="about-dialog"
+      class="about-dialog"
+      aria-labelledby="about-title"
+      aria-describedby="about-description"
+    >
+      <div class="about-header">
+        <h2 id="about-title">About Crypto Tab</h2>
+        <button
+          id="close-about"
+          class="close-button"
+          type="button"
+          aria-label="Close About Crypto Tab"
+          autofocus
+        >
+          &times;
+        </button>
+      </div>
+      <div class="about-body">
+        <p id="about-description" class="about-description">
+          Back in 2017, two friends got curious about Bitcoin.<br />Crypto Tab came out of a simple
+          wish - open a new tab, check the price, and get on with the day.
+        </p>
+        <p class="about-story">
+          It’s made for vibe investors, so the price is averaged by the hour, day, week or month.
+        </p>
+        <p class="about-story">
+          First shipped in October 2017, maintained on and off ever since, and somehow grew
+          organically to thousands of active installs! Now with dark mode, custom colors and finally
+          an option to switch to Ether.
+        </p>
+        <section class="about-contributors" aria-labelledby="contributors-title">
+          <h3 id="contributors-title">Contributors</h3>
+          <ul class="contributors">
+            <li>
+              <a href="https://github.com/superKalo" target="_blank" rel="noopener noreferrer">
+                <img src="img/contributors/superkalo.webp" width="36" height="36" alt="" />
+                <span>@superKalo</span>
+              </a>
+            </li>
+            <li>
+              <a href="https://github.com/cmihaylov" target="_blank" rel="noopener noreferrer">
+                <img src="img/contributors/cmihaylov.webp" width="36" height="36" alt="" />
+                <span>@cmihaylov</span>
+              </a>
+            </li>
+            <li>
+              <a href="https://github.com/boyan-kirov" target="_blank" rel="noopener noreferrer">
+                <img src="img/contributors/boyan-kirov.webp" width="36" height="36" alt="" />
+                <span>@boyan-kirov</span>
+              </a>
+            </li>
+            <li>
+              <a href="https://github.com/ivelinmegdanov" target="_blank" rel="noopener noreferrer">
+                <img src="img/contributors/ivelinmegdanov.webp" width="36" height="36" alt="" />
+                <span>@ivelinmegdanov</span>
+              </a>
+            </li>
+          </ul>
+        </section>
+        <p class="about-contact">
+          All of us behind it are long-time members of the
+          <a href="https://goodmorning.dev" target="_blank" rel="noopener noreferrer"
+            >goodmorning.dev</a
+          >
+          team. We build browser extensions, wallets and dApps for Web3 - got something in mind?
+          Let’s talk 🤝
+        </p>
+        <div class="about-meta">
+          <nav class="about-links" aria-label="Project links">
+            <a
+              href="https://github.com/superKalo/crypto-tab"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Open source on GitHub
+            </a>
+            <a
+              href="https://github.com/superKalo/crypto-tab/issues/new?template=bug-report.yml"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Report a bug
+            </a>
+          </nav>
+          <dl class="about-details">
+            <div>
+              <dt>Version</dt>
+              <dd>@@version</dd>
+            </div>
+          </dl>
+        </div>
+      </div>
+    </dialog>
 
     <script src="lib/chart.umd.js"></script>
     <script src="lib/dayjs.min.js"></script>
