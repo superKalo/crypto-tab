@@ -472,10 +472,10 @@ small {
 
 /* Clock style */
 .clock-period {
-    font-size: 40px;
-    font-weight: bold;
-    vertical-align: bottom;
-    margin-left: 5px;
+    font-size: 36px;
+    font-weight: 400;
+    vertical-align: baseline;
+    margin-left: 12px;
 }
 
 /* Token selection beside the price */
