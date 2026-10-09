@@ -3,8 +3,6 @@ window.App = window.App || {};
 window.App.SettingsPanel = (function () {
     let settingsPanel;
     let toggleButton;
-    let themeToggle;
-    let themeOptions;
     let tokenPicker;
     let tokenSelect;
     let tokenPickerControl;
@@ -34,8 +32,6 @@ window.App.SettingsPanel = (function () {
     function init() {
         settingsPanel = document.getElementById('settings-panel');
         toggleButton = document.getElementById('toggle-settings');
-        themeToggle = document.getElementById('theme-toggle');
-        themeOptions = document.querySelectorAll('.toggle-option');
         tokenPicker = document.getElementById('token-picker');
         tokenSelect = document.getElementById('token-select');
 
@@ -56,10 +52,6 @@ window.App.SettingsPanel = (function () {
             btn.addEventListener('click', () => hidePanel(true));
         });
 
-        themeOptions.forEach((option) => {
-            option.addEventListener('click', handleThemeToggle);
-        });
-
         tokenPicker.addEventListener('toggle', () => {
             document.getElementById('appearance-settings').hidden = tokenPicker.open;
         });
@@ -72,6 +64,10 @@ window.App.SettingsPanel = (function () {
         });
 
         document.getElementById('clock-format').addEventListener('change', (e) => {
+            if (!e.target.checked) {
+                return;
+            }
+
             clockFormatChanged = true;
             const newFormat = window.App.Clock.normalizeFormat(e.target.value);
             window.App.Settings.set('clockFormat', newFormat);
@@ -139,25 +135,6 @@ window.App.SettingsPanel = (function () {
         hidePanel();
     }
 
-    function handleThemeToggle(event) {
-        const selectedOption = event.target;
-
-        themeOptions.forEach((option) => option.classList.remove('active'));
-        selectedOption.classList.add('active');
-
-        const theme = selectedOption.dataset.theme;
-
-        if (theme === 'dark') {
-            document.body.classList.add('dark-theme');
-        } else {
-            document.body.classList.remove('dark-theme');
-        }
-
-        themeToggle.setAttribute('data-active', theme);
-
-        window.App.Settings.set('theme', theme);
-    }
-
     function resetColors() {
         document.documentElement.style.setProperty('--color-up', DEFAULT_UP_COLOR);
         document.documentElement.style.setProperty('--color-down', DEFAULT_DOWN_COLOR);
@@ -180,15 +157,6 @@ window.App.SettingsPanel = (function () {
     async function loadSettings() {
         const settings = await window.App.Settings.get();
 
-        const savedTheme = settings.theme || 'light';
-        themeToggle.setAttribute('data-active', savedTheme);
-
-        themeOptions.forEach((option) => {
-            option.classList.toggle('active', option.dataset.theme === savedTheme);
-        });
-
-        window.App.ThemeManager.applyTheme(savedTheme);
-
         const upColor = settings.colorup || DEFAULT_UP_COLOR;
         const downColor = settings.colordown || DEFAULT_DOWN_COLOR;
 
@@ -210,9 +178,10 @@ window.App.SettingsPanel = (function () {
         renderSelectedToken(window.App.Crypto.currentCrypto || cryptoType);
 
         if (!clockFormatChanged) {
-            document.getElementById('clock-format').value = window.App.Clock.normalizeFormat(
-                settings.clockFormat
-            );
+            const format = window.App.Clock.normalizeFormat(settings.clockFormat);
+            document.querySelectorAll('input[name="clockFormat"]').forEach((option) => {
+                option.checked = option.value === format;
+            });
         }
     }
 

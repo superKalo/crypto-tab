@@ -2,76 +2,65 @@ window.App = window.App || {};
 
 window.App.ThemeManager = (function () {
     let themeOptions;
+    let isInitialized = false;
+    let themeChanged = false;
 
-    async function init() {
-        themeOptions = document.querySelectorAll('.toggle-option');
-
-        const savedTheme = await getSavedTheme();
-        applyTheme(savedTheme);
-        updateActiveOption(savedTheme);
-
-        themeOptions.forEach((option) => {
-            option.addEventListener('click', handleThemeToggle);
-        });
-
-        listenToSystemThemeChange();
+    function normalizeTheme(theme) {
+        return ['light', 'system', 'dark'].includes(theme) ? theme : 'light';
     }
 
-    async function handleThemeToggle(event) {
-        const selectedTheme = event.target.dataset.theme;
+    async function init() {
+        if (isInitialized) {
+            return;
+        }
+
+        isInitialized = true;
+        themeOptions = document.querySelectorAll('input[name="theme"]');
+
+        themeOptions.forEach((option) => {
+            option.addEventListener('change', handleThemeToggle);
+        });
+
+        try {
+            const settings = await window.App.Settings.get();
+            if (!themeChanged) {
+                const theme = normalizeTheme(settings.theme);
+                updateActiveOption(theme);
+                applyTheme(theme);
+            }
+        } catch (error) {
+            if (!themeChanged) {
+                applyTheme('light');
+            }
+            console.warn('Unable to load the theme preference. Keeping the current theme.', error);
+        }
+    }
+
+    function handleThemeToggle(event) {
+        if (!event.target.checked) {
+            return;
+        }
+
+        themeChanged = true;
+        const selectedTheme = normalizeTheme(event.target.value);
 
         updateActiveOption(selectedTheme);
         applyTheme(selectedTheme);
 
-        saveTheme(selectedTheme);
+        window.App.Settings.set('theme', selectedTheme);
     }
 
     function updateActiveOption(theme) {
-        themeOptions.forEach((option) => option.classList.remove('active'));
-
         themeOptions.forEach((option) => {
-            if (option.dataset.theme === theme) {
-                option.classList.add('active');
-            }
+            option.checked = option.value === theme;
         });
-
-        const themeToggle = document.getElementById('theme-toggle');
-        if (themeToggle) {
-            themeToggle.setAttribute('data-active', theme);
-        }
     }
 
     function applyTheme(theme) {
-        const body = document.body;
-
-        if (theme === 'system') {
-            body.classList.remove('dark-theme', 'light-theme');
-        } else if (theme === 'dark') {
-            body.classList.add('dark-theme');
-            body.classList.remove('light-theme');
-        } else {
-            body.classList.add('light-theme');
-            body.classList.remove('dark-theme');
-        }
-    }
-
-    async function listenToSystemThemeChange() {
-        const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-        mediaQuery.addEventListener('change', async () => {
-            const savedTheme = await getSavedTheme();
-            if (savedTheme === 'system') {
-                applyTheme('system');
-            }
-        });
-    }
-
-    async function getSavedTheme() {
-        const settings = await window.App.Settings.get();
-        return settings.theme || 'system';
-    }
-
-    function saveTheme(theme) {
-        window.App.Settings.set('theme', theme);
+        const selectedTheme = normalizeTheme(theme);
+        document.body.classList.toggle('dark-theme', selectedTheme === 'dark');
+        document.body.classList.toggle('light-theme', selectedTheme === 'light');
+        // System mode inherits the live prefers-color-scheme CSS media query.
     }
 
     return {
