@@ -30,6 +30,43 @@ const storageMigrationPromise = storageMigration.migrate().catch((error) => {
 const repositoryFactory = new globalThis.App.PriceRepositoryFactory({
     storage: 'BROWSER_STORAGE',
 });
+let settingsWriteQueue = Promise.resolve();
+
+function handleSettingsUpdate(patch, sendResponse) {
+    const validators = {
+        theme: (value) => ['light', 'system', 'dark'].includes(value),
+        clockFormat: (value) => ['12h', '24h'].includes(value),
+        cryptoType: (value) => globalThis.App.CryptoTokens.isSupportedToken(value),
+        period: (value) => globalThis.App.CryptoTokens.isChartPeriod(value),
+        colorup: (value) => /^#[\da-f]{6}$/i.test(value),
+        colordown: (value) => /^#[\da-f]{6}$/i.test(value),
+    };
+
+    const write = settingsWriteQueue.then(async () => {
+        if (
+            !patch ||
+            typeof patch !== 'object' ||
+            Array.isArray(patch) ||
+            !Object.entries(patch).every(
+                ([key, value]) => Object.hasOwn(validators, key) && validators[key](value)
+            )
+        ) {
+            throw new Error('Invalid settings update');
+        }
+
+        const stored = await storageMigration.callStorage('get', 'settings');
+        await storageMigration.callStorage('set', {
+            settings: { ...stored.settings, ...patch },
+        });
+    });
+
+    // A failed write must not block later updates from this or another tab.
+    settingsWriteQueue = write.catch(() => {});
+    write.then(
+        () => sendResponse({ ok: true }),
+        (error) => sendResponse({ ok: false, error: error.message })
+    );
+}
 
 function serializeRepositoryResult(result) {
     return {
@@ -71,6 +108,12 @@ function handleLegacyRequest(period, cryptoType, sendResponse) {
 extensionApi.runtime.onMessage.addListener((request, _sender, sendResponse) => {
     if (!request || typeof request !== 'object') {
         return false;
+    }
+
+    if (request.type === 'updateSettings') {
+        handleSettingsUpdate(request.settings, sendResponse);
+
+        return true;
     }
 
     if (request.type === 'getCryptoPriceData') {

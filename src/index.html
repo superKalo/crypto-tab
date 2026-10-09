@@ -279,23 +279,36 @@
             aria-labelledby="appearance-heading"
           >
             <h3 id="appearance-heading" class="settings-section-title">Appearance</h3>
-            <div class="settings-container">
-              <label>Theme</label>
-              <div class="toggle-container">
-                <div id="theme-toggle" class="toggle">
-                  <div class="toggle-option active" data-theme="light">Light</div>
-                  <div class="toggle-option" data-theme="system">System</div>
-                  <div class="toggle-option" data-theme="dark">Dark</div>
-                </div>
+            <fieldset id="theme-toggle" class="settings-choice">
+              <legend>Theme</legend>
+              <div class="segmented-control">
+                <label class="segmented-option">
+                  <input type="radio" name="theme" value="light" checked />
+                  <span>Light</span>
+                </label>
+                <label class="segmented-option">
+                  <input type="radio" name="theme" value="system" />
+                  <span>System</span>
+                </label>
+                <label class="segmented-option">
+                  <input type="radio" name="theme" value="dark" />
+                  <span>Dark</span>
+                </label>
               </div>
-            </div>
-            <div class="settings-container">
-              <label for="clock-format">Clock Format</label>
-              <select id="clock-format">
-                <option value="24h">24h</option>
-                <option value="12h">12h (AM/PM)</option>
-              </select>
-            </div>
+            </fieldset>
+            <fieldset id="clock-format" class="settings-choice">
+              <legend>Clock Format</legend>
+              <div class="segmented-control">
+                <label class="segmented-option">
+                  <input type="radio" name="clockFormat" value="24h" checked />
+                  <span>24h</span>
+                </label>
+                <label class="segmented-option">
+                  <input type="radio" name="clockFormat" value="12h" />
+                  <span>12h (AM/PM)</span>
+                </label>
+              </div>
+            </fieldset>
             <div class="settings-container">
               <label>Price Colors</label>
               <div class="color-picker-row">
