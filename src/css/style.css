@@ -33,7 +33,7 @@ small {
 
 /** Components */
 .time {
-    font-size: 120px;
+    font-size: clamp(64px, 25vw, 120px);
     font-weight: 500;
 }
 
@@ -472,10 +472,10 @@ small {
 
 /* Clock style */
 .clock-period {
-    font-size: 36px;
+    font-size: 0.3em;
     font-weight: 400;
     vertical-align: baseline;
-    margin-left: 12px;
+    margin-left: calc(1em / 3);
 }
 
 /* Token selection beside the price */
