@@ -82,7 +82,8 @@ window.App.Clock = {
             return;
         }
 
-        const { time, period } = this.formatTime(new Date(), this.format);
+        const now = new Date();
+        const { time, period } = this.formatTime(now, this.format);
         if (this.$time.textContent !== time) {
             this.$time.textContent = time;
         }
@@ -91,7 +92,8 @@ window.App.Clock = {
         }
         this.$period.hidden = period === '';
 
-        const delay = 60 * 1000 - (Date.now() % (60 * 1000));
+        // Schedule from the rendered time so a minute rollover cannot skip the next tick.
+        const delay = 60 * 1000 - (now.getTime() % (60 * 1000));
         this.timer = window.setTimeout(() => this.update(), delay);
     },
 
