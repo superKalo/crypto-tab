@@ -8,6 +8,10 @@ window.App = window.App || {};
 window.App.Chart = function (el) {
     this.el = el;
     this.cryptoType = App.CryptoTokens.getDefaultToken();
+    this.handleThemeChange = () => {
+        this.updateTheme();
+        this.chartInstance.update('theme');
+    };
 
     this.config = {
         type: 'line',
@@ -33,6 +37,12 @@ window.App.Chart = function (el) {
         },
         options: {
             showAllTooltips: true,
+            transitions: {
+                // Refresh shared point styles without animating the theme change.
+                theme: {
+                    animation: { duration: 0 },
+                },
+            },
             plugins: {
                 tooltip: {
                     multiple: true,
@@ -105,6 +115,22 @@ window.App.Chart = function (el) {
 
 window.App.Chart.prototype.isInitiated = function () {
     return !!this.chartInstance;
+};
+
+window.App.Chart.prototype.updateTheme = function () {
+    const styles = getComputedStyle(document.documentElement);
+    const color = (name) => styles.getPropertyValue(name).trim();
+    const dataset = this.config.data.datasets[0];
+    const tooltip = this.config.options.plugins.tooltip;
+
+    dataset.borderColor = color('--chart-line-color');
+    dataset.pointBorderColor = color('--chart-point-color');
+    dataset.pointHoverBorderColor = dataset.pointBorderColor;
+    dataset.backgroundColor = color('--background-color');
+    dataset.pointBackgroundColor = dataset.backgroundColor;
+    dataset.pointHoverBackgroundColor = dataset.backgroundColor;
+    tooltip.backgroundColor = color('--tooltip-bg');
+    tooltip.bodyColor = color('--tooltip-text-color');
 };
 
 window.App.Chart.prototype.update = function (_labels, _data) {
@@ -201,7 +227,7 @@ window.App.Chart.prototype.alwaysVisibleTooltipsPlugin = function () {
 
                     // Draw tooltip background and arrow as a single element
                     ctx.save();
-                    ctx.fillStyle = 'rgba(79, 120, 226, 0.85)';
+                    ctx.fillStyle = chart.options.plugins.tooltip.backgroundColor;
                     ctx.beginPath();
 
                     // Draw the rounded rectangle
@@ -219,7 +245,7 @@ window.App.Chart.prototype.alwaysVisibleTooltipsPlugin = function () {
 
                     // Draw tooltip background and arrow as a single element
                     ctx.save();
-                    ctx.fillStyle = 'rgba(79, 120, 226, 0.85)';
+                    ctx.fillStyle = chart.options.plugins.tooltip.backgroundColor;
                     ctx.beginPath();
 
                     // Draw the rounded rectangle
@@ -234,7 +260,7 @@ window.App.Chart.prototype.alwaysVisibleTooltipsPlugin = function () {
                 }
 
                 // Draw tooltip text
-                ctx.fillStyle = '#fff';
+                ctx.fillStyle = chart.options.plugins.tooltip.bodyColor;
                 ctx.font = '12px Arial';
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
@@ -269,9 +295,11 @@ window.App.Chart.prototype.init = function (
 
     this.config.data.labels = labels;
     this.config.data.datasets[0].data = values;
+    this.updateTheme();
 
     const ctx = this.el.getContext('2d');
     this.chartInstance = new Chart(ctx, this.config);
+    window.addEventListener('themechange', this.handleThemeChange);
 };
 
 window.App.Chart.prototype.destroy = function () {
@@ -281,4 +309,5 @@ window.App.Chart.prototype.destroy = function () {
 
     this.chartInstance.destroy();
     this.chartInstance = null;
+    window.removeEventListener('themechange', this.handleThemeChange);
 };
