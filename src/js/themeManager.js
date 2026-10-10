@@ -16,6 +16,11 @@ window.App.ThemeManager = (function () {
         }
 
         isInitialized = true;
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+            if (currentTheme === 'system') {
+                notifyThemeChange();
+            }
+        });
         // Apply the default before styles load, then read the saved theme independently of charts.
         applyTheme(currentTheme);
 
@@ -79,6 +84,11 @@ window.App.ThemeManager = (function () {
         document.documentElement.classList.toggle('light-theme', currentTheme === 'light');
         updateActiveOption(currentTheme);
         // System mode inherits the live prefers-color-scheme CSS media query.
+        notifyThemeChange();
+    }
+
+    function notifyThemeChange() {
+        window.dispatchEvent(new Event('themechange'));
     }
 
     return {

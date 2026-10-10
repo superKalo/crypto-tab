@@ -91,7 +91,7 @@ small {
 }
 
 .positive {
-    color: var(--color-up, #61ca00);
+    color: var(--color-up, var(--positive-color));
 }
 .negative {
     color: var(--color-down, #ff4949);
@@ -102,6 +102,10 @@ small {
     height: 200px;
     width: 100%;
     margin-bottom: 20px;
+}
+
+#last-updated {
+    color: var(--text-color-secondary);
 }
 
 .message {
@@ -982,20 +986,11 @@ small {
     outline: 2px solid var(--text-color);
     outline-offset: 3px;
 }
-.settings-container {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
 .settings label {
     display: block;
     font-weight: bold;
     color: var(--text-color-secondary);
 }
-.settings-container {
-    position: relative;
-}
-
 .close-button {
     cursor: pointer;
     font-size: 22px;
@@ -1063,55 +1058,83 @@ small {
     }
 }
 
-.color-picker-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 20px;
-}
-.color-picker {
-    width: 50%;
+.price-color-options {
     display: flex;
     flex-direction: column;
-    gap: 5px;
+    gap: 8px;
 }
-.color-picker-label {
-    display: flex;
-    justify-content: space-between;
+.price-color-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto auto;
     align-items: center;
-    color: var(--text-color-secondary);
-}
-.color-picker__label span {
-    font-size: 14px;
-}
-.circle-icon {
-    width: 18px;
-    height: 18px;
-    border-radius: 50%;
-    background-color: var(--toggle-inactive-color);
-}
-.color-input-wrapper {
-    position: relative;
-    display: inline-block;
-}
-.color-button {
-    width: 100%;
-    padding: 8px 12px;
-    border-radius: 8px;
+    gap: 12px;
+    padding: 6px 10px 6px 12px;
     border: 1px solid var(--border-color);
+    border-radius: 8px;
     background: var(--input-bg);
+}
+.settings .price-color-label {
+    color: var(--text-color);
+    font-weight: normal;
+    line-height: 1.4;
     cursor: pointer;
-    font-size: 14px;
+}
+.price-color-preview {
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+.color-control {
+    position: relative;
+    display: block;
+    width: 64px;
+    height: 36px;
+}
+.color-control-face {
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    height: 100%;
+    border: 1px solid var(--input-border-color);
+    border-radius: 6px;
+    background: var(--background-color);
     color: var(--text-color-secondary);
 }
-.color-input-wrapper input[type='color'] {
+.color-swatch {
+    width: 20px;
+    height: 20px;
+    border-radius: 4px;
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.15);
+}
+.color-control-up .color-swatch {
+    background: var(--color-up, var(--positive-color));
+}
+.color-control-down .color-swatch {
+    background: var(--color-down, var(--negative-color));
+}
+.color-control input[type='color'] {
+    box-sizing: border-box;
     position: absolute;
     left: 0;
     top: 0;
     opacity: 0;
     width: 100%;
     height: 100%;
+    margin: 0;
+    padding: 0;
+    border: 0;
     cursor: pointer;
+    touch-action: manipulation;
+}
+.color-control:hover .color-control-face {
+    border-color: var(--text-color-secondary);
+    color: var(--text-color);
+}
+.color-control input:focus-visible + .color-control-face {
+    outline: 2px solid var(--text-color);
+    outline-offset: 3px;
 }
 /* About dialog */
 body.about-open {
@@ -1265,19 +1288,20 @@ body.about-open {
 }
 
 .reset-colors {
-    border: 1px solid var(--border-color);
-    background: var(--background-color);
-    color: var(--text-color);
-    font-size: 14px;
-    padding: 8px 12px;
-    border-radius: 8px;
-    transition: all 0.3s ease;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    margin-top: 6px;
+    padding: 6px 0;
+    border: 0;
+    border-radius: 2px;
+    background: none;
+    color: var(--text-color-secondary);
+    font: inherit;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    cursor: pointer;
+    touch-action: manipulation;
 }
 .reset-colors:hover {
-    background-color: var(--toggle-bg);
-    border-color: var(--toggle-inactive-color);
-    text-decoration: none;
+    color: var(--text-color);
 }
 .apply-button {
     border: 1px solid var(--text-color);

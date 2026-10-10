@@ -10,8 +10,10 @@ window.App.SettingsPanel = (function () {
     let aboutButton;
     const changedPreferences = new Set();
 
+    // Keep the stored default as a marker for the theme's positive color.
     const DEFAULT_UP_COLOR = '#61ca00';
     const DEFAULT_DOWN_COLOR = '#ff4949';
+    let currentUpColor = DEFAULT_UP_COLOR;
 
     function renderSelectedToken(tokenId) {
         const token = window.App.CryptoTokens.getToken(tokenId);
@@ -133,6 +135,7 @@ window.App.SettingsPanel = (function () {
                 }
             });
         });
+        window.addEventListener('themechange', () => applyColor('up', currentUpColor));
         loadSettings();
     }
 
@@ -227,24 +230,23 @@ window.App.SettingsPanel = (function () {
     function applyColor(direction, value) {
         const fallback = direction === 'up' ? DEFAULT_UP_COLOR : DEFAULT_DOWN_COLOR;
         const color = /^#[\da-f]{6}$/i.test(value) ? value : fallback;
-        document.documentElement.style.setProperty(`--color-${direction}`, color);
-        document.getElementById(`color-${direction}`).value = color;
-        updateCircleColor(`circle-${direction}`, color);
-        updateBorderColor(`border-${direction}`, color);
-    }
+        const usesThemeColor = direction === 'up' && color.toLowerCase() === DEFAULT_UP_COLOR;
+        const root = document.documentElement;
 
-    function updateCircleColor(circleId, color) {
-        const circle = document.getElementById(circleId);
-        if (circle) {
-            circle.style.backgroundColor = color;
+        if (direction === 'up') {
+            currentUpColor = color;
         }
-    }
 
-    function updateBorderColor(borderId, color) {
-        const border = document.getElementById(borderId);
-        if (border) {
-            border.style.borderColor = color;
+        if (usesThemeColor) {
+            root.style.removeProperty('--color-up');
+        } else {
+            root.style.setProperty(`--color-${direction}`, color);
         }
+
+        const displayedColor = usesThemeColor
+            ? getComputedStyle(root).getPropertyValue('--positive-color').trim()
+            : color;
+        document.getElementById(`color-${direction}`).value = displayedColor;
     }
 
     return {
