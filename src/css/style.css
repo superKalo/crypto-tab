@@ -91,7 +91,7 @@ small {
 }
 
 .positive {
-    color: var(--color-up, #61ca00);
+    color: var(--color-up, var(--positive-color));
 }
 .negative {
     color: var(--color-down, #ff4949);

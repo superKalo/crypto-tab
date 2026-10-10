@@ -5,6 +5,7 @@
     --light-background-color: #ffffff;
     --light-text-color: #333333;
     --light-text-color-secondary: #555;
+    --light-positive-color: #428600;
     --light-border-color: #dddddd;
     --light-btn-background: #4f78e2;
     --light-btn-active-color: #ffffff;
@@ -28,6 +29,7 @@
     --dark-background-color: #121212;
     --dark-text-color: #f5f5f5;
     --dark-text-color-secondary: #aaa;
+    --dark-positive-color: #82ad6b;
     --dark-border-color: #444444;
     --dark-btn-background: #61ca00;
     --dark-btn-active-color: #121212;
@@ -47,7 +49,6 @@
     --dark-chart-label-color: #888;
 
     /* Shared colors (same in both themes) */
-    --positive-color: #61ca00;
     --negative-color: #ff4949;
 
     /* Default theme (light) */
@@ -55,6 +56,7 @@
     --background-color: var(--light-background-color);
     --text-color: var(--light-text-color);
     --text-color-secondary: var(--light-text-color-secondary);
+    --positive-color: var(--light-positive-color);
     --border-color: var(--light-border-color);
     --btn-background: var(--light-btn-background);
     --btn-active-color: var(--light-btn-active-color);
@@ -81,6 +83,7 @@
         --background-color: var(--dark-background-color);
         --text-color: var(--dark-text-color);
         --text-color-secondary: var(--dark-text-color-secondary);
+        --positive-color: var(--dark-positive-color);
         --border-color: var(--dark-border-color);
         --btn-background: var(--dark-btn-background);
         --btn-active-color: var(--dark-btn-active-color);
@@ -107,6 +110,7 @@
     --background-color: var(--light-background-color);
     --text-color: var(--light-text-color);
     --text-color-secondary: var(--light-text-color-secondary);
+    --positive-color: var(--light-positive-color);
     --border-color: var(--light-border-color);
     --btn-background: var(--light-btn-background);
     --btn-active-color: var(--light-btn-active-color);
@@ -132,6 +136,7 @@
     --background-color: var(--dark-background-color);
     --text-color: var(--dark-text-color);
     --text-color-secondary: var(--dark-text-color-secondary);
+    --positive-color: var(--dark-positive-color);
     --border-color: var(--dark-border-color);
     --btn-background: var(--dark-btn-background);
     --btn-active-color: var(--dark-btn-active-color);
