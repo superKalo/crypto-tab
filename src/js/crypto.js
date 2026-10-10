@@ -14,6 +14,7 @@ window.App.Crypto = {
     $cryptoTypeLabel: document.getElementById('crypto-type'),
     $dataPeriods: document.querySelectorAll('.js-period'),
     $lastUpdated: document.getElementById('last-updated'),
+    $priceHeading: document.getElementById('price-token-picker'),
     $priceNow: document.getElementById('price-now'),
     $retryPrice: document.getElementById('retry-price'),
 
@@ -72,7 +73,6 @@ window.App.Crypto = {
             onOpen: () => App.TokenPickerIntro.dismiss(),
         });
         this.tokenPicker.renderSelected(this.currentCrypto);
-        App.TokenPickerIntro.init();
 
         this.$dataPeriods.forEach((element) => {
             element.addEventListener('click', () => {
@@ -249,6 +249,12 @@ window.App.Crypto = {
             this.$change.textContent = '';
         }
 
+        // Reveal the complete first result without recentering a visible loading placeholder.
+        const isFirstPriceResult = this.$priceHeading.getAttribute('aria-busy') === 'true';
+        this.$priceHeading.setAttribute('aria-busy', 'false');
+        if (isFirstPriceResult) {
+            App.TokenPickerIntro.init();
+        }
         this.updateLastUpdated();
     },
 

@@ -1,8 +1,5 @@
-window.App.Clock.init().catch((error) => {
-    window.App.Message.fireError(`Unable to initialize the clock. ${error.message}`);
-});
-
 window.App.Crypto.init().catch((error) => {
+    window.App.Crypto.$priceHeading.setAttribute('aria-busy', 'false');
     window.App.Message.fireError(`Unable to initialize Crypto Tab. ${error.message}`);
 });
 

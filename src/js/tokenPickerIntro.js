@@ -3,6 +3,7 @@ window.App = window.App || {};
 window.App.TokenPickerIntro = {
     storageKey: 'token-picker-intro-v1',
     dismissed: false,
+    showTimer: null,
     $card: document.getElementById('token-picker-intro'),
     $trigger: document.getElementById('price-token-select'),
 
@@ -54,9 +55,12 @@ window.App.TokenPickerIntro = {
                 return;
             }
 
-            this.$card.hidden = false;
-            this.$trigger.setAttribute('aria-describedby', 'token-intro-description');
-            this.position();
+            this.showTimer = window.setTimeout(() => {
+                this.showTimer = null;
+                this.$card.hidden = false;
+                this.$trigger.setAttribute('aria-describedby', 'token-intro-description');
+                this.position();
+            }, 500);
         } catch (error) {
             this.hide();
             console.warn('Unable to read the token introduction preference.', error);
@@ -80,6 +84,8 @@ window.App.TokenPickerIntro = {
 
     hide() {
         this.dismissed = true;
+        window.clearTimeout(this.showTimer);
+        this.showTimer = null;
         if (this.$card.contains(document.activeElement)) {
             this.$trigger.focus();
         }

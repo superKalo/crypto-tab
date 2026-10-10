@@ -14,6 +14,11 @@
     <meta name="image" content="https://i.imgur.com/pHG5fBk.jpg" />
     @@socialMediaTags
 
+    <script src="js/browser-extension-api.js"></script>
+    <script src="env/env.js"></script>
+    <script src="js/settings.js"></script>
+    <script src="js/themeManager.js"></script>
+
     <link rel="stylesheet" href="css/reset.css" />
     <link rel="stylesheet" href="css/style.css" />
     <link rel="stylesheet" href="css/theme-variables.css" />
@@ -83,7 +88,7 @@
         </a>
       </div>
 
-      <div id="price-token-picker" class="price-heading mb text-center">
+      <div id="price-token-picker" class="price-heading mb text-center" aria-busy="true">
         <h2 class="chart-period">
           <button
             id="price-token-select"
@@ -506,29 +511,26 @@ m-2257 -705 c31 -17 57 -36 57 -41 0 -4 -9 -31 -20 -59 -29 -74 -77 -262 -95
       </div>
     </dialog>
 
-    <script src="lib/chart.umd.js"></script>
-    <script src="lib/dayjs.min.js"></script>
-    <script src="lib/utc.js"></script>
-    <script src="lib/localizedFormat.js"></script>
-    <script src="lib/relativeTime.js"></script>
-    <script src="lib/calendar.js"></script>
+    <script src="js/message.js"></script>
+    <script src="js/clock.js"></script>
+
+    <script defer src="lib/chart.umd.js"></script>
+    <script defer src="lib/dayjs.min.js"></script>
+    <script defer src="lib/utc.js"></script>
+    <script defer src="lib/localizedFormat.js"></script>
+    <script defer src="lib/relativeTime.js"></script>
+    <script defer src="lib/calendar.js"></script>
     @@superRepoScript
 
-    <script src="js/browser-extension-api.js"></script>
-    <script src="env/env.js"></script>
-    <script src="js/utils.js"></script>
-    <script src="js/cryptoTokens.js"></script>
-    <script src="js/tokenPicker.js"></script>
-    <script src="js/settings.js"></script>
-    <script src="js/tokenPickerIntro.js"></script>
-    <script src="js/message.js"></script>
+    <script defer src="js/utils.js"></script>
+    <script defer src="js/cryptoTokens.js"></script>
+    <script defer src="js/tokenPicker.js"></script>
+    <script defer src="js/tokenPickerIntro.js"></script>
     @@priceRepositoryScripts
-    <script src="js/priceRepositoryClient.js"></script>
-    <script src="js/chart.js"></script>
-    <script src="js/clock.js"></script>
-    <script src="js/crypto.js"></script>
-    <script src="js/script.js"></script>
-    <script src="js/settingsPanel.js"></script>
-    <script src="js/themeManager.js"></script>
+    <script defer src="js/priceRepositoryClient.js"></script>
+    <script defer src="js/chart.js"></script>
+    <script defer src="js/crypto.js"></script>
+    <script defer src="js/script.js"></script>
+    <script defer src="js/settingsPanel.js"></script>
   </body>
 </html>

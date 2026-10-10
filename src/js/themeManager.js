@@ -1,7 +1,8 @@
 window.App = window.App || {};
 
 window.App.ThemeManager = (function () {
-    let themeOptions;
+    let themeOptions = [];
+    let currentTheme = 'light';
     let isInitialized = false;
     let themeChanged = false;
 
@@ -15,16 +16,18 @@ window.App.ThemeManager = (function () {
         }
 
         isInitialized = true;
-        themeOptions = document.querySelectorAll('input[name="theme"]');
+        // Apply the default before styles load, then read the saved theme independently of charts.
+        applyTheme(currentTheme);
 
-        themeOptions.forEach((option) => {
-            option.addEventListener('change', handleThemeToggle);
-        });
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initControls, { once: true });
+        } else {
+            initControls();
+        }
         window.App.Settings.subscribe((settings, changedKeys) => {
             if (changedKeys.includes('theme')) {
                 themeChanged = true;
                 const theme = normalizeTheme(settings.theme);
-                updateActiveOption(theme);
                 applyTheme(theme);
             }
         });
@@ -33,7 +36,6 @@ window.App.ThemeManager = (function () {
             const settings = await window.App.Settings.get();
             if (!themeChanged) {
                 const theme = normalizeTheme(settings.theme);
-                updateActiveOption(theme);
                 applyTheme(theme);
             }
         } catch (error) {
@@ -44,6 +46,14 @@ window.App.ThemeManager = (function () {
         }
     }
 
+    function initControls() {
+        themeOptions = document.querySelectorAll('input[name="theme"]');
+        themeOptions.forEach((option) => {
+            option.addEventListener('change', handleThemeToggle);
+        });
+        updateActiveOption(currentTheme);
+    }
+
     function handleThemeToggle(event) {
         if (!event.target.checked) {
             return;
@@ -52,7 +62,6 @@ window.App.ThemeManager = (function () {
         themeChanged = true;
         const selectedTheme = normalizeTheme(event.target.value);
 
-        updateActiveOption(selectedTheme);
         applyTheme(selectedTheme);
 
         window.App.Settings.set('theme', selectedTheme);
@@ -65,9 +74,10 @@ window.App.ThemeManager = (function () {
     }
 
     function applyTheme(theme) {
-        const selectedTheme = normalizeTheme(theme);
-        document.body.classList.toggle('dark-theme', selectedTheme === 'dark');
-        document.body.classList.toggle('light-theme', selectedTheme === 'light');
+        currentTheme = normalizeTheme(theme);
+        document.documentElement.classList.toggle('dark-theme', currentTheme === 'dark');
+        document.documentElement.classList.toggle('light-theme', currentTheme === 'light');
+        updateActiveOption(currentTheme);
         // System mode inherits the live prefers-color-scheme CSS media query.
     }
 

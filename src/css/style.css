@@ -8,10 +8,6 @@ body {
     color: var(--text-color);
 }
 
-html {
-    transition: all 1s;
-}
-
 strong {
     font-weight: bold;
 }
@@ -529,6 +525,20 @@ small {
     position: relative;
     width: 100%;
     line-height: 1.5;
+    transition: opacity 140ms ease-out;
+}
+.price-heading[aria-busy='true'] {
+    opacity: 0;
+    visibility: hidden;
+}
+@media (max-width: 600px) {
+    .chart-period {
+        /* Reserve two lines, including the token icon, before the price change arrives. */
+        min-height: 3.25em;
+    }
+    #change {
+        display: block;
+    }
 }
 .price-token-select {
     display: inline-block;
@@ -600,6 +610,9 @@ small {
     transform: translateY(0) scale(1) rotate(0deg);
 }
 @media (prefers-reduced-motion: reduce) {
+    .price-heading {
+        transition: none;
+    }
     .price-token-mark {
         transition: none;
     }
@@ -723,11 +736,11 @@ small {
     outline: 2px solid var(--text-color);
     outline-offset: 3px;
 }
-body.dark-theme .price-token-select {
+:root.dark-theme .price-token-select {
     color: var(--token-color-dark, #f7931a);
 }
 @media (prefers-color-scheme: dark) {
-    body:not(.light-theme) .price-token-select {
+    :root:not(.light-theme) .price-token-select {
         color: var(--token-color-dark, #f7931a);
     }
 }
