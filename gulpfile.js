@@ -89,14 +89,14 @@ gulp.task("preprocess-index", function () {
           {
             match: "superRepoScript",
             replacement:
-              ENV === "website" ? '<script src="lib/index.js"></script>' : "",
+              ENV === "website" ? '<script defer src="lib/index.js"></script>' : "",
           },
           {
             match: "priceRepositoryScripts",
             replacement:
               ENV === "website"
-                ? `<script src="js/priceApi.js"></script>
-    <script src="js/priceRepositoryFactory.js"></script>`
+                ? `<script defer src="js/priceApi.js"></script>
+    <script defer src="js/priceRepositoryFactory.js"></script>`
                 : "",
           },
         ],

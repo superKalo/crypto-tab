@@ -125,3 +125,8 @@ window.App.Clock = {
         this.settingsGeneration += 1;
     },
 };
+
+// Render before the deferred chart scripts load; the clock has no chart dependencies.
+window.App.Clock.init().catch((error) => {
+    window.App.Message.fireError(`Unable to initialize the clock. ${error.message}`);
+});

@@ -8,10 +8,6 @@ body {
     color: var(--text-color);
 }
 
-html {
-    transition: all 1s;
-}
-
 strong {
     font-weight: bold;
 }
@@ -723,11 +719,11 @@ small {
     outline: 2px solid var(--text-color);
     outline-offset: 3px;
 }
-body.dark-theme .price-token-select {
+:root.dark-theme .price-token-select {
     color: var(--token-color-dark, #f7931a);
 }
 @media (prefers-color-scheme: dark) {
-    body:not(.light-theme) .price-token-select {
+    :root:not(.light-theme) .price-token-select {
         color: var(--token-color-dark, #f7931a);
     }
 }

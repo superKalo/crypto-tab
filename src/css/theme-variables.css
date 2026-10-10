@@ -90,7 +90,7 @@
 }
 
 /* Light Theme Override */
-body.light-theme {
+:root.light-theme {
     --theme-color: var(--light-theme-color);
     --background-color: var(--light-background-color);
     --text-color: var(--light-text-color);
@@ -112,7 +112,7 @@ body.light-theme {
 }
 
 /* Dark Theme Override */
-body.dark-theme {
+:root.dark-theme {
     --theme-color: var(--dark-theme-color);
     --background-color: var(--dark-background-color);
     --text-color: var(--dark-text-color);
