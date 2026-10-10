@@ -77,16 +77,16 @@ gulp.task("preprocess-index", function () {
                 : `<!-- Schema.org for Google -->
                         <meta itemprop="name" content="Crypto Tab">
                         <meta itemprop="description" content="${productDescription}">
-                        <meta itemprop="image" content="https://crypto-tab.com/img/logo.png">
+                        <meta itemprop="image" content="https://i.imgur.com/pHG5fBk.jpg">
                         <!-- Twitter -->
                         <meta name="twitter:card" content="summary">
                         <meta name="twitter:title" content="Crypto Tab">
                         <meta name="twitter:description" content="${productDescription}">
-                        <meta name="twitter:image" content="https://crypto-tab.com/img/logo.png">
+                        <meta name="twitter:image" content="https://i.imgur.com/pHG5fBk.jpg">
                         <!-- Open Graph general (Facebook, Pinterest & Google+) -->
                         <meta property="og:title" content="Crypto Tab">
                         <meta property="og:description" content="${productDescription}">
-                        <meta property="og:image" content="https://crypto-tab.com/img/logo.png">
+                        <meta property="og:image" content="https://i.imgur.com/pHG5fBk.jpg">
                         <meta property="og:url" content="https://crypto-tab.com">
                         <meta property="og:site_name" content="Crypto Tab">
                         <meta property="og:locale" content="en_US">
