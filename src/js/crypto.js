@@ -340,8 +340,8 @@ window.App.Crypto = {
     },
 
     updateLastUpdated() {
-        this.renderUpdateStatus('Price', 'NOW', 'price');
-        this.renderUpdateStatus('Chart', this.currentPeriod, 'chart');
+        this.renderUpdateStatus('price', 'NOW', 'price');
+        this.renderUpdateStatus('chart', this.currentPeriod, 'chart');
     },
 
     renderUpdateStatus(label, period, elementPrefix) {
