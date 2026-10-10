@@ -11,7 +11,7 @@
     --light-btn-active-color: #ffffff;
     --light-toggle-bg: #e0e0e0;
     --light-toggle-active-color: #333333;
-    --light-toggle-inactive-color: #888888;
+    --light-toggle-inactive-color: #555555;
     --light-toggle-indicator-bg: #ffffff;
     --light-input-bg: #f9f9f9;
     --light-input-border-color: #ddd;
@@ -35,7 +35,7 @@
     --dark-btn-active-color: #121212;
     --dark-toggle-bg: #333333;
     --dark-toggle-active-color: #ffffff;
-    --dark-toggle-inactive-color: #bbbbbb;
+    --dark-toggle-inactive-color: #cccccc;
     --dark-toggle-indicator-bg: #444444;
     --dark-input-bg: #333333;
     --dark-input-border-color: #555555;

@@ -296,35 +296,74 @@
                 </label>
               </div>
             </fieldset>
-            <div class="settings-container">
-              <label>Price Colors</label>
-              <div class="color-picker-row">
-                <div class="color-picker">
-                  <div class="color-picker-label">
-                    <label for="color-up">Up</label>
-                    <div id="circle-up" class="circle-icon"></div>
-                  </div>
-                  <div class="color-input-wrapper">
-                    <button id="border-up" type="button" class="color-button">Change color</button>
-                    <input type="color" id="color-up" value="#428600" />
-                  </div>
+            <fieldset class="settings-choice price-colors">
+              <legend>Price change colors</legend>
+              <div class="price-color-options">
+                <div class="price-color-row">
+                  <label for="color-up" class="price-color-label">Price increase</label>
+                  <span class="price-color-preview positive" aria-hidden="true">+2.50%</span>
+                  <span class="color-control color-control-up">
+                    <input
+                      type="color"
+                      id="color-up"
+                      name="colorup"
+                      value="#428600"
+                      title="Choose a color for price increases"
+                    />
+                    <span class="color-control-face" aria-hidden="true">
+                      <span class="color-swatch"></span>
+                      <svg
+                        width="14"
+                        height="14"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.8"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        focusable="false"
+                      >
+                        <path d="m3.5 16.5 12-12a3 3 0 0 1 4.25 4.25l-12 12L3 21l.5-4.5Z" />
+                        <path d="m13.75 6.25 4.25 4.25" />
+                      </svg>
+                    </span>
+                  </span>
                 </div>
-
-                <div class="color-picker">
-                  <div class="color-picker-label">
-                    <label for="color-down">Down</label>
-                    <div id="circle-down" class="circle-icon"></div>
-                  </div>
-                  <div class="color-input-wrapper">
-                    <button id="border-down" type="button" class="color-button">
-                      Change color
-                    </button>
-                    <input type="color" id="color-down" value="#ff4949" />
-                  </div>
+                <div class="price-color-row">
+                  <label for="color-down" class="price-color-label">Price decrease</label>
+                  <span class="price-color-preview negative" aria-hidden="true">−2.50%</span>
+                  <span class="color-control color-control-down">
+                    <input
+                      type="color"
+                      id="color-down"
+                      name="colordown"
+                      value="#ff4949"
+                      title="Choose a color for price decreases"
+                    />
+                    <span class="color-control-face" aria-hidden="true">
+                      <span class="color-swatch"></span>
+                      <svg
+                        width="14"
+                        height="14"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.8"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        focusable="false"
+                      >
+                        <path d="m3.5 16.5 12-12a3 3 0 0 1 4.25 4.25l-12 12L3 21l.5-4.5Z" />
+                        <path d="m13.75 6.25 4.25 4.25" />
+                      </svg>
+                    </span>
+                  </span>
                 </div>
               </div>
-              <button id="reset-colors" class="btn reset-colors">Reset colors</button>
-            </div>
+              <button id="reset-colors" type="button" class="reset-colors">
+                Restore default colors
+              </button>
+            </fieldset>
           </section>
         </div>
       </div>

@@ -247,22 +247,6 @@ window.App.SettingsPanel = (function () {
             ? getComputedStyle(root).getPropertyValue('--positive-color').trim()
             : color;
         document.getElementById(`color-${direction}`).value = displayedColor;
-        updateCircleColor(`circle-${direction}`, displayedColor);
-        updateBorderColor(`border-${direction}`, displayedColor);
-    }
-
-    function updateCircleColor(circleId, color) {
-        const circle = document.getElementById(circleId);
-        if (circle) {
-            circle.style.backgroundColor = color;
-        }
-    }
-
-    function updateBorderColor(borderId, color) {
-        const border = document.getElementById(borderId);
-        if (border) {
-            border.style.borderColor = color;
-        }
     }
 
     return {
