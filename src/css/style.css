@@ -123,8 +123,8 @@ small {
 }
 .update-separator {
     margin-right: 8px;
-    font-size: 75%;
-    opacity: 0.6;
+    font-size: 85%;
+    opacity: 0.85;
 }
 .update-status {
     display: inline-flex;
