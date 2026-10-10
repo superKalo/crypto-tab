@@ -12,11 +12,14 @@ const productDescription =
 const filesArr = [
   "./src/js/**/*",
   "./src/css/**/*",
+  "./src/img/logo.svg",
   "./src/img/tokens/**/*",
   "./src/img/contributors/**/*",
 ];
 if (ENV.includes("extension")) {
   filesArr.push("./src/manifest.json", "./src/icons/**/*");
+} else {
+  filesArr.push("./src/img/logo.png");
 }
 
 // Remove the previous target build so renamed and deleted files cannot leak into dist.
@@ -33,7 +36,9 @@ gulp.task("copy-files", function () {
 
 // Copy favicons from src to dist directory
 gulp.task("copy-favicons", function () {
-  return gulp.src("./src/favicons/*").pipe(gulp.dest(distPath));
+  return gulp
+    .src("./src/favicons/*", { encoding: false })
+    .pipe(gulp.dest(distPath));
 });
 
 // Preprocess HTML files by replacing certain patterns based on the environment
@@ -59,8 +64,9 @@ gulp.task("preprocess-index", function () {
                 : `<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
                         <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
                         <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+                        <link rel="icon" type="image/svg+xml" sizes="any" href="/img/logo.svg">
                         <link rel="manifest" href="/manifest.json">
-                        <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+                        <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#4f78e2">
                         <meta name="theme-color" content="#ffffff">`,
           },
           {
@@ -71,16 +77,16 @@ gulp.task("preprocess-index", function () {
                 : `<!-- Schema.org for Google -->
                         <meta itemprop="name" content="Crypto Tab">
                         <meta itemprop="description" content="${productDescription}">
-                        <meta itemprop="image" content="https://i.imgur.com/pHG5fBk.jpg">
+                        <meta itemprop="image" content="https://crypto-tab.com/img/logo.png">
                         <!-- Twitter -->
                         <meta name="twitter:card" content="summary">
                         <meta name="twitter:title" content="Crypto Tab">
                         <meta name="twitter:description" content="${productDescription}">
-                        <meta name="twitter:image" content="https://i.imgur.com/pHG5fBk.jpg">
+                        <meta name="twitter:image" content="https://crypto-tab.com/img/logo.png">
                         <!-- Open Graph general (Facebook, Pinterest & Google+) -->
                         <meta property="og:title" content="Crypto Tab">
                         <meta property="og:description" content="${productDescription}">
-                        <meta property="og:image" content="https://i.imgur.com/pHG5fBk.jpg">
+                        <meta property="og:image" content="https://crypto-tab.com/img/logo.png">
                         <meta property="og:url" content="https://crypto-tab.com">
                         <meta property="og:site_name" content="Crypto Tab">
                         <meta property="og:locale" content="en_US">
