@@ -8,6 +8,10 @@ const { ENV } = process.env;
 const distPath = `./dist/${ENV}/`;
 const productDescription =
   "Replace your browser New Tab page with live price charts for Bitcoin, Ethereum, and more.";
+const socialPreviewImage =
+  "https://crypto-tab.com/mockups/social/crypto-tab-social-preview.jpg";
+const socialPreviewAlt =
+  "Crypto Tab showing cryptocurrency prices and a chart on a laptop in a sunlit workspace.";
 
 const filesArr = [
   "./src/js/**/*",
@@ -19,7 +23,10 @@ const filesArr = [
 if (ENV.includes("extension")) {
   filesArr.push("./src/manifest.json", "./src/icons/**/*");
 } else {
-  filesArr.push("./src/img/logo.png");
+  filesArr.push(
+    "./src/img/logo.png",
+    "./src/mockups/social/crypto-tab-social-preview.jpg"
+  );
 }
 
 // Remove the previous target build so renamed and deleted files cannot leak into dist.
@@ -74,20 +81,21 @@ gulp.task("preprocess-index", function () {
             replacement:
               ENV.includes("extension")
                 ? ""
-                : `<!-- Schema.org for Google -->
-                        <meta itemprop="name" content="Crypto Tab">
-                        <meta itemprop="description" content="${productDescription}">
-                        <meta itemprop="image" content="https://i.imgur.com/pHG5fBk.jpg">
-                        <!-- Twitter -->
-                        <meta name="twitter:card" content="summary">
+                : `<!-- X / Twitter -->
+                        <meta name="twitter:card" content="summary_large_image">
                         <meta name="twitter:title" content="Crypto Tab">
                         <meta name="twitter:description" content="${productDescription}">
-                        <meta name="twitter:image" content="https://i.imgur.com/pHG5fBk.jpg">
-                        <!-- Open Graph general (Facebook, Pinterest & Google+) -->
+                        <meta name="twitter:image" content="${socialPreviewImage}">
+                        <meta name="twitter:image:alt" content="${socialPreviewAlt}">
+                        <!-- Open Graph -->
                         <meta property="og:title" content="Crypto Tab">
                         <meta property="og:description" content="${productDescription}">
-                        <meta property="og:image" content="https://i.imgur.com/pHG5fBk.jpg">
-                        <meta property="og:url" content="https://crypto-tab.com">
+                        <meta property="og:image" content="${socialPreviewImage}">
+                        <meta property="og:image:type" content="image/jpeg">
+                        <meta property="og:image:width" content="1200">
+                        <meta property="og:image:height" content="630">
+                        <meta property="og:image:alt" content="${socialPreviewAlt}">
+                        <meta property="og:url" content="https://crypto-tab.com/">
                         <meta property="og:site_name" content="Crypto Tab">
                         <meta property="og:locale" content="en_US">
                         <meta property="og:type" content="website">`,
