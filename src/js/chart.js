@@ -131,6 +131,7 @@ window.App.Chart.prototype.updateTheme = function () {
     dataset.pointHoverBackgroundColor = dataset.backgroundColor;
     tooltip.backgroundColor = color('--tooltip-bg');
     tooltip.bodyColor = color('--tooltip-text-color');
+    this.config.options.scales.x.ticks.color = color('--chart-label-color');
 };
 
 window.App.Chart.prototype.update = function (_labels, _data) {

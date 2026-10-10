@@ -373,7 +373,7 @@ window.App.Crypto = {
         const oldestFetched = Math.min(...entries.map(({ status }) => status.lastFetched));
         const hasStaleData = entries.some(({ status }) => status.isStale);
         const lastUpdatedSpan = document.createElement('span');
-        lastUpdatedSpan.className = hasStaleData ? 'negative' : 'positive';
+        lastUpdatedSpan.className = hasStaleData ? 'negative' : '';
         lastUpdatedSpan.textContent = dayjs(oldestFetched).fromNow();
 
         this.$lastUpdated.appendChild(document.createTextNode('Updated '));

@@ -21,6 +21,7 @@
     --light-tooltip-text-color: #ffffff;
     --light-chart-line-color: #b0c4f6;
     --light-chart-point-color: #4f78e2;
+    --light-chart-label-color: #777;
 
     /* Dark theme values */
     --dark-theme-color: #fff;
@@ -43,6 +44,7 @@
     --dark-tooltip-text-color: #f5f5f5;
     --dark-chart-line-color: #52678f;
     --dark-chart-point-color: #6f8bc2;
+    --dark-chart-label-color: #888;
 
     /* Shared colors (same in both themes) */
     --positive-color: #61ca00;
@@ -69,6 +71,7 @@
     --tooltip-text-color: var(--light-tooltip-text-color);
     --chart-line-color: var(--light-chart-line-color);
     --chart-point-color: var(--light-chart-point-color);
+    --chart-label-color: var(--light-chart-label-color);
 }
 
 /* System Dark Theme Preference */
@@ -94,6 +97,7 @@
         --tooltip-text-color: var(--dark-tooltip-text-color);
         --chart-line-color: var(--dark-chart-line-color);
         --chart-point-color: var(--dark-chart-point-color);
+        --chart-label-color: var(--dark-chart-label-color);
     }
 }
 
@@ -119,6 +123,7 @@
     --tooltip-text-color: var(--light-tooltip-text-color);
     --chart-line-color: var(--light-chart-line-color);
     --chart-point-color: var(--light-chart-point-color);
+    --chart-label-color: var(--light-chart-label-color);
 }
 
 /* Dark Theme Override */
@@ -143,4 +148,5 @@
     --tooltip-text-color: var(--dark-tooltip-text-color);
     --chart-line-color: var(--dark-chart-line-color);
     --chart-point-color: var(--dark-chart-point-color);
+    --chart-label-color: var(--dark-chart-label-color);
 }

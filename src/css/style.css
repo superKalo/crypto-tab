@@ -104,6 +104,10 @@ small {
     margin-bottom: 20px;
 }
 
+#last-updated {
+    color: var(--text-color-secondary);
+}
+
 .message {
     text-align: center;
     position: absolute;
