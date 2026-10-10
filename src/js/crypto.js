@@ -84,6 +84,20 @@ window.App.Crypto = {
             this.loadCurrentPrice(this.requestGeneration);
         });
 
+        this.$lastUpdated.querySelectorAll('.update-trigger').forEach((trigger) => {
+            const showTooltip = () => trigger.classList.remove('tooltip-dismissed');
+            trigger.addEventListener('mouseenter', showTooltip);
+            trigger.addEventListener('focusin', showTooltip);
+        });
+        this.handleTooltipEscape = (event) => {
+            if (event.key === 'Escape') {
+                this.$lastUpdated.querySelectorAll('.update-trigger').forEach((trigger) => {
+                    trigger.classList.add('tooltip-dismissed');
+                });
+            }
+        };
+        document.addEventListener('keydown', this.handleTooltipEscape);
+
         this.handleVisibilityChange = () => {
             if (!document.hidden) {
                 this.refreshActiveData();
@@ -326,61 +340,71 @@ window.App.Crypto = {
     },
 
     updateLastUpdated() {
-        const entries = [
-            { label: 'Price', status: this.getRepositoryStatus(this.currentCrypto, 'NOW') },
-            {
-                label: 'Chart',
-                status: this.getRepositoryStatus(this.currentCrypto, this.currentPeriod),
-            },
-        ];
-        const details = entries.map(({ label, status }) => {
-            if (!status) {
-                return `${label}: loading…`;
+        this.renderUpdateStatus('Price', 'NOW', 'price');
+        this.renderUpdateStatus('Chart', this.currentPeriod, 'chart');
+    },
+
+    renderUpdateStatus(label, period, elementPrefix) {
+        const status = this.getRepositoryStatus(this.currentCrypto, period);
+        const policy = App.CryptoTokens.getRefreshPolicy(period);
+        const summary = document.getElementById(`${elementPrefix}-update-status`);
+        const statusLabel = document.getElementById(`${elementPrefix}-update-label`);
+        const age = document.getElementById(`${elementPrefix}-update-time`);
+        const note = document.getElementById(`${elementPrefix}-update-note`);
+        const details = document.getElementById(`${elementPrefix}-update-details`);
+        const description = [policy?.description || 'Checking data…'];
+
+        summary.classList.toggle('negative', Boolean(status && (!status.ok || status.isStale)));
+        statusLabel.textContent = label;
+        note.textContent = '';
+
+        if (!status) {
+            age.textContent = 'loading…';
+            description.push('Checking for data…');
+        } else if (!status.ok) {
+            age.textContent = 'unavailable';
+            description.push(
+                'The latest refresh failed. Retrying automatically while this tab is visible.'
+            );
+        } else if (!status.lastFetched) {
+            age.textContent = 'update time unavailable';
+        } else {
+            const hourCycle = App.Clock?.format === '12h' ? 'h12' : 'h23';
+            const updatedAt = new Intl.DateTimeFormat(undefined, {
+                dateStyle: 'medium',
+                timeStyle: 'short',
+                hourCycle,
+            }).format(status.lastFetched);
+            statusLabel.textContent = `${label} updated`;
+            age.textContent = dayjs(status.lastFetched)
+                .fromNow()
+                .replace('a few seconds', 'few sec')
+                .replace('a minute', '1 min')
+                .replace(/\bminutes?\b/g, 'min');
+            description.push(`Last refreshed: ${updatedAt}.`);
+
+            if (status.isStale) {
+                note.textContent = '· Cached data';
+                description.push(
+                    'The latest refresh failed. Retrying automatically while this tab is visible.'
+                );
+            } else {
+                const nextRefreshAt = App.CryptoTokens.getNextRefreshAt(period, status.lastFetched);
+                if (nextRefreshAt > Date.now()) {
+                    const time = new Intl.DateTimeFormat(undefined, {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        hourCycle,
+                    }).format(nextRefreshAt);
+                    description.push(`Next refresh around ${time}, while this tab is visible.`);
+                } else {
+                    description.push('Checking for updates…');
+                }
             }
-
-            if (!status.ok) {
-                return `${label}: unavailable. Will retry automatically.`;
-            }
-
-            const updated = status.lastFetched
-                ? `${dayjs(status.lastFetched).fromNow()} (${dayjs(status.lastFetched).calendar()})`
-                : 'update time unavailable';
-            return `${label}: ${updated}${status.isStale ? ' · Cached data' : ''}`;
-        });
-
-        this.$lastUpdated.setAttribute('title', details.join('\n'));
-        this.$lastUpdated.textContent = '';
-
-        const unavailable = entries.filter(({ status }) => status && !status.ok);
-        if (unavailable.length) {
-            this.$lastUpdated.textContent =
-                unavailable.length === entries.length
-                    ? 'Data unavailable'
-                    : `${unavailable[0].label} unavailable`;
-            return;
         }
 
-        if (entries.some(({ status }) => !status)) {
-            this.$lastUpdated.textContent = 'Updating…';
-            return;
-        }
-
-        if (entries.some(({ status }) => !status.lastFetched)) {
-            this.$lastUpdated.textContent = 'Update time unavailable';
-            return;
-        }
-
-        const oldestFetched = Math.min(...entries.map(({ status }) => status.lastFetched));
-        const hasStaleData = entries.some(({ status }) => status.isStale);
-        const lastUpdatedSpan = document.createElement('span');
-        lastUpdatedSpan.className = hasStaleData ? 'negative' : '';
-        lastUpdatedSpan.textContent = dayjs(oldestFetched).fromNow();
-
-        this.$lastUpdated.appendChild(document.createTextNode('Updated '));
-        this.$lastUpdated.appendChild(lastUpdatedSpan);
-        if (hasStaleData) {
-            this.$lastUpdated.appendChild(document.createTextNode(' · Cached data'));
-        }
+        age.setAttribute('aria-label', `${statusLabel.textContent} ${age.textContent}`);
+        details.textContent = description.join('\n\n');
     },
 
     startRefreshTimer() {
@@ -411,6 +435,9 @@ window.App.Crypto = {
         }
         if (this.handlePageHide) {
             window.removeEventListener('pagehide', this.handlePageHide);
+        }
+        if (this.handleTooltipEscape) {
+            document.removeEventListener('keydown', this.handleTooltipEscape);
         }
         this.unsubscribeSettings?.();
     },

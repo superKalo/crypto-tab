@@ -197,9 +197,47 @@
         <span id="message" class="message" role="status"></span>
       </div>
 
-      <p class="text-center mb">
-        <small><span id="last-updated">Updating…</span></small>
-      </p>
+      <div id="last-updated" class="data-updates mb" role="group" aria-label="Data freshness">
+        <span class="update-status-group">
+          <span id="price-update-status" class="update-status">
+            <span id="price-update-label">Price</span>
+            <span class="update-trigger">
+              <span
+                id="price-update-time"
+                class="update-time"
+                tabindex="0"
+                aria-describedby="price-update-details"
+              >
+                loading…
+              </span>
+              <span id="price-update-details" class="update-details" role="tooltip">
+                Checking the current price…
+              </span>
+            </span>
+            <span id="price-update-note" class="update-note"></span>
+          </span>
+        </span>
+        <span class="update-status-group">
+          <span class="update-separator" aria-hidden="true">·</span>
+          <span id="chart-update-status" class="update-status">
+            <span id="chart-update-label">Chart</span>
+            <span class="update-trigger">
+              <span
+                id="chart-update-time"
+                class="update-time"
+                tabindex="0"
+                aria-describedby="chart-update-details"
+              >
+                loading…
+              </span>
+              <span id="chart-update-details" class="update-details" role="tooltip">
+                Checking chart data…
+              </span>
+            </span>
+            <span id="chart-update-note" class="update-note"></span>
+          </span>
+        </span>
+      </div>
 
       <div id="settings-panel" class="settings hidden" aria-labelledby="settings-title">
         <div class="settings-header">

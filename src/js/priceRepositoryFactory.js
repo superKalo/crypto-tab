@@ -23,16 +23,37 @@ globalThis.App.PriceRepositoryFactory = class PriceRepositoryFactory {
 
     createRepository(cryptoType, period) {
         const isCurrentPrice = period === 'NOW';
+        const policy = App.CryptoTokens.getRefreshPolicy(period);
 
-        return new SuperRepo({
+        const repository = new SuperRepo({
             storage: this.storage,
             name: `prices-v2:${cryptoType}:${period}`,
-            outOfDateAfter: isCurrentPrice ? 3 * 60 * 1000 : 15 * 60 * 1000,
+            outOfDateAfter: policy.interval,
             request: () => this.request(period, cryptoType),
             mapData: isCurrentPrice
                 ? this.mapCurrentPrice
                 : (data) => this.mapChartData(data, period),
         });
+
+        // Apply the same clock boundary to both our cache read and SuperRepo's
+        // internal recheck before a request, including after worker suspension.
+        const getCacheStatus = repository.getDataUpToDateStatus.bind(repository);
+        repository.getDataUpToDateStatus = async () => {
+            const status = await getCacheStatus();
+            const nextRefreshAt = App.CryptoTokens.getNextRefreshAt(period, status.lastFetched);
+            const now = Date.now();
+
+            return {
+                ...status,
+                isDataUpToDate:
+                    status.isDataUpToDate &&
+                    nextRefreshAt !== null &&
+                    status.lastFetched <= now &&
+                    now < nextRefreshAt,
+            };
+        };
+
+        return repository;
     }
 
     async getData(cryptoType, period) {
