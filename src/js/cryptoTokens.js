@@ -6,7 +6,7 @@ globalThis.App.CryptoTokens = {
             id: 'bitcoin',
             displayName: 'Bitcoin',
             symbol: 'BTC',
-            priceFractionDigits: 8,
+            priceFractionDigits: 0,
             logoPath: 'img/tokens/bitcoin.svg',
             textColor: '#b85e00',
             darkTextColor: '#f7931a',
