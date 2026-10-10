@@ -525,6 +525,20 @@ small {
     position: relative;
     width: 100%;
     line-height: 1.5;
+    transition: opacity 140ms ease-out;
+}
+.price-heading[aria-busy='true'] {
+    opacity: 0;
+    visibility: hidden;
+}
+@media (max-width: 600px) {
+    .chart-period {
+        /* Reserve two lines, including the token icon, before the price change arrives. */
+        min-height: 3.25em;
+    }
+    #change {
+        display: block;
+    }
 }
 .price-token-select {
     display: inline-block;
@@ -596,6 +610,9 @@ small {
     transform: translateY(0) scale(1) rotate(0deg);
 }
 @media (prefers-reduced-motion: reduce) {
+    .price-heading {
+        transition: none;
+    }
     .price-token-mark {
         transition: none;
     }
