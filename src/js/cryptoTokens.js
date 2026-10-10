@@ -69,6 +69,65 @@ globalThis.App.CryptoTokens = {
         NOW: 'now',
     },
 
+    REFRESH_POLICIES: {
+        NOW: {
+            interval: 3 * 60 * 1000,
+            alignToClock: false,
+            description: 'Current price. Refreshes every 3 minutes.',
+        },
+        ONE_HOUR: {
+            interval: 5 * 60 * 1000,
+            alignToClock: true,
+            description: '5-minute price samples. Refreshes on each 5-minute mark.',
+        },
+        ONE_DAY: {
+            interval: 5 * 60 * 1000,
+            alignToClock: true,
+            description:
+                'Hourly averages. The current hour is still changing, so data refreshes every 5 minutes.',
+        },
+        ONE_WEEK: {
+            interval: 15 * 60 * 1000,
+            alignToClock: true,
+            description:
+                "Daily averages. Today's average is still changing, so data refreshes every 15 minutes.",
+        },
+        ONE_MONTH: {
+            interval: 15 * 60 * 1000,
+            alignToClock: true,
+            description:
+                "Daily averages. Today's average is still changing, so data refreshes every 15 minutes.",
+        },
+        ONE_YEAR: {
+            interval: 15 * 60 * 1000,
+            alignToClock: true,
+            description:
+                "Monthly averages. This month's average is still changing, so data refreshes every 15 minutes.",
+        },
+        ALL: {
+            interval: 15 * 60 * 1000,
+            alignToClock: true,
+            description:
+                "Monthly averages. This month's average is still changing, so data refreshes every 15 minutes.",
+        },
+    },
+
+    getRefreshPolicy(period) {
+        return this.REFRESH_POLICIES[period] || null;
+    },
+
+    getNextRefreshAt(period, lastFetched) {
+        const policy = this.getRefreshPolicy(period);
+
+        if (!policy || !Number.isFinite(lastFetched) || lastFetched <= 0) {
+            return null;
+        }
+
+        return policy.alignToClock
+            ? (Math.floor(lastFetched / policy.interval) + 1) * policy.interval
+            : lastFetched + policy.interval;
+    },
+
     getAllTokens() {
         return Object.values(this.TOKENS);
     },

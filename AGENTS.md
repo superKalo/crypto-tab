@@ -71,7 +71,11 @@ from shared UI code when the compatibility layer or `window.browser` should be u
 -   Repository keys must be unique per token and period and remain versioned, currently
     `prices-v2:<token>:<period>`.
 -   Current-price (`NOW`) data expires after 3 minutes.
--   Historical chart data expires after 15 minutes.
+-   Chart data expires on the next 5-minute clock boundary for `ONE_HOUR` and `ONE_DAY`, and the next
+    15-minute boundary for `ONE_WEEK`, `ONE_MONTH`, `ONE_YEAR`, and `ALL`. The current hour/day/month
+    average can still change; chart point spacing does not imply that the current point is final.
+-   Keep refresh policy and next-check calculations in `CryptoTokens`, shared by repository owners
+    and the UI. The single 30-second UI interval checks the active repositories when the tab is visible.
 -   Repository results use this stable contract:
 
 ```js
