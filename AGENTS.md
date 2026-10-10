@@ -150,6 +150,9 @@ optimization that can be rebuilt after service-worker suspension.
 
 Use Node.js 22 or newer and install dependencies with `npm install` (or `npm ci` in a clean environment).
 
+The website is usually already running at `http://localhost:8000/` for local testing. Check and reuse
+that server before starting another one.
+
 ```bash
 npm run build:website
 npm run build:extension:webkit
