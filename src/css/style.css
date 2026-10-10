@@ -1146,8 +1146,16 @@ body.about-open {
     padding: 24px 24px 16px;
 }
 .about-header h2 {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
     font-size: 20px;
     font-weight: bold;
+}
+.about-logo {
+    display: block;
+    flex-shrink: 0;
 }
 .about-header .close-button {
     flex-shrink: 0;
