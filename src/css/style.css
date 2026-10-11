@@ -95,9 +95,6 @@ small {
 .update-trigger {
     display: inline-flex;
 }
-.update-note:empty {
-    display: none;
-}
 .update-time {
     border-radius: 2px;
     text-decoration: underline dotted;

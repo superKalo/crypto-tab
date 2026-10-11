@@ -237,11 +237,7 @@ window.App.Crypto = {
 
         this.chart.init(result.data, cryptoType);
 
-        if (result.isStale) {
-            App.Message.fireError('Showing cached chart data because the latest request failed.');
-        } else {
-            App.Message.clear();
-        }
+        App.Message.clear();
 
         this.updateLastUpdated();
     },
@@ -345,14 +341,11 @@ window.App.Crypto = {
         const policy = App.CryptoTokens.getRefreshPolicy(period);
         const statusLabel = document.getElementById(`${elementPrefix}-update-label`);
         const age = document.getElementById(`${elementPrefix}-update-time`);
-        const note = document.getElementById(`${elementPrefix}-update-note`);
         const details = document.getElementById(`${elementPrefix}-update-details`);
         const description = [policy?.description || 'Checking data…'];
 
         statusLabel.textContent = label;
-        note.textContent = '';
-        age.classList.toggle('negative', Boolean(status && !status.ok));
-        note.classList.toggle('negative', Boolean(status?.isStale));
+        age.classList.toggle('negative', Boolean(status && (!status.ok || status.isStale)));
 
         if (!status) {
             age.textContent = 'loading…';
@@ -380,9 +373,8 @@ window.App.Crypto = {
             description.push(`Last refreshed: ${updatedAt}.`);
 
             if (status.isStale) {
-                note.textContent = '· Cached data';
                 description.push(
-                    'The latest refresh failed. Retrying automatically while this tab is visible.'
+                    `Showing cached ${label} data because the latest refresh failed. Retrying every ${this.REFRESH_INTERVAL / 1000} seconds while this tab is visible.`
                 );
             } else {
                 const nextRefreshAt = App.CryptoTokens.getNextRefreshAt(period, status.lastFetched);
