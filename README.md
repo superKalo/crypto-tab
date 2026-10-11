@@ -12,7 +12,7 @@
     <a href="https://chromewebstore.google.com/detail/crypto-tab/hmbkmkdhhlgemdgeefnhfaffdpddohpa"><strong>🧩 Install for Chromium (Chrome, Brave, Edge)</strong></a>
     &nbsp;·&nbsp;
     <a href="https://addons.mozilla.org/en-US/firefox/addon/crypto-tab/"><strong>🦊 Install for Firefox</strong></a><br />
-    ...or <a href="https://crypto-tab.com"><strong>preview it as a web version</strong></a> 👀
+    ...or <a href="https://crypto-tab.com">preview it</a> as a web version 👀
 </p>
 
 ## Features
