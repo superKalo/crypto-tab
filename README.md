@@ -23,6 +23,11 @@
 -   Switch between a 12-hour and 24-hour clock.
 -   Keep your selected token, chart period, and preferences, with changes synced across open tabs.
 
+## Privacy
+
+Read the [Privacy Policy](PRIVACY.md) for details about local storage, price requests, and data handling
+in the browser extension.
+
 ## Report a bug or request a token
 
 [**Report a bug on GitHub**](https://github.com/superKalo/crypto-tab/issues/new?template=bug-report.yml).
