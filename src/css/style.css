@@ -1296,20 +1296,21 @@ body.about-open {
 .about-details {
     flex-shrink: 0;
 }
-.about-details > div {
-    display: flex;
-    align-items: baseline;
-    gap: 6px;
-}
 .about-links {
     display: flex;
-    flex-wrap: wrap;
-    gap: 8px 20px;
+    align-items: center;
+    gap: 14px;
 }
 .about-links a {
     display: inline-flex;
     align-items: center;
+    gap: 6px;
     min-height: 28px;
+}
+.about-links-separator {
+    color: var(--text-color-secondary);
+    font-size: 85%;
+    opacity: 0.85;
 }
 .about-contact {
     margin-top: 8px;
