@@ -4,7 +4,7 @@
 
 <p align="center">
     <a href="https://crypto-tab.com">
-        <img src="https://i.imgur.com/E0N5eM0.gif" alt="Crypto Tab preview" width="526" height="381" />
+        <img src="src/mockups/social/crypto-tab-social-preview.jpg" alt="Crypto Tab showing cryptocurrency prices and a chart on a laptop" width="800" height="420" />
     </a>
 </p>
 
