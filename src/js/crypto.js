@@ -16,7 +16,7 @@ window.App.Crypto = {
     $lastUpdated: document.getElementById('last-updated'),
     $priceHeading: document.getElementById('price-token-picker'),
     $priceNow: document.getElementById('price-now'),
-    $retryPrice: document.getElementById('retry-price'),
+    $pricePrefix: document.getElementById('price-prefix'),
 
     chart: null,
     currentCrypto: '',
@@ -80,10 +80,6 @@ window.App.Crypto = {
             });
         });
 
-        this.$retryPrice.addEventListener('click', () => {
-            this.loadCurrentPrice(this.requestGeneration);
-        });
-
         this.$lastUpdated.querySelectorAll('.update-trigger').forEach((trigger) => {
             const showTooltip = () => trigger.classList.remove('tooltip-dismissed');
             trigger.addEventListener('mouseenter', showTooltip);
@@ -143,9 +139,10 @@ window.App.Crypto = {
 
         this.chart.destroy();
         this.setRepositoryStatus(cryptoType, 'NOW', null);
-        this.$priceNow.textContent = 'Loading…';
+        this.$priceNow.textContent = 'loading…';
+        this.$pricePrefix.textContent = 'price is';
+        this.$priceNow.removeAttribute('aria-label');
         this.$change.textContent = '';
-        this.$retryPrice.classList.add('hidden');
         this.updateCryptoTypeLabel();
         this.updateLastUpdated();
         App.Message.clear();
@@ -179,8 +176,9 @@ window.App.Crypto = {
 
         if (tokenChanged) {
             this.setRepositoryStatus(cryptoType, 'NOW', null);
-            this.$priceNow.textContent = 'Loading…';
-            this.$retryPrice.classList.add('hidden');
+            this.$priceNow.textContent = 'loading…';
+            this.$pricePrefix.textContent = 'price is';
+            this.$priceNow.removeAttribute('aria-label');
             this.updateCryptoTypeLabel();
         }
 
@@ -217,8 +215,6 @@ window.App.Crypto = {
 
     async loadCurrentPrice(generation) {
         const cryptoType = this.currentCrypto;
-        this.$retryPrice.disabled = true;
-        this.$retryPrice.textContent = 'Retrying…';
 
         const result = await this.repositoryClient.getData(cryptoType, 'NOW');
 
@@ -233,7 +229,7 @@ window.App.Crypto = {
     renderChartResult(result, cryptoType) {
         if (!result.ok) {
             App.Message.fireError(
-                `Unable to load ${App.CryptoTokens.getDisplayName(cryptoType)} chart data. Will retry automatically.`
+                `Unable to load ${App.CryptoTokens.getDisplayName(cryptoType)} chart data. Retrying every ${this.REFRESH_INTERVAL / 1000} seconds while this tab is visible.`
             );
             this.updateLastUpdated();
             return;
@@ -241,25 +237,19 @@ window.App.Crypto = {
 
         this.chart.init(result.data, cryptoType);
 
-        if (result.isStale) {
-            App.Message.fireError('Showing cached chart data because the latest request failed.');
-        } else {
-            App.Message.clear();
-        }
+        App.Message.clear();
 
         this.updateLastUpdated();
     },
 
     renderCurrentPriceResult(result) {
-        this.$retryPrice.disabled = false;
-        this.$retryPrice.textContent = 'Retry price';
-        this.$retryPrice.classList.toggle('hidden', result.ok);
-
         if (result.ok) {
             this.setPriceNow(result.data.price);
             this.setPriceChange(result.data.changePercent);
         } else {
-            this.$priceNow.textContent = 'unavailable';
+            this.$pricePrefix.textContent = 'price';
+            this.$priceNow.textContent = 'couldn’t be loaded';
+            this.$priceNow.setAttribute('aria-label', 'Price temporarily unavailable');
             this.$change.textContent = '';
         }
 
@@ -312,6 +302,8 @@ window.App.Crypto = {
     },
 
     setPriceNow(price) {
+        this.$pricePrefix.textContent = 'price is';
+        this.$priceNow.removeAttribute('aria-label');
         this.$priceNow.textContent = App.Utils.formatPrice(price, this.currentCrypto);
     },
 
@@ -347,16 +339,13 @@ window.App.Crypto = {
     renderUpdateStatus(label, period, elementPrefix) {
         const status = this.getRepositoryStatus(this.currentCrypto, period);
         const policy = App.CryptoTokens.getRefreshPolicy(period);
-        const summary = document.getElementById(`${elementPrefix}-update-status`);
         const statusLabel = document.getElementById(`${elementPrefix}-update-label`);
         const age = document.getElementById(`${elementPrefix}-update-time`);
-        const note = document.getElementById(`${elementPrefix}-update-note`);
         const details = document.getElementById(`${elementPrefix}-update-details`);
         const description = [policy?.description || 'Checking data…'];
 
-        summary.classList.toggle('negative', Boolean(status && (!status.ok || status.isStale)));
         statusLabel.textContent = label;
-        note.textContent = '';
+        age.classList.toggle('negative', Boolean(status && (!status.ok || status.isStale)));
 
         if (!status) {
             age.textContent = 'loading…';
@@ -384,9 +373,8 @@ window.App.Crypto = {
             description.push(`Last refreshed: ${updatedAt}.`);
 
             if (status.isStale) {
-                note.textContent = '· Cached data';
                 description.push(
-                    'The latest refresh failed. Retrying automatically while this tab is visible.'
+                    `Showing cached ${label} data because the latest refresh failed. Retrying every ${this.REFRESH_INTERVAL / 1000} seconds while this tab is visible.`
                 );
             } else {
                 const nextRefreshAt = App.CryptoTokens.getNextRefreshAt(period, status.lastFetched);
