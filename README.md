@@ -4,16 +4,16 @@
 
 <p align="center">
     <a href="https://crypto-tab.com">
-        <img src="https://i.imgur.com/E0N5eM0.gif" alt="Crypto Tab preview" width="526" height="381" />
+        <img src="src/mockups/social/crypto-tab-social-preview.jpg" alt="Crypto Tab showing cryptocurrency prices and a chart on a laptop" width="100%" />
     </a>
 </p>
 
-## 📦 Install
-
--   Google Chrome: [**Available on Chrome Store**](https://chromewebstore.google.com/detail/crypto-tab/hmbkmkdhhlgemdgeefnhfaffdpddohpa).
--   Mozilla Firefox: [**Available on Firefox Add-ons (AMO)**](https://addons.mozilla.org/en-US/firefox/addon/crypto-tab/).
-
-... or just [**try it in your browser**](https://crypto-tab.com) 👀
+<p align="center">
+    🧩 <a href="https://chromewebstore.google.com/detail/crypto-tab/hmbkmkdhhlgemdgeefnhfaffdpddohpa"><strong>Install for Chromium (Chrome, Brave, Edge)</strong></a>
+    &nbsp;·&nbsp;
+    🦊 <a href="https://addons.mozilla.org/en-US/firefox/addon/crypto-tab/"><strong>Install for Firefox</strong></a><br />
+    ...or <a href="https://crypto-tab.com">preview it</a> as a web version 👀
+</p>
 
 ## Features
 
