@@ -30,6 +30,50 @@ small {
     flex-direction: column;
 }
 
+.website-header {
+    box-sizing: border-box;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    width: 100%;
+    max-width: 1240px;
+    margin: 0 auto;
+    padding: 24px;
+}
+.website-intro {
+    min-width: 0;
+}
+.website-identity {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+}
+.website-brand {
+    font-size: 16px;
+    font-weight: 600;
+}
+.website-preview-label {
+    padding: 3px 8px;
+    border-radius: 999px;
+    background: var(--toggle-bg);
+    color: var(--text-color-secondary);
+    font-size: 11px;
+    font-weight: 500;
+    line-height: 16px;
+}
+.website-description {
+    margin-top: 8px;
+    color: var(--text-color-secondary);
+    font-size: 13px;
+    line-height: 1.5;
+}
+
 /** Components */
 .time {
     font-size: clamp(64px, 25vw, 120px);
@@ -163,30 +207,31 @@ small {
 }
 
 .install {
-    width: 500px;
+    width: 320px;
     max-width: 100%;
     display: flex;
-    margin-top: -15px;
+    flex-wrap: wrap;
+    gap: 10px;
+    flex-shrink: 0;
 }
 .install__link {
-    align-self: flex-end;
-    width: 280px;
+    box-sizing: border-box;
+    flex: 1 1 150px;
+    min-height: 44px;
+    padding: 9px 12px;
     color: inherit;
     background: var(--background-color);
-    border-radius: 6px;
+    border-radius: 8px;
     border: 1px solid var(--border-color);
     box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
     display: flex;
-    flex-flow: row;
-    height: 60px;
+    gap: 8px;
     align-items: center;
-    transition: 0.2s linear;
+    justify-content: center;
     font-size: 13px;
     line-height: 20px;
     text-decoration: none;
-    transition: 0.3s;
-    position: relative;
-    right: 0;
+    touch-action: manipulation;
 }
 .install__link:hover,
 .install__link:focus-visible {
@@ -197,61 +242,16 @@ small {
     outline: 2px solid var(--theme-color);
     outline-offset: 3px;
 }
-.install__link:nth-child(1) {
-    border-top-right-radius: 0;
-    border-bottom-right-radius: 0;
-}
-.install__link:nth-child(1) .install_side {
-    align-items: flex-end;
-}
-.install__link:nth-child(2) {
-    border-top-left-radius: 0;
-    border-bottom-left-radius: 0;
-}
-
-.install__icon svg path,
-.install__icon svg polygon {
-    fill: currentColor;
-}
-.install__link:hover .install__icon,
-.install__link:focus-visible .install__icon {
-    color: var(--theme-color);
-}
-.install__link svg {
-    transition: ease-in all 0.3s;
-}
-.install__link:hover svg {
-    transform: rotate(90deg);
-}
 .install__icon {
-    height: 60px;
-    width: 60px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--text-color-secondary);
-    transition: color 0.3s;
+    height: 24px;
+    width: 24px;
+    display: block;
+    flex-shrink: 0;
 }
 
-.install_side {
-    height: 60px;
-    width: 60px;
-    display: flex;
-    flex: 1;
-    justify-content: center;
-    flex-flow: column;
-}
 .install_title {
     color: var(--theme-color);
     font-weight: 600;
-    transition: all 0.3s;
-}
-.install__descr {
-    display: block;
-    color: var(--text-color-secondary);
-    max-width: 90%;
-    overflow: hidden;
-    text-overflow: ellipsis;
     white-space: nowrap;
 }
 
@@ -1382,9 +1382,6 @@ body.about-open {
         margin-bottom: 24px;
         white-space: nowrap;
     }
-    .install {
-        display: none;
-    }
     .price-heading {
         margin-bottom: 12px;
     }
@@ -1503,5 +1500,27 @@ body.about-open {
     }
     .about-body {
         padding: 0 16px 16px;
+    }
+}
+
+/* Keep the website framing above the preview when there is less room. */
+@media (max-width: 800px), (max-height: 650px) {
+    body.website {
+        display: flex;
+        flex-direction: column;
+    }
+    .website-header {
+        position: static;
+        flex-direction: column;
+        gap: 16px;
+        text-align: center;
+    }
+    .website-identity {
+        justify-content: center;
+    }
+    .website .wrapper {
+        flex: 1;
+        min-height: 0;
+        padding-top: 24px;
     }
 }

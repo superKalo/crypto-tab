@@ -24,6 +24,7 @@ if (ENV.includes("extension")) {
   filesArr.push("./src/manifest.json", "./src/icons/**/*");
 } else {
   filesArr.push(
+    "./src/img/browsers/*.svg",
     "./src/img/logo.png",
     "./src/mockups/social/crypto-tab-social-preview.jpg"
   );
@@ -55,6 +56,17 @@ gulp.task("preprocess-index", function () {
     .pipe(
       replace({
         patterns: [
+          {
+            match: "bodyClass",
+            replacement: ENV === "website" ? "website" : "",
+          },
+          {
+            match: "websiteHeader",
+            replacement:
+              ENV === "website"
+                ? fs.readFileSync("./src/templates/website-header.html", "utf8").trim()
+                : "",
+          },
           {
             match: "title",
             replacement: ENV.includes("extension") ? "New Tab" : "Crypto Tab",
