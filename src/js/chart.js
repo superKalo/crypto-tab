@@ -77,14 +77,21 @@ window.App.Chart = function (el) {
                 },
             },
             layout: {
-                padding: {
-                    left: 40,
-                    right: 40,
-                    top: 20,
-                    bottom: 0,
+                padding: () => {
+                    const sidePadding =
+                        parseFloat(getComputedStyle(this.el).getPropertyValue('--chart-side-padding')) ||
+                        0;
+
+                    return {
+                        left: sidePadding,
+                        right: sidePadding,
+                        top: 20,
+                        bottom: 0,
+                    };
                 },
             },
             responsive: true,
+            maintainAspectRatio: false,
             hover: {
                 mode: 'nearest',
                 intersect: true,
