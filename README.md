@@ -1,6 +1,6 @@
 <h1 align="center"><a href="https://crypto-tab.com"><img src="src/img/logo.svg" height="70" width="70" alt="Crypto Tab Logo" /></a><br />Crypto Tab</h1>
 
-<p align="center">Crypto Tab is a browser extension that replaces your New Tab page with live cryptocurrency price charts and a clock. It's open source, free, lightweight and comes with light and dark themes.</p>
+<p align="center">Crypto Tab is a browser extension that replaces your New Tab page with cryptocurrency prices, charts, and a clock. It's open source, free, lightweight, and comes with light and dark themes.</p>
 
 <p align="center">
     <a href="https://crypto-tab.com">
@@ -9,24 +9,28 @@
 </p>
 
 <p align="center">
-    🧩 <a href="https://chromewebstore.google.com/detail/crypto-tab/hmbkmkdhhlgemdgeefnhfaffdpddohpa"><strong>Install for Chromium (Chrome, Brave, Edge)</strong></a>
+    <a href="https://chromewebstore.google.com/detail/crypto-tab/hmbkmkdhhlgemdgeefnhfaffdpddohpa"><strong>Add to Chrome (or other Chromium browsers)</strong></a>
     &nbsp;·&nbsp;
-    🦊 <a href="https://addons.mozilla.org/en-US/firefox/addon/crypto-tab/"><strong>Install for Firefox</strong></a><br />
+    <a href="https://addons.mozilla.org/en-US/firefox/addon/crypto-tab/"><strong>Add to Firefox</strong></a><br />
     ...or <a href="https://crypto-tab.com">preview it</a> as a web version 👀
 </p>
 
 ## Features
 
--   Follow Bitcoin (BTC), Ether (ETH), Ambire Wallet (WALLET), and Hedera (HBAR), with prices in USD.
--   Explore charts for the past hour, day, week, month, year, or all time.
--   Choose a light, dark, or system theme and customize price colors.
--   Switch between a 12-hour and 24-hour clock.
--   Keep your selected token, chart period, and preferences, with changes synced across open tabs.
+-   Choose Bitcoin (BTC), Ether (ETH), Ambire Wallet (WALLET), or Hedera (HBAR) to see its price in USD.
+-   View the past hour, day, week, month, year, or all available history in a single chart.
+-   Make the page your own with light, dark, or system themes and custom colors for price changes.
+-   Read the time in your preferred 12-hour or 24-hour format.
+-   Pick up where you left off with your selected token, chart period, and preferences saved locally.
+
+Prices update automatically while Crypto Tab is visible. Preference changes are shared between open
+Crypto Tab tabs in the same browser profile.
 
 ## Privacy
 
-Read the [Privacy Policy](PRIVACY.md) for details about local storage, price requests, and data handling
-in the browser extension.
+The extension works without an account. It stores preferences and cached prices locally and fetches
+market prices from the Crypto Tab API. Read the [Privacy Policy](PRIVACY.md) for details about
+extension permissions, price requests, and server logs.
 
 ## Report a bug or request a token
 
