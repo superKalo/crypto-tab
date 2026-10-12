@@ -7,7 +7,7 @@ const { version: productVersion } = require("./package.json");
 const { ENV } = process.env;
 const distPath = `./dist/${ENV}/`;
 const productDescription =
-  "Replace your browser New Tab page with live price charts for Bitcoin, Ethereum, and more.";
+  "Replace your New Tab page with crypto prices, charts, and a clock. Follow Bitcoin, Ether, and more in USD.";
 const socialPreviewImage =
   "https://crypto-tab.com/mockups/social/crypto-tab-social-preview.jpg";
 const socialPreviewAlt =

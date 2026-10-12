@@ -1,7 +1,7 @@
 {
   "name": "Crypto Tab",
   "short_name": "Crypto Tab",
-  "description": "Live cryptocurrency price charts in every new browser tab",
+  "description": "Replace your New Tab page with crypto prices, charts, and a clock. Follow Bitcoin, Ether, and more in USD.",
   "start_url": "./",
   "icons": [
     {
