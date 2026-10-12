@@ -9,10 +9,10 @@
 </p>
 
 <p align="center">
-    <a href="https://chromewebstore.google.com/detail/crypto-tab/hmbkmkdhhlgemdgeefnhfaffdpddohpa"><strong>Add to Chrome, Brave, or Edge (and other Chromium browsers)</strong></a>
+    <a href="https://chromewebstore.google.com/detail/crypto-tab/hmbkmkdhhlgemdgeefnhfaffdpddohpa"><strong>Add to Chrome (or other Chromium browsers)</strong></a>
     &nbsp;·&nbsp;
     <a href="https://addons.mozilla.org/en-US/firefox/addon/crypto-tab/"><strong>Add to Firefox</strong></a><br />
-    <a href="https://crypto-tab.com">Try the web version</a> before installing.
+    ...or <a href="https://crypto-tab.com">preview it</a> as a web version 👀
 </p>
 
 ## Features
