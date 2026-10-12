@@ -3,7 +3,12 @@
   "description": "Replace the New Tab page with live cryptocurrency price charts",
   "version": "2.0.0",
   "browser_specific_settings": {
-    "gecko": { "id": "{904ad0ba-0f9e-4b2d-a868-a467138ba9df}" }
+    "gecko": {
+      "id": "{904ad0ba-0f9e-4b2d-a868-a467138ba9df}",
+      "data_collection_permissions": {
+        "required": ["none"]
+      }
+    }
   },
   "icons": {
     "16": "icons/icon16.png",
