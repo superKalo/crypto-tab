@@ -1,6 +1,6 @@
 <h1 align="center"><a href="https://crypto-tab.com"><img src="src/img/logo.svg" height="70" width="70" alt="Crypto Tab Logo" /></a><br />Crypto Tab</h1>
 
-<p align="center">Crypto Tab is a free, lightweight, open source browser extension that replaces your New Tab page with cryptocurrency prices, charts, and a clock.</p>
+<p align="center">Crypto Tab is a browser extension that replaces your New Tab page with cryptocurrency prices, charts, and a clock. It's open source, free, lightweight, and comes with light and dark themes.</p>
 
 <p align="center">
     <a href="https://crypto-tab.com">
