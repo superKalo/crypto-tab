@@ -195,6 +195,7 @@ window.App.Chart.prototype.formatTickLabel = function (label) {
 window.App.Chart.prototype.usesCustomTimeLabels = function () {
     return (
         this.period === App.CryptoTokens.PERIODS.ONE_DAY ||
+        this.period === App.CryptoTokens.PERIODS.ONE_MONTH ||
         this.period === App.CryptoTokens.PERIODS.ONE_YEAR ||
         (this.period === App.CryptoTokens.PERIODS.ONE_HOUR && App.Clock.format === '12h')
     );
@@ -212,8 +213,14 @@ window.App.Chart.prototype.drawTimeLabels = function (chart) {
 
     const ctx = chart.ctx;
     const isDay = this.period === App.CryptoTokens.PERIODS.ONE_DAY;
+    const isMonth = this.period === App.CryptoTokens.PERIODS.ONE_MONTH;
     const isYear = this.period === App.CryptoTokens.PERIODS.ONE_YEAR;
-    const labelPattern = isYear ? /^(.+)( ’\d{2})$/ : /^(\d{2})(:\d{2})?( AM| PM)?$/;
+    let labelPattern = /^(\d{2})(:\d{2})?( AM| PM)?$/;
+    if (isYear) {
+        labelPattern = /^(.+)( ’\d{2})$/;
+    } else if (isMonth) {
+        labelPattern = /^(\d{1,2})( .+)$/;
+    }
     scale.getLabelItems().forEach(({ label, font, textOffset, options }) => {
         const parts = labelPattern.exec(label)?.slice(1) || [label];
 
@@ -236,7 +243,7 @@ window.App.Chart.prototype.drawTimeLabels = function (chart) {
 
         parts.forEach((part, index) => {
             if (part) {
-                const isMuted = index === 2 || ((isDay || isYear) && index === 1);
+                const isMuted = index === 2 || ((isDay || isMonth || isYear) && index === 1);
                 ctx.globalAlpha = opacity * (isMuted ? 0.5 : 1);
                 ctx.fillText(part, x, textOffset);
                 x += ctx.measureText(part).width;
