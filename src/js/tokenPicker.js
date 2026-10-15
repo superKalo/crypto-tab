@@ -90,26 +90,42 @@ window.App.TokenPicker = (function () {
                 option.type = 'button';
                 option.className = 'token-option';
                 option.dataset.token = token.id;
-                option.appendChild(TokenPicker.createIdentity(token));
+
+                const content = document.createElement('span');
+                content.className = 'token-option-content';
+                content.appendChild(TokenPicker.createIdentity(token));
+
+                const description = document.createElement('span');
+                description.className = 'token-option-description';
+                description.textContent = token.description;
+                content.appendChild(description);
+                option.appendChild(content);
+
+                const svgNamespace = 'http://www.w3.org/2000/svg';
+                const check = document.createElementNS(svgNamespace, 'svg');
+                check.setAttribute('class', 'token-option-check');
+                check.setAttribute('width', '28');
+                check.setAttribute('height', '28');
+                check.setAttribute('viewBox', '0 0 24 24');
+                check.setAttribute('fill', 'none');
+                check.setAttribute('stroke', 'currentColor');
+                check.setAttribute('stroke-width', '2');
+                check.setAttribute('stroke-linecap', 'round');
+                check.setAttribute('stroke-linejoin', 'round');
+                check.setAttribute('aria-hidden', 'true');
+                check.setAttribute('focusable', 'false');
+
+                const checkPath = document.createElementNS(svgNamespace, 'path');
+                checkPath.setAttribute('d', 'm5 12 4 4L19 6');
+                check.appendChild(checkPath);
+                option.appendChild(check);
+
                 option.addEventListener('click', () => {
                     this.onSelect(token.id);
                     this.setOpen(false, true);
                 });
 
-                const description = document.createElement('span');
-                description.className = 'token-option-description';
-                description.textContent = token.description;
-                option.appendChild(description);
-
-                const link = document.createElement('a');
-                link.className = 'token-link';
-                link.href = token.coinGeckoUrl;
-                link.target = '_blank';
-                link.rel = 'noopener noreferrer';
-                link.textContent = 'Learn more';
-                link.setAttribute('aria-label', `Learn more about ${token.displayName}`);
-
-                row.append(option, link);
+                row.appendChild(option);
                 this.options.appendChild(row);
             });
 

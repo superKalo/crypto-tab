@@ -187,6 +187,8 @@ There is not yet a committed automated test suite.
     semicolons, and a 100-character print width.
 -   Follow the existing style in build configuration files and avoid unrelated mass-formatting.
 -   Prefer plain browser APIs and small focused functions over new abstractions or dependencies.
+-   Use SVG icons consistent with the existing UI for external links. Do not use Unicode arrow glyphs
+    as interface icons.
 -   Keep functions and state ownership explicit; avoid duplicated settings writes or data transformations.
 -   Use DOM APIs such as `textContent` and element creation for dynamic text.
 -   Preserve unrelated user changes in the working tree.

@@ -10,7 +10,7 @@ globalThis.App.CryptoTokens = {
             logoPath: 'img/tokens/bitcoin.svg',
             textColor: '#b85e00',
             darkTextColor: '#f7931a',
-            description: 'Peer-to-peer digital currency on the Bitcoin network.',
+            description: 'The digital currency on the Bitcoin network.',
             coinGeckoUrl: 'https://www.coingecko.com/en/coins/bitcoin',
         },
         ethereum: {
@@ -33,7 +33,7 @@ globalThis.App.CryptoTokens = {
             logoPath: 'img/tokens/wallet.svg',
             textColor: '#6000ff',
             darkTextColor: '#ad80ff',
-            description: 'The governance token of Ambire Wallet.',
+            description: 'The governance token of Ambire wallet.',
             coinGeckoUrl: 'https://www.coingecko.com/en/coins/ambire-wallet',
         },
         hedera: {
@@ -45,7 +45,7 @@ globalThis.App.CryptoTokens = {
             logoPath: 'img/tokens/hedera.svg',
             textColor: '#222222',
             darkTextColor: '#f5f5f5',
-            description: 'HBAR, the native coin of the Hedera network.',
+            description: 'The native coin of the Hedera network.',
             coinGeckoUrl: 'https://www.coingecko.com/en/coins/hedera',
         },
     },
