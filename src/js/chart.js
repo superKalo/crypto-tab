@@ -83,8 +83,7 @@ window.App.Chart = function (el) {
                     caretSize: 11,
                     callbacks: {
                         title: () => '',
-                        label: (tooltipItem) =>
-                            App.Utils.formatPrice(tooltipItem.parsed.y, this.cryptoType),
+                        label: (tooltipItem) => this.formatTooltipLabel(tooltipItem),
                     },
                     displayColors: false,
                 },
@@ -115,6 +114,7 @@ window.App.Chart = function (el) {
             scales: {
                 x: {
                     display: true,
+                    afterBuildTicks: (scale) => this.filterYearTicks(scale),
                     grid: {
                         display: false,
                     },
@@ -168,6 +168,10 @@ window.App.Chart.prototype.update = function (_labels, _data) {
 };
 
 window.App.Chart.prototype.formatTickLabel = function (label) {
+    if (this.period === App.CryptoTokens.PERIODS.ALL) {
+        return label.match(/\d{4}$/)?.[0] || label;
+    }
+
     if (this.period === App.CryptoTokens.PERIODS.ONE_YEAR) {
         return label.replace(/ \d{2}(\d{2})$/, ' ’$1');
     }
@@ -190,6 +194,38 @@ window.App.Chart.prototype.formatTickLabel = function (label) {
     const separator = is12Hour ? ' ' : '';
 
     return `${displayHour}${minutes}${separator}${suffix}`;
+};
+
+window.App.Chart.prototype.formatTooltipLabel = function (tooltipItem) {
+    const price = App.Utils.formatPrice(tooltipItem.parsed.y, this.cryptoType);
+    if (this.period !== App.CryptoTokens.PERIODS.ALL) {
+        return price;
+    }
+
+    const date = tooltipItem.label.replace(/ \d{2}(\d{2})$/, ' ’$1');
+    return `${date} · ${price}`;
+};
+
+window.App.Chart.prototype.filterYearTicks = function (scale) {
+    if (this.period !== App.CryptoTokens.PERIODS.ALL) {
+        return;
+    }
+
+    const years = new Set();
+    const yearlyTicks = scale.ticks.filter(({ value }) => {
+        const year = this.formatTickLabel(this.config.data.labels[value]);
+        if (years.has(year)) {
+            return false;
+        }
+
+        years.add(year);
+        return true;
+    });
+    // Anchor labels to January; a short initial year would crowd the next year's label.
+    const yearStarts = yearlyTicks.filter(({ value }) =>
+        /^Jan \d{4}$/.test(this.config.data.labels[value])
+    );
+    scale.ticks = yearStarts.length ? yearStarts : yearlyTicks;
 };
 
 window.App.Chart.prototype.usesCustomTimeLabels = function () {
@@ -283,7 +319,7 @@ window.App.Chart.prototype.alwaysVisibleTooltipsPlugin = function () {
             const minValue = Math.min(...data);
 
             let foundMax = false;
-            let foundMin = false;
+            let foundMin = this.period === App.CryptoTokens.PERIODS.ALL && minValue === maxValue;
             const permanentTooltips = [];
 
             // Find min and max values
@@ -402,6 +438,20 @@ window.App.Chart.prototype.init = function (
     this.config.options.scales.x.ticks.minRotation = isDay ? 45 : 0;
     this.config.options.scales.x.ticks.maxRotation = isDay ? 45 : 50;
     const { labels, values } = this.prepareData(_data);
+    const isAll = period === App.CryptoTokens.PERIODS.ALL;
+    const dataset = this.config.data.datasets[0];
+    this.config.options.scales.x.ticks.autoSkipPadding = isAll ? 12 : 3;
+    dataset.clip = isAll ? 8 : undefined;
+    dataset.pointRadius = 5;
+    if (isAll) {
+        const minIndex = values.indexOf(Math.min(...values));
+        const maxIndex = values.indexOf(Math.max(...values));
+        dataset.pointRadius = values.map((_, index) =>
+            index === minIndex || index === maxIndex ? 5 : 0
+        );
+    }
+    this.config.options.hover.mode = isAll ? 'index' : 'nearest';
+    this.config.options.hover.intersect = !isAll;
 
     // If already initiated - do not init twice! Update data only.
     if (this.isInitiated()) {

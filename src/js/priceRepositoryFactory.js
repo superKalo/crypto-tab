@@ -42,11 +42,17 @@ globalThis.App.PriceRepositoryFactory = class PriceRepositoryFactory {
             const status = await getCacheStatus();
             const nextRefreshAt = App.CryptoTokens.getNextRefreshAt(period, status.lastFetched);
             const now = Date.now();
+            // Older ALL caches contain years only; refresh them to recover monthly labels.
+            const hasLegacyAllLabels =
+                period === 'ALL' &&
+                Array.isArray(status.localData) &&
+                status.localData.some(({ timestamp }) => /^\d{4}$/.test(timestamp));
 
             return {
                 ...status,
                 isDataUpToDate:
                     status.isDataUpToDate &&
+                    !hasLegacyAllLabels &&
                     nextRefreshAt !== null &&
                     status.lastFetched <= now &&
                     now < nextRefreshAt,
@@ -146,19 +152,21 @@ globalThis.App.PriceRepositoryFactory = class PriceRepositoryFactory {
         const labelFormat = this.getLabelFormat(period);
 
         return data
-            .map(({ timestamp, value }) => ({
-                value,
-                timestamp: dayjs
-                    .utc(timestamp < 1e12 ? timestamp * 1000 : timestamp)
-                    .local()
-                    .format(labelFormat),
-            }))
+            .map(({ timestamp, value }) => {
+                const date = dayjs.utc(timestamp < 1e12 ? timestamp * 1000 : timestamp);
+
+                return {
+                    value,
+                    // ALL timestamps identify UTC calendar months, not local instants.
+                    timestamp: (period === 'ALL' ? date : date.local()).format(labelFormat),
+                };
+            })
             .reverse();
     }
 
     getLabelFormat(period) {
         const formats = {
-            ALL: 'YYYY',
+            ALL: 'MMM YYYY',
             ONE_YEAR: 'MMM YYYY',
             ONE_MONTH: 'D MMM',
             ONE_WEEK: 'dddd',
