@@ -15,7 +15,10 @@ window.App.Chart = function (el) {
         this.chartInstance.update('theme');
     };
     this.handleClockFormatChange = () => {
-        if (this.period === App.CryptoTokens.PERIODS.ONE_DAY) {
+        if (
+            this.period === App.CryptoTokens.PERIODS.ONE_DAY ||
+            this.period === App.CryptoTokens.PERIODS.ONE_HOUR
+        ) {
             this.chartInstance.update('none');
         }
     };
@@ -44,8 +47,8 @@ window.App.Chart = function (el) {
         },
         plugins: [
             {
-                id: 'dayTimeLabels',
-                afterDatasetsDraw: (chart) => this.drawDayLabels(chart),
+                id: 'timeLabels',
+                afterDatasetsDraw: (chart) => this.drawTimeLabels(chart),
             },
         ],
         options: {
@@ -116,11 +119,9 @@ window.App.Chart = function (el) {
                         display: false,
                     },
                     ticks: {
-                        // Keep native label measurements while drawing 1D text in two tones.
+                        // Keep native label measurements while drawing time text in two tones.
                         color: () =>
-                            this.period === App.CryptoTokens.PERIODS.ONE_DAY
-                                ? 'transparent'
-                                : this.labelColor,
+                            this.usesCustomTimeLabels() ? 'transparent' : this.labelColor,
                         callback: (value) => this.formatTickLabel(this.config.data.labels[value]),
                     },
                 },
@@ -167,7 +168,8 @@ window.App.Chart.prototype.update = function (_labels, _data) {
 };
 
 window.App.Chart.prototype.formatTickLabel = function (label) {
-    if (this.period !== App.CryptoTokens.PERIODS.ONE_DAY) {
+    const isDay = this.period === App.CryptoTokens.PERIODS.ONE_DAY;
+    if (!isDay && this.period !== App.CryptoTokens.PERIODS.ONE_HOUR) {
         return label;
     }
 
@@ -179,16 +181,24 @@ window.App.Chart.prototype.formatTickLabel = function (label) {
     const hours = Number(time[1]);
     const is12Hour = App.Clock.format === '12h';
     const displayHour = String(is12Hour ? hours % 12 || 12 : hours).padStart(2, '0');
-    const minutes = is12Hour && time[2] === '00' ? '' : `:${time[2]}`;
+    const minutes = isDay && is12Hour && time[2] === '00' ? '' : `:${time[2]}`;
     const suffix = is12Hour ? (hours < 12 ? 'AM' : 'PM') : '';
+    const separator = is12Hour ? ' ' : '';
 
-    return `${displayHour}${minutes}${suffix}`;
+    return `${displayHour}${minutes}${separator}${suffix}`;
 };
 
-window.App.Chart.prototype.drawDayLabels = function (chart) {
+window.App.Chart.prototype.usesCustomTimeLabels = function () {
+    return (
+        this.period === App.CryptoTokens.PERIODS.ONE_DAY ||
+        (this.period === App.CryptoTokens.PERIODS.ONE_HOUR && App.Clock.format === '12h')
+    );
+};
+
+window.App.Chart.prototype.drawTimeLabels = function (chart) {
     const scale = chart.scales.x;
     if (
-        this.period !== App.CryptoTokens.PERIODS.ONE_DAY ||
+        !this.usesCustomTimeLabels() ||
         !scale.options.display ||
         !scale.options.ticks.display
     ) {
@@ -196,8 +206,9 @@ window.App.Chart.prototype.drawDayLabels = function (chart) {
     }
 
     const ctx = chart.ctx;
+    const isDay = this.period === App.CryptoTokens.PERIODS.ONE_DAY;
     scale.getLabelItems().forEach(({ label, font, textOffset, options }) => {
-        const parts = /^(\d{2})(:\d{2})?(AM|PM)?$/.exec(label)?.slice(1) || [label];
+        const parts = /^(\d{2})(:\d{2})?( AM| PM)?$/.exec(label)?.slice(1) || [label];
 
         ctx.save();
         ctx.font = font.string;
@@ -218,7 +229,8 @@ window.App.Chart.prototype.drawDayLabels = function (chart) {
 
         parts.forEach((part, index) => {
             if (part) {
-                ctx.globalAlpha = opacity * (index > 0 ? 0.5 : 1);
+                const isMuted = index === 2 || (isDay && index === 1);
+                ctx.globalAlpha = opacity * (isMuted ? 0.5 : 1);
                 ctx.fillText(part, x, textOffset);
                 x += ctx.measureText(part).width;
             }
