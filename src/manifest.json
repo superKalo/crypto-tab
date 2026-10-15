@@ -1,7 +1,7 @@
 {
   "name": "Crypto Tab",
   "description": "Replace your New Tab page with crypto prices, charts, and a clock. Follow Bitcoin, Ether, and more in USD.",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "browser_specific_settings": {
     "gecko": {
       "id": "{904ad0ba-0f9e-4b2d-a868-a467138ba9df}",
