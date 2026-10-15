@@ -235,7 +235,7 @@ window.App.Crypto = {
             return;
         }
 
-        this.chart.init(result.data, cryptoType);
+        this.chart.init(result.data, cryptoType, this.currentPeriod);
 
         App.Message.clear();
 
