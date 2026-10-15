@@ -143,8 +143,14 @@
       <div id="last-updated" class="data-updates mb" role="group" aria-label="Data freshness">
         <span class="update-status-group">
           <span id="price-update-status" class="update-status">
-            <span id="price-update-label">price</span>
             <span class="update-trigger">
+              <span
+                id="price-update-label"
+                class="update-label"
+                aria-describedby="price-update-details"
+              >
+                price
+              </span>
               <span
                 id="price-update-time"
                 class="update-time"
@@ -160,10 +166,16 @@
           </span>
         </span>
         <span class="update-status-group">
-          <span class="update-separator" aria-hidden="true">·</span>
+          <span id="update-separator" class="update-separator" aria-hidden="true">·</span>
           <span id="chart-update-status" class="update-status">
-            <span id="chart-update-label">chart</span>
             <span class="update-trigger">
+              <span
+                id="chart-update-label"
+                class="update-label"
+                aria-describedby="chart-update-details"
+              >
+                chart
+              </span>
               <span
                 id="chart-update-time"
                 class="update-time"
@@ -178,6 +190,7 @@
             </span>
           </span>
         </span>
+        <span id="combined-update-time" hidden></span>
       </div>
 
       <div id="settings-panel" class="settings hidden" aria-labelledby="settings-title">

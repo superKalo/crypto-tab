@@ -8,6 +8,7 @@ window.App = window.App || {};
 window.App.Crypto = {
     PERIODS: window.App.CryptoTokens.PERIODS,
     REFRESH_INTERVAL: 30 * 1000,
+    MAX_COMBINED_UPDATE_GAP: 60 * 1000,
 
     $chart: document.getElementById('chart'),
     $change: document.getElementById('change'),
@@ -334,6 +335,52 @@ window.App.Crypto = {
     updateLastUpdated() {
         this.renderUpdateStatus('price', 'NOW', 'price');
         this.renderUpdateStatus('chart', this.currentPeriod, 'chart');
+
+        const statuses = [
+            this.getRepositoryStatus(this.currentCrypto, 'NOW'),
+            this.getRepositoryStatus(this.currentCrypto, this.currentPeriod),
+        ];
+        const now = Date.now();
+        const combined =
+            statuses.every(
+                (status) =>
+                    status?.ok &&
+                    !status.error &&
+                    !status.isStale &&
+                    Number.isFinite(status.lastFetched) &&
+                    status.lastFetched > 0 &&
+                    status.lastFetched <= now
+            ) &&
+            Math.abs(statuses[0].lastFetched - statuses[1].lastFetched) <=
+                this.MAX_COMBINED_UPDATE_GAP;
+        const combinedTime = document.getElementById('combined-update-time');
+
+        this.$lastUpdated.classList.toggle('data-updates-combined', combined);
+        document.getElementById('update-separator').textContent = combined ? '&' : '·';
+        combinedTime.hidden = !combined;
+
+        ['price', 'chart'].forEach((label) => {
+            const statusLabel = document.getElementById(`${label}-update-label`);
+            statusLabel.tabIndex = combined ? 0 : -1;
+
+            if (combined) {
+                statusLabel.textContent = label;
+                statusLabel.setAttribute(
+                    'aria-label',
+                    document.getElementById(`${label}-update-time`).getAttribute('aria-label')
+                );
+            } else {
+                statusLabel.removeAttribute('aria-label');
+            }
+        });
+
+        if (combined) {
+            // Use the older refresh so the shared age never overstates freshness.
+            const lastFetched = Math.min(statuses[0].lastFetched, statuses[1].lastFetched);
+            combinedTime.textContent = `updated ${dayjs(lastFetched)
+                .fromNow()
+                .replace('a few seconds ago', 'a moment ago')}`;
+        }
     },
 
     renderUpdateStatus(label, period, elementPrefix) {

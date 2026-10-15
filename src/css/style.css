@@ -142,18 +142,23 @@ small {
 }
 .update-trigger {
     display: inline-flex;
+    align-items: baseline;
+    gap: 4px;
 }
-.update-time {
+.update-time,
+.data-updates-combined .update-label {
     border-radius: 2px;
     text-decoration: underline dotted;
     text-decoration-color: var(--border-color);
     text-underline-offset: 3px;
     cursor: help;
 }
-.update-time:hover {
+.update-time:hover,
+.data-updates-combined .update-label:hover {
     text-decoration-color: currentColor;
 }
-.update-time:focus-visible {
+.update-time:focus-visible,
+.data-updates-combined .update-label:focus-visible {
     outline: 2px solid currentColor;
     outline-offset: 3px;
 }
@@ -187,6 +192,21 @@ small {
 .update-trigger:not(.tooltip-dismissed):hover .update-details,
 .update-trigger:not(.tooltip-dismissed):focus-within .update-details {
     visibility: visible;
+}
+.data-updates-combined {
+    gap: 4px;
+}
+.data-updates-combined .update-status-group {
+    width: auto;
+}
+.data-updates-combined .update-separator {
+    display: inline;
+    margin-right: 4px;
+    font-size: inherit;
+    opacity: 1;
+}
+.data-updates-combined .update-time {
+    display: none;
 }
 @media (max-width: 600px) {
     .update-status-group {
