@@ -28,9 +28,11 @@ window.App.SettingsPanel = (function () {
         tokenPickerControl.renderSelected(tokenId);
         document.getElementById('token-description').textContent = token.description;
 
-        const link = document.getElementById('token-learn-more');
+        const link = document.getElementById('token-coingecko-link');
         link.href = token.coinGeckoUrl;
-        link.setAttribute('aria-label', `Learn more about ${token.displayName}`);
+        const linkLabel = `View ${token.selectionName || token.displayName} on CoinGecko (opens in a new tab)`;
+        link.setAttribute('aria-label', linkLabel);
+        link.title = linkLabel;
     }
 
     function init() {
