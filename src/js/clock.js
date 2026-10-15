@@ -75,9 +75,14 @@ window.App.Clock = {
     },
 
     updateFormat(format) {
+        const previousFormat = this.format;
         this.settingsGeneration += 1;
         this.format = this.normalizeFormat(format);
         this.update();
+
+        if (this.format !== previousFormat) {
+            window.dispatchEvent(new Event('clockformatchange'));
+        }
     },
 
     update() {

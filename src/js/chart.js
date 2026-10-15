@@ -8,9 +8,16 @@ window.App = window.App || {};
 window.App.Chart = function (el) {
     this.el = el;
     this.cryptoType = App.CryptoTokens.getDefaultToken();
+    this.period = App.CryptoTokens.getDefaultPeriod();
+    this.labelColor = '#777';
     this.handleThemeChange = () => {
         this.updateTheme();
         this.chartInstance.update('theme');
+    };
+    this.handleClockFormatChange = () => {
+        if (this.period === App.CryptoTokens.PERIODS.ONE_DAY) {
+            this.chartInstance.update('none');
+        }
     };
 
     this.config = {
@@ -35,6 +42,12 @@ window.App.Chart = function (el) {
                 },
             ],
         },
+        plugins: [
+            {
+                id: 'dayTimeLabels',
+                afterDatasetsDraw: (chart) => this.drawDayLabels(chart),
+            },
+        ],
         options: {
             showAllTooltips: true,
             transitions: {
@@ -103,7 +116,12 @@ window.App.Chart = function (el) {
                         display: false,
                     },
                     ticks: {
-                        color: '#777',
+                        // Keep native label measurements while drawing 1D text in two tones.
+                        color: () =>
+                            this.period === App.CryptoTokens.PERIODS.ONE_DAY
+                                ? 'transparent'
+                                : this.labelColor,
+                        callback: (value) => this.formatTickLabel(this.config.data.labels[value]),
                     },
                 },
                 y: {
@@ -138,7 +156,7 @@ window.App.Chart.prototype.updateTheme = function () {
     dataset.pointHoverBackgroundColor = dataset.backgroundColor;
     tooltip.backgroundColor = color('--tooltip-bg');
     tooltip.bodyColor = color('--tooltip-text-color');
-    this.config.options.scales.x.ticks.color = color('--chart-label-color');
+    this.labelColor = color('--chart-label-color');
 };
 
 window.App.Chart.prototype.update = function (_labels, _data) {
@@ -146,6 +164,67 @@ window.App.Chart.prototype.update = function (_labels, _data) {
     this.chartInstance.data.datasets[0].data = _data;
 
     this.chartInstance.update();
+};
+
+window.App.Chart.prototype.formatTickLabel = function (label) {
+    if (this.period !== App.CryptoTokens.PERIODS.ONE_DAY) {
+        return label;
+    }
+
+    const time = /^([01]\d|2[0-3]):([0-5]\d)$/.exec(label);
+    if (!time) {
+        return label;
+    }
+
+    const hours = Number(time[1]);
+    const is12Hour = App.Clock.format === '12h';
+    const displayHour = String(is12Hour ? hours % 12 || 12 : hours).padStart(2, '0');
+    const minutes = is12Hour && time[2] === '00' ? '' : `:${time[2]}`;
+    const suffix = is12Hour ? (hours < 12 ? 'AM' : 'PM') : '';
+
+    return `${displayHour}${minutes}${suffix}`;
+};
+
+window.App.Chart.prototype.drawDayLabels = function (chart) {
+    const scale = chart.scales.x;
+    if (
+        this.period !== App.CryptoTokens.PERIODS.ONE_DAY ||
+        !scale.options.display ||
+        !scale.options.ticks.display
+    ) {
+        return;
+    }
+
+    const ctx = chart.ctx;
+    scale.getLabelItems().forEach(({ label, font, textOffset, options }) => {
+        const parts = /^(\d{2})(:\d{2})?(AM|PM)?$/.exec(label)?.slice(1) || [label];
+
+        ctx.save();
+        ctx.font = font.string;
+        ctx.fillStyle = this.labelColor;
+        ctx.translate(...options.translation);
+        ctx.rotate(options.rotation);
+        ctx.textBaseline = options.textBaseline;
+        ctx.textAlign = 'left';
+
+        const width = ctx.measureText(label).width;
+        const opacity = ctx.globalAlpha;
+        let x = 0;
+        if (options.textAlign === 'right' || options.textAlign === 'end') {
+            x = -width;
+        } else if (options.textAlign === 'center') {
+            x = -width / 2;
+        }
+
+        parts.forEach((part, index) => {
+            if (part) {
+                ctx.globalAlpha = opacity * (index > 0 ? 0.5 : 1);
+                ctx.fillText(part, x, textOffset);
+                x += ctx.measureText(part).width;
+            }
+        });
+        ctx.restore();
+    });
 };
 
 window.App.Chart.prototype.prepareData = function (_data) {
@@ -288,9 +367,14 @@ window.App.Chart.prototype.alwaysVisibleTooltipsPlugin = function () {
 
 window.App.Chart.prototype.init = function (
     _data,
-    cryptoType = App.CryptoTokens.getDefaultToken()
+    cryptoType = App.CryptoTokens.getDefaultToken(),
+    period = App.CryptoTokens.getDefaultPeriod()
 ) {
     this.cryptoType = cryptoType;
+    this.period = period;
+    const isDay = period === App.CryptoTokens.PERIODS.ONE_DAY;
+    this.config.options.scales.x.ticks.minRotation = isDay ? 45 : 0;
+    this.config.options.scales.x.ticks.maxRotation = isDay ? 45 : 50;
     const { labels, values } = this.prepareData(_data);
 
     // If already initiated - do not init twice! Update data only.
@@ -308,6 +392,7 @@ window.App.Chart.prototype.init = function (
     const ctx = this.el.getContext('2d');
     this.chartInstance = new Chart(ctx, this.config);
     window.addEventListener('themechange', this.handleThemeChange);
+    window.addEventListener('clockformatchange', this.handleClockFormatChange);
 };
 
 window.App.Chart.prototype.destroy = function () {
@@ -318,4 +403,5 @@ window.App.Chart.prototype.destroy = function () {
     this.chartInstance.destroy();
     this.chartInstance = null;
     window.removeEventListener('themechange', this.handleThemeChange);
+    window.removeEventListener('clockformatchange', this.handleClockFormatChange);
 };
