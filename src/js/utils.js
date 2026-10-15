@@ -11,7 +11,10 @@ window.App.Utils = (function () {
                 return '$—';
             }
 
-            const fractionDigits = App.CryptoTokens.getToken(tokenId)?.priceFractionDigits ?? 8;
+            const fractionDigits = Math.max(
+                App.CryptoTokens.getToken(tokenId)?.priceFractionDigits ?? 8,
+                numericPrice > 0 && numericPrice < 1 ? 2 : 0
+            );
 
             if (!priceFormatters.has(fractionDigits)) {
                 priceFormatters.set(
