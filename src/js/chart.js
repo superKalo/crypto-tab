@@ -317,6 +317,12 @@ window.App.Chart.prototype.alwaysVisibleTooltipsPlugin = function () {
             const data = dataset.data;
             const maxValue = Math.max(...data);
             const minValue = Math.min(...data);
+            const averageLabel = {
+                ONE_WEEK: '(daily avg)',
+                ONE_MONTH: '(daily avg)',
+                ONE_YEAR: '(monthly avg)',
+                ALL: '(monthly avg)',
+            }[this.period];
 
             let foundMax = false;
             let foundMin = this.period === App.CryptoTokens.PERIODS.ALL && minValue === maxValue;
@@ -361,14 +367,24 @@ window.App.Chart.prototype.alwaysVisibleTooltipsPlugin = function () {
                 // Calculate tooltip dimensions
                 ctx.font = '12px Arial';
                 const textMetrics = ctx.measureText(formattedValue);
-                const tooltipWidth = textMetrics.width + 7; // Plus some padding
-                const tooltipHeight = 22;
+                let tooltipWidth = textMetrics.width + 7; // Plus some padding
+                if (averageLabel) {
+                    ctx.font = '11px Arial';
+                    tooltipWidth = Math.max(tooltipWidth, ctx.measureText(averageLabel).width + 12);
+                }
+                const tooltipHeight = averageLabel ? 36 : 22;
                 const cornerRadius = 0.5;
 
                 // Determine whether to place the tooltip on the left or right
                 const chartWidth = chart.width;
                 let tooltipX;
-                const tooltipY = tooltipPosition.y - tooltipHeight / 2;
+                const tooltipY = averageLabel
+                    ? Math.max(0, tooltipPosition.y - 25)
+                    : tooltipPosition.y - tooltipHeight / 2;
+                const caretY = Math.max(
+                    tooltipY + 11,
+                    Math.min(tooltipPosition.y, tooltipY + tooltipHeight - 11)
+                );
 
                 if (tooltipPosition.x > chartWidth / 2) {
                     // Position tooltip to the left + some padding
@@ -383,9 +399,9 @@ window.App.Chart.prototype.alwaysVisibleTooltipsPlugin = function () {
                     ctx.roundRect(tooltipX, tooltipY, tooltipWidth, tooltipHeight, cornerRadius);
 
                     // Draw the arrow pointing to the right
-                    ctx.moveTo(tooltipX + tooltipWidth, tooltipY + tooltipHeight / 2 - 11);
+                    ctx.moveTo(tooltipX + tooltipWidth, caretY - 11);
                     ctx.lineTo(tooltipX + tooltipWidth + 12, tooltipPosition.y);
-                    ctx.lineTo(tooltipX + tooltipWidth, tooltipY + tooltipHeight / 2 + 11);
+                    ctx.lineTo(tooltipX + tooltipWidth, caretY + 11);
                     ctx.closePath();
                     ctx.fill();
                 } else {
@@ -401,23 +417,28 @@ window.App.Chart.prototype.alwaysVisibleTooltipsPlugin = function () {
                     ctx.roundRect(tooltipX, tooltipY, tooltipWidth, tooltipHeight, cornerRadius);
 
                     // Draw the arrow pointing to the left
-                    ctx.moveTo(tooltipX, tooltipY + tooltipHeight / 2 - 11);
+                    ctx.moveTo(tooltipX, caretY - 11);
                     ctx.lineTo(tooltipX - 12, tooltipPosition.y);
-                    ctx.lineTo(tooltipX, tooltipY + tooltipHeight / 2 + 11);
+                    ctx.lineTo(tooltipX, caretY + 11);
                     ctx.closePath();
                     ctx.fill();
                 }
 
                 // Draw tooltip text
                 ctx.fillStyle = chart.options.plugins.tooltip.bodyColor;
-                ctx.font = '12px Arial';
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
+                ctx.font = '12px Arial';
                 ctx.fillText(
                     formattedValue,
                     tooltipX + tooltipWidth / 2,
-                    tooltipY + tooltipHeight / 2
+                    tooltipY + (averageLabel ? 11 : tooltipHeight / 2)
                 );
+                if (averageLabel) {
+                    ctx.font = '11px Arial';
+                    ctx.globalAlpha *= 0.7;
+                    ctx.fillText(averageLabel, tooltipX + tooltipWidth / 2, tooltipY + 26);
+                }
 
                 ctx.restore();
             });
