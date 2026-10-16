@@ -405,10 +405,7 @@ window.App.Crypto = {
                 hour: '2-digit',
                 minute: '2-digit',
             });
-            this.renderUpdateMessage(
-                footnote,
-                `Next refresh around ${time}, while this tab is visible.`
-            );
+            footnote.textContent = `Next refresh around ${time}, while this tab is visible.`;
         } else {
             footnote.textContent = 'Checking for updates while this tab is visible…';
         }
@@ -422,24 +419,6 @@ window.App.Crypto = {
             .formatToParts(timestamp)
             .map(({ type, value }) => (type === 'dayPeriod' ? value.toUpperCase() : value))
             .join('');
-    },
-
-    renderUpdateMessage(element, message) {
-        const parts = /^(Next refresh around )(.+?)(, while this tab is visible\.)$/.exec(message);
-
-        if (!parts) {
-            element.textContent = message;
-            return;
-        }
-
-        const time = document.createElement('span');
-        time.className = 'positive';
-        time.textContent = parts[2];
-        element.replaceChildren(
-            document.createTextNode(parts[1]),
-            time,
-            document.createTextNode(parts[3])
-        );
     },
 
     renderUpdateStatus(label, period, elementPrefix) {
@@ -552,7 +531,7 @@ window.App.Crypto = {
                 const notice = document.createElement('span');
                 notice.className =
                     'update-details-section update-details-description update-details-notice';
-                this.renderUpdateMessage(notice, text);
+                notice.textContent = text;
                 return notice;
             });
 
