@@ -175,7 +175,7 @@ gulp.task("set-env", function () {
 gulp.task("copy-npm-dependencies", function () {
   return gulp
     .src([
-      "node_modules/chart.js/dist/chart.umd.js",
+      "node_modules/chart.js/dist/chart.umd.min.js",
       "node_modules/super-repo/lib/index.js",
       "node_modules/dayjs/dayjs.min.js",
       "node_modules/dayjs/plugin/relativeTime.js",
