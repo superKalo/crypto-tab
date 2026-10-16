@@ -392,6 +392,24 @@ window.App.Crypto = {
             document.getElementById(`combined-${label}-description`).textContent =
                 description.join('. ');
         });
+
+        const nextRefreshAt = Math.min(
+            ...periods.map((period, index) =>
+                App.CryptoTokens.getNextRefreshAt(period, statuses[index].lastFetched)
+            )
+        );
+        const footnote = document.getElementById('combined-next-refresh');
+
+        if (nextRefreshAt > now) {
+            const time = new Intl.DateTimeFormat(undefined, {
+                hour: '2-digit',
+                minute: '2-digit',
+                hourCycle: App.Clock?.format === '12h' ? 'h12' : 'h23',
+            }).format(nextRefreshAt);
+            footnote.textContent = `Next refresh around ${time}, while this tab is visible.`;
+        } else {
+            footnote.textContent = 'Checking for updates while this tab is visible…';
+        }
     },
 
     formatUpdateTime(lastFetched) {

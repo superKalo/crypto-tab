@@ -224,6 +224,10 @@ small {
 .update-details-notice {
     color: var(--text-color);
 }
+.update-details-footnote {
+    color: var(--text-color-secondary);
+    font-size: 90%;
+}
 .update-details::after {
     content: '';
     position: absolute;
