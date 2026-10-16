@@ -551,14 +551,37 @@ small {
     font-weight: 600;
     white-space: nowrap;
     cursor: pointer;
+    transition: color 120ms ease-out;
 }
 .footer-action svg {
     flex-shrink: 0;
     width: 16px;
     height: 16px;
+    transition: color 120ms ease-out;
 }
-.footer-action:hover {
+#open-about:hover svg,
+#open-about:focus-visible svg {
+    color: #4f78e2;
+}
+.footer-action:hover,
+.footer-action:focus-visible {
     color: var(--text-color);
+}
+#toggle-settings circle {
+    fill: currentColor;
+    fill-opacity: 0;
+    transition: fill-opacity 120ms ease-out;
+}
+#toggle-settings:hover circle,
+#toggle-settings:focus-visible circle {
+    fill-opacity: 1;
+}
+@media (prefers-reduced-motion: reduce) {
+    .footer-action,
+    .footer-action svg,
+    #toggle-settings circle {
+        transition: none;
+    }
 }
 
 /* Utilities */
