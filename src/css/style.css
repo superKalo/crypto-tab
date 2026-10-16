@@ -212,7 +212,6 @@ small {
 }
 .update-details-time {
     flex-shrink: 0;
-    color: var(--text-color-secondary);
     font-size: 90%;
     white-space: nowrap;
 }

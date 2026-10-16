@@ -401,22 +401,45 @@ window.App.Crypto = {
         const footnote = document.getElementById('combined-next-refresh');
 
         if (nextRefreshAt > now) {
-            const time = new Intl.DateTimeFormat(undefined, {
+            const time = this.formatUpdateTime(nextRefreshAt, {
                 hour: '2-digit',
                 minute: '2-digit',
-                hourCycle: App.Clock?.format === '12h' ? 'h12' : 'h23',
-            }).format(nextRefreshAt);
-            footnote.textContent = `Next refresh around ${time}, while this tab is visible.`;
+            });
+            this.renderUpdateMessage(
+                footnote,
+                `Next refresh around ${time}, while this tab is visible.`
+            );
         } else {
             footnote.textContent = 'Checking for updates while this tab is visible…';
         }
     },
 
-    formatUpdateTime(lastFetched) {
+    formatUpdateTime(timestamp, options = { timeStyle: 'medium' }) {
         return new Intl.DateTimeFormat(undefined, {
-            timeStyle: 'medium',
+            ...options,
             hourCycle: App.Clock?.format === '12h' ? 'h12' : 'h23',
-        }).format(lastFetched);
+        })
+            .formatToParts(timestamp)
+            .map(({ type, value }) => (type === 'dayPeriod' ? value.toUpperCase() : value))
+            .join('');
+    },
+
+    renderUpdateMessage(element, message) {
+        const parts = /^(Next refresh around )(.+?)(, while this tab is visible\.)$/.exec(message);
+
+        if (!parts) {
+            element.textContent = message;
+            return;
+        }
+
+        const time = document.createElement('span');
+        time.className = 'positive';
+        time.textContent = parts[2];
+        element.replaceChildren(
+            document.createTextNode(parts[1]),
+            time,
+            document.createTextNode(parts[3])
+        );
     },
 
     renderUpdateStatus(label, period, elementPrefix) {
@@ -441,12 +464,10 @@ window.App.Crypto = {
         } else if (!status.lastFetched) {
             age.textContent = 'update time unavailable';
         } else {
-            const hourCycle = App.Clock?.format === '12h' ? 'h12' : 'h23';
-            const updatedAt = new Intl.DateTimeFormat(undefined, {
+            const updatedAt = this.formatUpdateTime(status.lastFetched, {
                 dateStyle: 'medium',
                 timeStyle: 'short',
-                hourCycle,
-            }).format(status.lastFetched);
+            });
             statusLabel.textContent = `${label} updated`;
             age.textContent = dayjs(status.lastFetched)
                 .fromNow()
@@ -462,11 +483,10 @@ window.App.Crypto = {
             } else {
                 const nextRefreshAt = App.CryptoTokens.getNextRefreshAt(period, status.lastFetched);
                 if (nextRefreshAt > Date.now()) {
-                    const time = new Intl.DateTimeFormat(undefined, {
+                    const time = this.formatUpdateTime(nextRefreshAt, {
                         hour: '2-digit',
                         minute: '2-digit',
-                        hourCycle,
-                    }).format(nextRefreshAt);
+                    });
                     description.push(`Next refresh around ${time}, while this tab is visible.`);
                 } else {
                     description.push('Checking for updates…');
@@ -508,7 +528,8 @@ window.App.Crypto = {
 
         if (Number.isFinite(status.lastFetched) && status.lastFetched > 0) {
             const time = document.createElement('time');
-            time.className = 'update-details-time';
+            const isSuccess = status.ok && !status.isStale && !status.error;
+            time.className = `update-details-time ${isSuccess ? 'positive' : 'negative'}`;
             time.dateTime = new Date(status.lastFetched).toISOString();
             time.textContent = this.formatUpdateTime(status.lastFetched);
             time.setAttribute(
@@ -531,7 +552,7 @@ window.App.Crypto = {
                 const notice = document.createElement('span');
                 notice.className =
                     'update-details-section update-details-description update-details-notice';
-                notice.textContent = text;
+                this.renderUpdateMessage(notice, text);
                 return notice;
             });
 
