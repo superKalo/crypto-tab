@@ -141,6 +141,45 @@
       </div>
 
       <div id="last-updated" class="data-updates mb" role="group" aria-label="Data freshness">
+        <span id="combined-update-status" class="update-status" hidden>
+          <span class="update-muted">updated</span>
+          <span class="update-trigger">
+            <span
+              id="combined-update-time"
+              class="update-time"
+              tabindex="0"
+              aria-describedby="combined-update-details"
+            >
+              <span id="combined-update-age">a moment</span>
+              <span class="update-muted">ago</span>
+            </span>
+            <span
+              id="combined-update-details"
+              class="update-details update-details-compact"
+              role="tooltip"
+            >
+              <span class="update-details-section">
+                <span class="update-details-row">
+                  <span class="update-details-title">Price now</span>
+                  <span id="combined-price-time" class="update-details-time"></span>
+                </span>
+                <span id="combined-price-description" class="update-details-description"></span>
+              </span>
+              <span class="update-details-section">
+                <span class="update-details-row">
+                  <span class="update-details-title">
+                    Chart
+                    <span class="update-details-context"
+                      >(<span id="combined-chart-summary"></span>)</span
+                    >
+                  </span>
+                  <span id="combined-chart-time" class="update-details-time"></span>
+                </span>
+                <span id="combined-chart-description" class="update-details-description"></span>
+              </span>
+            </span>
+          </span>
+        </span>
         <span class="update-status-group">
           <span id="price-update-status" class="update-status">
             <span id="price-update-label">price</span>

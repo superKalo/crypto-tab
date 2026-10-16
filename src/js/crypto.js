@@ -94,6 +94,9 @@ window.App.Crypto = {
         };
         document.addEventListener('keydown', this.handleTooltipEscape);
 
+        this.handleClockFormatChange = () => this.updateLastUpdated();
+        window.addEventListener('clockformatchange', this.handleClockFormatChange);
+
         this.handleVisibilityChange = () => {
             if (!document.hidden) {
                 this.refreshActiveData();
@@ -334,6 +337,68 @@ window.App.Crypto = {
     updateLastUpdated() {
         this.renderUpdateStatus('price', 'NOW', 'price');
         this.renderUpdateStatus('chart', this.currentPeriod, 'chart');
+        this.renderCombinedUpdateStatus();
+    },
+
+    renderCombinedUpdateStatus() {
+        const periods = ['NOW', this.currentPeriod];
+        const statuses = periods.map((period) =>
+            this.getRepositoryStatus(this.currentCrypto, period)
+        );
+        const now = Date.now();
+        const combined = statuses.every((status, index) => {
+            const nextRefreshAt = App.CryptoTokens.getNextRefreshAt(
+                periods[index],
+                status?.lastFetched
+            );
+
+            // Allow one UI check to refresh data due on independent schedules.
+            return (
+                status?.ok &&
+                !status.error &&
+                !status.isStale &&
+                status.lastFetched <= now &&
+                nextRefreshAt !== null &&
+                now < nextRefreshAt + this.REFRESH_INTERVAL
+            );
+        });
+
+        this.$lastUpdated.classList.toggle('data-updates-combined', combined);
+        document.getElementById('combined-update-status').hidden = !combined;
+
+        if (!combined) {
+            return;
+        }
+
+        // The older refresh represents how recently both sets of data were updated.
+        const lastFetched = Math.min(...statuses.map((status) => status.lastFetched));
+        const age = dayjs(lastFetched).fromNow(true).replace('a few seconds', 'a moment');
+        document.getElementById('combined-update-age').textContent = age;
+        document
+            .getElementById('combined-update-time')
+            .setAttribute('aria-label', `Price and chart updated ${age} ago`);
+
+        ['price', 'chart'].forEach((label, index) => {
+            document.getElementById(`combined-${label}-time`).textContent = this.formatUpdateTime(
+                statuses[index].lastFetched
+            );
+            const [summary, ...description] = App.CryptoTokens.getRefreshPolicy(
+                periods[index]
+            ).description.split('. ');
+            if (label === 'chart') {
+                document.getElementById('combined-chart-summary').textContent =
+                    summary.toLowerCase();
+            }
+            document.getElementById(`combined-${label}-description`).textContent =
+                description.join('. ');
+        });
+    },
+
+    formatUpdateTime(lastFetched) {
+        return new Intl.DateTimeFormat(undefined, {
+            timeStyle: 'medium',
+            hourCycle: App.Clock?.format === '12h' ? 'h12' : 'h23',
+        }).format(lastFetched);
     },
 
     renderUpdateStatus(label, period, elementPrefix) {
@@ -392,7 +457,67 @@ window.App.Crypto = {
         }
 
         age.setAttribute('aria-label', `${statusLabel.textContent} ${age.textContent}`);
-        details.textContent = description.join('\n\n');
+        this.renderUpdateDetails(details, description, label, status);
+    },
+
+    renderUpdateDetails(details, description, label, status) {
+        const formatted = Boolean(status);
+        details.classList.toggle('update-details-formatted', formatted);
+
+        if (!formatted) {
+            details.textContent = description.join('\n\n');
+            return;
+        }
+
+        const [policy, ...messages] = description;
+        const [summary, ...explanation] = policy.split('. ');
+        const section = document.createElement('span');
+        section.className = 'update-details-section';
+        const header = document.createElement('span');
+        header.className = 'update-details-row';
+        const title = document.createElement('span');
+        title.className = 'update-details-title';
+        title.textContent = label === 'price' ? 'Price now' : 'Chart';
+
+        if (label === 'chart') {
+            const context = document.createElement('span');
+            context.className = 'update-details-context';
+            context.textContent = ` (${summary.toLowerCase()})`;
+            title.appendChild(context);
+        }
+
+        header.appendChild(title);
+
+        if (Number.isFinite(status.lastFetched) && status.lastFetched > 0) {
+            const time = document.createElement('time');
+            time.className = 'update-details-time';
+            time.dateTime = new Date(status.lastFetched).toISOString();
+            time.textContent = this.formatUpdateTime(status.lastFetched);
+            time.setAttribute(
+                'aria-label',
+                messages.find((text) => text.startsWith('Last refreshed:')) ||
+                    `Last refreshed: ${time.textContent}`
+            );
+            header.appendChild(time);
+        }
+
+        const body = document.createElement('span');
+        body.className = 'update-details-description';
+        body.textContent = explanation.join('. ');
+        section.appendChild(header);
+        section.appendChild(body);
+
+        const notices = messages
+            .filter((text) => !text.startsWith('Last refreshed:'))
+            .map((text) => {
+                const notice = document.createElement('span');
+                notice.className =
+                    'update-details-section update-details-description update-details-notice';
+                notice.textContent = text;
+                return notice;
+            });
+
+        details.replaceChildren(section, ...notices);
     },
 
     startRefreshTimer() {
@@ -426,6 +551,9 @@ window.App.Crypto = {
         }
         if (this.handleTooltipEscape) {
             document.removeEventListener('keydown', this.handleTooltipEscape);
+        }
+        if (this.handleClockFormatChange) {
+            window.removeEventListener('clockformatchange', this.handleClockFormatChange);
         }
         this.unsubscribeSettings?.();
     },

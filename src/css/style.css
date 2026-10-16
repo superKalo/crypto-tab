@@ -143,6 +143,14 @@ small {
 .update-trigger {
     display: inline-flex;
 }
+.update-status[hidden],
+.update-trigger[hidden],
+.data-updates-combined .update-status-group {
+    display: none;
+}
+.update-muted {
+    opacity: 0.5;
+}
 .update-time {
     border-radius: 2px;
     text-decoration: underline dotted;
@@ -175,6 +183,46 @@ small {
     text-align: left;
     white-space: pre-line;
     visibility: hidden;
+}
+.update-details-compact,
+.update-details-formatted {
+    white-space: normal;
+}
+.update-details-section {
+    display: block;
+}
+.update-details-section + .update-details-section {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border-color);
+}
+.update-details-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 24px;
+    font-variant-numeric: tabular-nums;
+}
+.update-details-title {
+    font-weight: 600;
+}
+.update-details-context {
+    color: var(--text-color-secondary);
+    font-weight: 400;
+}
+.update-details-time {
+    flex-shrink: 0;
+    color: var(--text-color-secondary);
+    font-size: 90%;
+    white-space: nowrap;
+}
+.update-details-description {
+    display: block;
+    margin-top: 6px;
+    color: var(--text-color-secondary);
+}
+.update-details-notice {
+    color: var(--text-color);
 }
 .update-details::after {
     content: '';
