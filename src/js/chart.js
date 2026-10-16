@@ -364,80 +364,105 @@ window.App.Chart.prototype.alwaysVisibleTooltipsPlugin = function () {
                 const value = chart.config.data.datasets[datasetIndex].data[index];
                 const formattedValue = App.Utils.formatPrice(value, this.cryptoType);
 
-                // Calculate tooltip dimensions
+                ctx.save();
+                ctx.textBaseline = 'alphabetic';
+
+                // Keep a little more room on the flat side than beside the wedge.
+                const caretSidePadding = 4;
+                const flatSidePadding = 6;
                 ctx.font = '12px Arial';
-                const textMetrics = ctx.measureText(formattedValue);
-                let tooltipWidth = textMetrics.width + 7; // Plus some padding
+                const priceMetrics = ctx.measureText(formattedValue);
+                let textWidth = priceMetrics.width;
+                let averageMetrics;
                 if (averageLabel) {
                     ctx.font = '11px Arial';
-                    tooltipWidth = Math.max(tooltipWidth, ctx.measureText(averageLabel).width + 12);
+                    averageMetrics = ctx.measureText(averageLabel);
+                    textWidth = Math.max(textWidth, averageMetrics.width);
                 }
+                const tooltipWidth = Math.ceil(textWidth) + caretSidePadding + flatSidePadding;
                 const tooltipHeight = averageLabel ? 36 : 22;
-                const cornerRadius = 0.5;
-
-                // Determine whether to place the tooltip on the left or right
-                const chartWidth = chart.width;
-                let tooltipX;
-                const tooltipY = averageLabel
-                    ? Math.max(0, tooltipPosition.y - 25)
-                    : tooltipPosition.y - tooltipHeight / 2;
-                const caretY = Math.max(
-                    tooltipY + 11,
-                    Math.min(tooltipPosition.y, tooltipY + tooltipHeight - 11)
+                const cornerRadius = 3;
+                const caretJoinRadius = 4;
+                const caretWidth = averageLabel ? 14 : 11;
+                const pointGap = 9;
+                const isLeft = tooltipPosition.x > chart.width / 2;
+                const tooltipX = isLeft
+                    ? tooltipPosition.x - pointGap - caretWidth - tooltipWidth
+                    : tooltipPosition.x + pointGap + caretWidth;
+                const tooltipY = Math.max(
+                    2,
+                    Math.min(
+                        tooltipPosition.y - tooltipHeight / 2,
+                        chart.height - tooltipHeight - 2
+                    )
                 );
+                const right = tooltipX + tooltipWidth;
+                const bottom = tooltipY + tooltipHeight;
+                const textX =
+                    tooltipX +
+                    (isLeft ? flatSidePadding : caretSidePadding) +
+                    Math.ceil(textWidth) / 2;
 
-                if (tooltipPosition.x > chartWidth / 2) {
-                    // Position tooltip to the left + some padding
-                    tooltipX = tooltipPosition.x - tooltipWidth - 22;
-
-                    // Draw tooltip background and arrow as a single element
-                    ctx.save();
-                    ctx.fillStyle = chart.options.plugins.tooltip.backgroundColor;
-                    ctx.beginPath();
-
-                    // Draw the rounded rectangle
-                    ctx.roundRect(tooltipX, tooltipY, tooltipWidth, tooltipHeight, cornerRadius);
-
-                    // Draw the arrow pointing to the right
-                    ctx.moveTo(tooltipX + tooltipWidth, caretY - 11);
-                    ctx.lineTo(tooltipX + tooltipWidth + 12, tooltipPosition.y);
-                    ctx.lineTo(tooltipX + tooltipWidth, caretY + 11);
-                    ctx.closePath();
-                    ctx.fill();
+                // The full-height wedge keeps the original price-tag silhouette.
+                ctx.fillStyle = chart.options.plugins.tooltip.backgroundColor;
+                ctx.beginPath();
+                ctx.moveTo(tooltipX + cornerRadius, tooltipY);
+                if (isLeft) {
+                    ctx.arcTo(
+                        right,
+                        tooltipY,
+                        right + caretWidth,
+                        tooltipPosition.y,
+                        caretJoinRadius
+                    );
+                    ctx.lineTo(right + caretWidth, tooltipPosition.y);
+                    ctx.arcTo(right, bottom, tooltipX, bottom, caretJoinRadius);
                 } else {
-                    // Position tooltip to the right + some padding
-                    tooltipX = tooltipPosition.x + 22;
-
-                    // Draw tooltip background and arrow as a single element
-                    ctx.save();
-                    ctx.fillStyle = chart.options.plugins.tooltip.backgroundColor;
-                    ctx.beginPath();
-
-                    // Draw the rounded rectangle
-                    ctx.roundRect(tooltipX, tooltipY, tooltipWidth, tooltipHeight, cornerRadius);
-
-                    // Draw the arrow pointing to the left
-                    ctx.moveTo(tooltipX, caretY - 11);
-                    ctx.lineTo(tooltipX - 12, tooltipPosition.y);
-                    ctx.lineTo(tooltipX, caretY + 11);
-                    ctx.closePath();
-                    ctx.fill();
+                    ctx.lineTo(right - cornerRadius, tooltipY);
+                    ctx.quadraticCurveTo(right, tooltipY, right, tooltipY + cornerRadius);
+                    ctx.lineTo(right, bottom - cornerRadius);
+                    ctx.quadraticCurveTo(right, bottom, right - cornerRadius, bottom);
                 }
+                if (isLeft) {
+                    ctx.lineTo(tooltipX + cornerRadius, bottom);
+                    ctx.quadraticCurveTo(tooltipX, bottom, tooltipX, bottom - cornerRadius);
+                    ctx.lineTo(tooltipX, tooltipY + cornerRadius);
+                    ctx.quadraticCurveTo(tooltipX, tooltipY, tooltipX + cornerRadius, tooltipY);
+                } else {
+                    ctx.arcTo(
+                        tooltipX,
+                        bottom,
+                        tooltipX - caretWidth,
+                        tooltipPosition.y,
+                        caretJoinRadius
+                    );
+                    ctx.lineTo(tooltipX - caretWidth, tooltipPosition.y);
+                    ctx.arcTo(tooltipX, tooltipY, right, tooltipY, caretJoinRadius);
+                }
+                ctx.closePath();
+                ctx.fill();
 
-                // Draw tooltip text
+                // Center the visible glyphs, rather than the font's em box.
+                const priceHeight =
+                    priceMetrics.actualBoundingBoxAscent + priceMetrics.actualBoundingBoxDescent;
+                const averageHeight = averageMetrics
+                    ? averageMetrics.actualBoundingBoxAscent +
+                      averageMetrics.actualBoundingBoxDescent
+                    : 0;
+                const textHeight = priceHeight + (averageLabel ? 4 + averageHeight : 0);
+                const textTop = tooltipY + (tooltipHeight - textHeight) / 2;
                 ctx.fillStyle = chart.options.plugins.tooltip.bodyColor;
                 ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
                 ctx.font = '12px Arial';
-                ctx.fillText(
-                    formattedValue,
-                    tooltipX + tooltipWidth / 2,
-                    tooltipY + (averageLabel ? 11 : tooltipHeight / 2)
-                );
+                ctx.fillText(formattedValue, textX, textTop + priceMetrics.actualBoundingBoxAscent);
                 if (averageLabel) {
                     ctx.font = '11px Arial';
                     ctx.globalAlpha *= 0.7;
-                    ctx.fillText(averageLabel, tooltipX + tooltipWidth / 2, tooltipY + 26);
+                    ctx.fillText(
+                        averageLabel,
+                        textX,
+                        textTop + priceHeight + 4 + averageMetrics.actualBoundingBoxAscent
+                    );
                 }
 
                 ctx.restore();
