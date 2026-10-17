@@ -26,7 +26,8 @@ if (ENV.includes("extension")) {
   filesArr.push(
     "./src/img/browsers/*.svg",
     "./src/img/logo.png",
-    "./src/mockups/social/crypto-tab-social-preview.jpg"
+    "./src/mockups/social/crypto-tab-social-preview.jpg",
+    "./src/goodbye/**/*"
   );
 }
 

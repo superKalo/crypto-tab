@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="referrer" content="origin" />
+    <meta name="color-scheme" content="light dark" />
+    <title>Help me improve · Crypto Tab</title>
+    <link rel="icon" type="image/svg+xml" href="../img/logo.svg" />
+    <link rel="stylesheet" href="../css/theme-variables.css" />
+    <link rel="stylesheet" href="goodbye.css" />
+    <script defer src="goodbye.js"></script>
+  </head>
+  <body class="goodbye-page">
+    <main>
+      <div class="author">
+        <img src="../img/contributors/superkalo.webp" alt="" width="40" height="40" />
+        <p>
+          <span class="author-name">Kalo</span>
+          <span class="author-role">Maker of Crypto Tab</span>
+        </p>
+      </div>
+
+      <section id="feedback-content" aria-labelledby="feedback-title">
+        <h1 id="feedback-title">Help me improve Crypto Tab</h1>
+        <p class="intro">Thanks for giving it a try. What made you uninstall?</p>
+
+        <form id="feedback-form" action="https://api.web3forms.com/submit" method="post">
+          <fieldset id="feedback-fields">
+            <legend class="visually-hidden">What was the main reason?</legend>
+            <div class="reasons">
+              <label class="reason">
+                <input type="radio" name="reason" value="default-new-tab" required />
+                <span>I prefer the default New Tab page.</span>
+              </label>
+              <label class="reason">
+                <input type="radio" name="reason" value="another-new-tab" required />
+                <span>I prefer another New Tab page.</span>
+              </label>
+              <div id="alternative-fields" class="follow-up" hidden>
+                <label for="alternative">Which one? <span class="optional">(optional)</span></label>
+                <select id="alternative" name="alternative" disabled>
+                  <option value="">Choose a New Tab page</option>
+                  <option value="Momentum">Momentum</option>
+                  <option value="Tabliss">Tabliss</option>
+                  <option value="Other">Other</option>
+                </select>
+                <div id="alternative-other-field" class="extra-field" hidden>
+                  <label for="alternative-other">
+                    New Tab page name <span class="optional">(optional)</span>
+                  </label>
+                  <input
+                    id="alternative-other"
+                    name="alternative_other"
+                    type="text"
+                    maxlength="120"
+                    disabled
+                  />
+                </div>
+              </div>
+              <label class="reason">
+                <input type="radio" name="reason" value="missing-cryptocurrency" required />
+                <span>A cryptocurrency I want is missing.</span>
+              </label>
+              <div id="cryptocurrency-field" class="follow-up" hidden>
+                <label for="cryptocurrency">
+                  Which cryptocurrency? <span class="optional">(optional)</span>
+                </label>
+                <input
+                  id="cryptocurrency"
+                  name="cryptocurrency"
+                  type="text"
+                  placeholder="Name or ticker"
+                  maxlength="120"
+                  disabled
+                />
+              </div>
+              <label class="reason">
+                <input type="radio" name="reason" value="design-customization" required />
+                <span>The design or customization wasn't for me.</span>
+              </label>
+              <label class="reason">
+                <input type="radio" name="reason" value="other" required />
+                <span>Other</span>
+              </label>
+            </div>
+
+            <details id="message-details" class="message-field">
+              <summary>Anything else? <span class="optional">(optional)</span></summary>
+              <label for="message" class="visually-hidden">Anything else? (optional)</label>
+              <textarea
+                id="message"
+                name="message"
+                rows="2"
+                maxlength="2000"
+                placeholder="What could I do better?"
+              ></textarea>
+            </details>
+
+            <label class="reply-choice">
+              <input id="reply-requested" type="checkbox" aria-controls="email-field" />
+              <span>I'd like a reply <span class="optional">(optional)</span></span>
+            </label>
+            <div id="email-field" class="extra-field" hidden>
+              <label for="email">Email address <span class="optional">(optional)</span></label>
+              <input
+                id="email"
+                name="email"
+                type="email"
+                autocomplete="email"
+                maxlength="254"
+                aria-describedby="email-note"
+                disabled
+              />
+              <p id="email-note" class="field-note">I'll only use it to reply to your feedback.</p>
+            </div>
+
+            <input
+              type="checkbox"
+              name="botcheck"
+              class="honeypot"
+              tabindex="-1"
+              autocomplete="off"
+              aria-hidden="true"
+            />
+          </fieldset>
+
+          <button id="send-feedback" type="submit" disabled>Send feedback</button>
+          <p id="feedback-status" class="status" role="status" aria-live="polite"></p>
+        </form>
+        <noscript>
+          <p>
+            Enable JavaScript to use this form, or email
+            <a href="mailto:superkalo@goodmorning.dev">superkalo@goodmorning.dev</a>.
+          </p>
+        </noscript>
+      </section>
+
+      <section id="feedback-success" aria-labelledby="success-title" hidden>
+        <h1 id="success-title" tabindex="-1">Thanks for sharing.</h1>
+        <p class="intro">I appreciate your feedback.</p>
+      </section>
+    </main>
+    <footer class="page-footer">
+      <p class="privacy-note">
+        Your feedback goes straight to me via Web3Forms.
+        <a href="privacy.html">Feedback privacy</a>
+      </p>
+    </footer>
+  </body>
+</html>
