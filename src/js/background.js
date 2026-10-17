@@ -32,6 +32,28 @@ const repositoryFactory = new globalThis.App.PriceRepositoryFactory({
 });
 let settingsWriteQueue = Promise.resolve();
 
+function registerUninstallFeedback() {
+    try {
+        const url = new URL('https://crypto-tab.com/goodbye/');
+        // This identifies the distribution family, including other Chromium browsers.
+        const store =
+            typeof extensionApi.runtime.getBrowserInfo === 'function'
+                ? 'firefox-addons'
+                : 'chrome-web-store';
+
+        // Keep context out of the initial HTTP request and website access logs.
+        url.hash = new URLSearchParams({
+            store,
+            version: extensionApi.runtime.getManifest().version,
+        }).toString();
+        Promise.resolve(extensionApi.runtime.setUninstallURL(url.href)).catch((error) => {
+            console.warn('Could not register uninstall feedback:', error);
+        });
+    } catch (error) {
+        console.warn('Could not register uninstall feedback:', error);
+    }
+}
+
 function handleSettingsUpdate(patch, sendResponse) {
     const validators = {
         theme: (value) => ['light', 'system', 'dark'].includes(value),
@@ -136,3 +158,6 @@ extensionApi.runtime.onMessage.addListener((request, _sender, sendResponse) => {
 
     return false;
 });
+
+// Re-register on background startup so updates also cover existing installations.
+registerUninstallFeedback();

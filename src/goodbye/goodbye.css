@@ -1,0 +1,278 @@
+* {
+    box-sizing: border-box;
+}
+
+[hidden],
+.honeypot {
+    display: none !important;
+}
+
+body {
+    margin: 0;
+    background: var(--background-color);
+    color: var(--text-color);
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 15px;
+    line-height: 1.5;
+}
+
+main {
+    width: 100%;
+    max-width: 496px;
+    margin: 48px auto;
+    padding: 0 24px;
+}
+
+.goodbye-page {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.goodbye-page main {
+    margin-bottom: 32px;
+}
+
+a {
+    color: inherit;
+    text-underline-offset: 3px;
+}
+
+.brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    margin-bottom: 28px;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.author {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 28px;
+    font-size: 14px;
+}
+
+.author img {
+    display: block;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.author p {
+    margin: 0;
+}
+
+.author-name {
+    display: block;
+    font-weight: 600;
+}
+
+.author-role {
+    display: block;
+    color: var(--text-color-secondary);
+    font-size: 13px;
+}
+
+h1 {
+    margin: 0 0 8px;
+    font-size: 32px;
+    font-weight: 600;
+    line-height: 1.2;
+    letter-spacing: -0.7px;
+}
+
+.intro {
+    margin: 0 0 24px;
+    color: var(--text-color-secondary);
+}
+
+fieldset {
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+
+.reason,
+.reply-choice {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    cursor: pointer;
+}
+
+.reason {
+    padding: 10px 0;
+}
+
+input[type='radio'],
+input[type='checkbox'] {
+    flex: 0 0 auto;
+    width: 17px;
+    height: 17px;
+    margin: 3px 0 0;
+    accent-color: #4f78e2;
+    cursor: pointer;
+}
+
+.reason input:checked + span {
+    font-weight: 600;
+}
+
+.follow-up {
+    margin: 0 0 12px 27px;
+}
+
+.extra-field {
+    margin-top: 12px;
+}
+
+.message-field {
+    margin: 20px 0 16px;
+}
+
+.message-field summary {
+    color: var(--text-color-secondary);
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.message-field[open] summary {
+    margin-bottom: 8px;
+}
+
+label[for] {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.optional {
+    color: var(--text-color-secondary);
+    font-size: 13px;
+    font-weight: 400;
+}
+
+input[type='text'],
+input[type='email'],
+select,
+textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--input-border-color);
+    border-radius: 7px;
+    background: var(--input-bg);
+    color: var(--text-color);
+    font: inherit;
+    font-size: 16px;
+}
+
+textarea {
+    display: block;
+    min-height: 68px;
+    resize: vertical;
+}
+
+textarea::placeholder,
+input::placeholder {
+    color: var(--text-color-secondary);
+    opacity: 1;
+}
+
+.reply-choice {
+    font-size: 14px;
+}
+
+.field-note,
+.privacy-note {
+    color: var(--text-color-secondary);
+    font-size: 12px;
+}
+
+.field-note {
+    margin: 5px 0 0;
+}
+
+button {
+    width: 100%;
+    min-height: 44px;
+    margin-top: 24px;
+    padding: 11px 16px;
+    border: 0;
+    border-radius: 7px;
+    background: #365edc;
+    color: #fff;
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+button:hover:not(:disabled) {
+    background: #2b4ec2;
+}
+
+button:disabled {
+    cursor: default;
+    opacity: 0.65;
+}
+
+:focus-visible {
+    outline: 2px solid var(--token-selected-border);
+    outline-offset: 3px;
+}
+
+.status {
+    margin: 12px 0 0;
+    font-size: 14px;
+}
+
+.status:empty {
+    display: none;
+}
+
+.page-footer {
+    width: 100%;
+    margin-top: auto;
+    padding: 0 20px 20px;
+}
+
+.privacy-note {
+    margin: 0;
+    text-align: center;
+}
+
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+}
+
+.privacy-page h2 {
+    margin: 24px 0 8px;
+    font-size: 18px;
+}
+
+.privacy-page p,
+.privacy-page ul {
+    margin: 0 0 16px;
+}
+
+@media (max-width: 540px) {
+    main {
+        margin: 28px auto;
+        padding: 0 20px;
+    }
+
+    h1 {
+        font-size: 29px;
+    }
+}
