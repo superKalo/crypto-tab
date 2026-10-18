@@ -36,24 +36,26 @@
               </label>
               <label class="reason">
                 <input type="radio" name="reason" value="another-new-tab" required />
-                <span>I prefer another New Tab page.</span>
+                <span>I prefer another New Tab extension.</span>
               </label>
               <div id="alternative-fields" class="follow-up" hidden>
                 <label for="alternative">Which one? <span class="optional">(optional)</span></label>
                 <select id="alternative" name="alternative" disabled>
-                  <option value="">Choose a New Tab page</option>
+                  <option value="">Please choose</option>
                   <option value="Momentum">Momentum</option>
+                  <option value="Bonjourr">Bonjourr</option>
                   <option value="Tabliss">Tabliss</option>
                   <option value="Other">Other</option>
                 </select>
                 <div id="alternative-other-field" class="extra-field" hidden>
                   <label for="alternative-other">
-                    New Tab page name <span class="optional">(optional)</span>
+                    Which extension? <span class="optional">(optional)</span>
                   </label>
                   <input
                     id="alternative-other"
                     name="alternative_other"
                     type="text"
+                    placeholder="Extension name"
                     maxlength="120"
                     disabled
                   />
@@ -87,8 +89,8 @@
             </div>
 
             <details id="message-details" class="message-field">
-              <summary>Anything else? <span class="optional">(optional)</span></summary>
-              <label for="message" class="visually-hidden">Anything else? (optional)</label>
+              <summary>Add a note <span class="optional">(optional)</span></summary>
+              <label for="message" class="visually-hidden">Your note (optional)</label>
               <textarea
                 id="message"
                 name="message"
@@ -100,7 +102,7 @@
 
             <label class="reply-choice">
               <input id="reply-requested" type="checkbox" aria-controls="email-field" />
-              <span>I'd like a reply <span class="optional">(optional)</span></span>
+              <span>I'm open to a reply <span class="optional">(optional)</span></span>
             </label>
             <div id="email-field" class="extra-field" hidden>
               <label for="email">Email address <span class="optional">(optional)</span></label>

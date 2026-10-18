@@ -16,7 +16,7 @@
     const email = document.getElementById('email');
     const reasons = {
         'default-new-tab': 'I prefer the default New Tab page.',
-        'another-new-tab': 'I prefer another New Tab page.',
+        'another-new-tab': 'I prefer another New Tab extension.',
         'missing-cryptocurrency': 'A cryptocurrency I want is missing.',
         'design-customization': "The design or customization wasn't for me.",
         other: 'Other',
@@ -86,6 +86,9 @@
 
     form.addEventListener('change', (event) => {
         updateConditionalFields();
+        if (event.target === alternative && !alternativeOtherField.hidden) {
+            alternativeOther.focus();
+        }
         if (event.target.name === 'reason' && event.target.value === 'other') {
             document.getElementById('message-details').open = true;
         }

@@ -266,6 +266,32 @@ button:disabled {
     margin: 0 0 16px;
 }
 
+.policy-page {
+    max-width: 740px;
+    overflow-wrap: anywhere;
+}
+
+.policy-page > h1 + p {
+    margin-bottom: 24px;
+    color: var(--text-color-secondary);
+    font-size: 14px;
+}
+
+.policy-page ul {
+    padding-left: 22px;
+}
+
+.policy-page li + li {
+    margin-top: 6px;
+}
+
+.policy-page code {
+    padding: 1px 4px;
+    border-radius: 4px;
+    background: var(--input-bg);
+    font-size: 0.9em;
+}
+
 @media (max-width: 540px) {
     main {
         margin: 28px auto;

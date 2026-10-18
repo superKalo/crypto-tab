@@ -29,8 +29,8 @@ Crypto Tab tabs in the same browser profile.
 ## Privacy
 
 The extension works without an account. It stores preferences and cached prices locally and fetches
-market prices from the Crypto Tab API. Read the [Privacy Policy](PRIVACY.md) for details about
-extension permissions, price requests, and server logs.
+market prices from the Crypto Tab API. Read the [Privacy Policy](https://crypto-tab.com/privacy/) for
+details about extension permissions, price requests, and server logs.
 
 ## Report a bug or request a token
 

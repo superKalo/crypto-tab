@@ -50,6 +50,19 @@ gulp.task("copy-favicons", function () {
     .pipe(gulp.dest(distPath));
 });
 
+// Keep the hosted policy in sync with the repository's Markdown source.
+gulp.task("build-privacy", async function () {
+  const { parse } = await import("marked");
+  const [markdown, template] = await Promise.all([
+    fs.promises.readFile("./PRIVACY.md", "utf8"),
+    fs.promises.readFile("./src/templates/privacy.html", "utf8"),
+  ]);
+  const html = template.replace("@@privacyContent", () => parse(markdown));
+
+  await fs.promises.mkdir(`${distPath}/privacy`, { recursive: true });
+  await fs.promises.writeFile(`${distPath}/privacy/index.html`, html);
+});
+
 // Preprocess HTML files by replacing certain patterns based on the environment
 gulp.task("preprocess-index", function () {
   return gulp
@@ -192,7 +205,7 @@ const buildTasks = gulp.series(
   "clean",
   gulp.parallel("copy-files", "preprocess-index", "copy-npm-dependencies", "set-env"),
   ENV.includes("extension") ? "preprocess-manifest" : (done) => done(),
-  ENV === "website" ? "copy-favicons" : (done) => done()
+  ENV === "website" ? gulp.parallel("copy-favicons", "build-privacy") : (done) => done()
 );
 
 // Main build task to run all necessary tasks in sequence and parallel as needed
@@ -202,6 +215,10 @@ gulp.task("build", buildTasks);
 gulp.task(
   "build:watch",
   gulp.series("build", function watchFiles() {
-    return gulp.watch("./src/**/*", gulp.series("build"));
+    const watchPaths = ["./src/**/*"];
+    if (ENV === "website") {
+      watchPaths.push("./PRIVACY.md");
+    }
+    return gulp.watch(watchPaths, gulp.series("build"));
   })
 );
