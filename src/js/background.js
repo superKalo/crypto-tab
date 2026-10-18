@@ -58,6 +58,8 @@ function handleSettingsUpdate(patch, sendResponse) {
     const validators = {
         theme: (value) => ['light', 'system', 'dark'].includes(value),
         clockFormat: (value) => ['system', '12h', '24h'].includes(value),
+        accentColor: (value) =>
+            value === null || (typeof value === 'string' && /^#[\da-f]{6}$/i.test(value)),
         cryptoType: (value) => globalThis.App.CryptoTokens.isSupportedToken(value),
         period: (value) => globalThis.App.CryptoTokens.isChartPeriod(value),
         colorup: (value) => /^#[\da-f]{6}$/i.test(value),
