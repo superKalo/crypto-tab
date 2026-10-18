@@ -49,34 +49,34 @@
             subject: 'Crypto Tab uninstall feedback',
             from_name: 'Crypto Tab feedback',
             reason: reasons[reason],
-            reason_code: reason,
-            form_version: '1',
         };
 
-        // Only accept the documented, non-identifying URL metadata.
-        if (['chrome-web-store', 'firefox-addons'].includes(store)) {
-            submission.store = store;
-        }
-        if (version.length <= 32 && /^\d+(?:\.\d+){0,3}$/.test(version)) {
-            submission.extension_version = version;
-        }
-
-        const message = form.elements.message.value.trim();
-        if (message) {
-            submission.message = message;
-        }
         if (reason === 'another-new-tab' && alternative.value) {
-            submission.alternative = alternative.value;
-            if (alternative.value === 'Other' && alternativeOther.value.trim()) {
-                submission.alternative_other = alternativeOther.value.trim();
-            }
+            submission.new_tab_extension =
+                alternative.value === 'Other'
+                    ? alternativeOther.value.trim() || 'Other'
+                    : alternative.value;
         }
         if (reason === 'missing-cryptocurrency' && cryptocurrency.value.trim()) {
             submission.cryptocurrency = cryptocurrency.value.trim();
         }
+        const message = form.elements.message.value.trim();
+        if (message) {
+            submission.message = message;
+        }
         if (replyRequested.checked && email.value.trim()) {
             submission.email = email.value.trim();
         }
+
+        // Keep technical metadata in one compact field after the answers.
+        const context = [`reason=${reason}`, 'form=1'];
+        if (['chrome-web-store', 'firefox-addons'].includes(store)) {
+            context.push(`store=${store}`);
+        }
+        if (version.length <= 32 && /^\d+(?:\.\d+){0,3}$/.test(version)) {
+            context.push(`version=${version}`);
+        }
+        submission.context = context.join('; ');
         if (form.elements.botcheck.checked) {
             submission.botcheck = true;
         }
