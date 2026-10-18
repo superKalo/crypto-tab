@@ -12,6 +12,10 @@ body {
 strong {
     font-weight: bold;
 }
+
+html.i18n-pending [data-i18n] {
+    visibility: hidden;
+}
 small {
     font-size: 80%;
 }
@@ -1184,6 +1188,20 @@ small {
 .settings-choice {
     min-width: 0;
 }
+.language-setting label {
+    margin-bottom: 12px;
+}
+.language-setting select {
+    box-sizing: border-box;
+    width: 100%;
+    min-height: 36px;
+    padding: 6px 10px;
+    border: 1px solid var(--input-border-color);
+    border-radius: 6px;
+    background: var(--background-color);
+    color: var(--text-color);
+    font: inherit;
+}
 .settings-choice legend {
     margin-bottom: 12px;
     font-weight: bold;
@@ -1221,6 +1239,9 @@ small {
     transition:
         color 0.2s,
         background-color 0.2s;
+}
+#clock-format .segmented-option {
+    flex-basis: auto;
 }
 .segmented-option input:checked + span {
     color: var(--toggle-active-color);

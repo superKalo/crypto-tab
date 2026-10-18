@@ -5,6 +5,7 @@ window.App.Settings = {
         period: '',
         theme: 'system',
         clockFormat: 'system',
+        language: 'system',
         accentColor: null,
     },
     listeners: new Set(),

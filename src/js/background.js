@@ -6,6 +6,7 @@ if (typeof importScripts === 'function') {
         '../lib/utc.js',
         '../lib/index.js',
         'storageMigration.js',
+        'localeConfig.js',
         'cryptoTokens.js',
         'priceApi.js',
         'priceRepositoryFactory.js'
@@ -58,6 +59,9 @@ function handleSettingsUpdate(patch, sendResponse) {
     const validators = {
         theme: (value) => ['light', 'system', 'dark'].includes(value),
         clockFormat: (value) => ['system', '12h', '24h'].includes(value),
+        language: (value) =>
+            typeof value === 'string' &&
+            globalThis.App.LocaleConfig.normalizePreference(value) === value,
         accentColor: (value) =>
             value === null || (typeof value === 'string' && /^#[\da-f]{6}$/i.test(value)),
         cryptoType: (value) => globalThis.App.CryptoTokens.isSupportedToken(value),

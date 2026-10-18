@@ -1,4 +1,7 @@
-(() => {
+(async () => {
+    await App.I18n.ready;
+    App.I18n.apply();
+
     // Public form key: routes submissions to the maintainer's verified email address.
     const accessKey = 'cf262972-16d6-4520-97a9-12f1ed563e21';
     const form = document.getElementById('feedback-form');
@@ -106,7 +109,7 @@
         isSending = true;
         fields.disabled = true;
         sendButton.disabled = true;
-        sendButton.textContent = 'Sending…';
+        sendButton.textContent = App.I18n.t('feedback.sending');
         form.setAttribute('aria-busy', 'true');
         status.textContent = '';
 
@@ -128,14 +131,13 @@
             document.getElementById('feedback-success').hidden = false;
             document.getElementById('success-title').focus();
         } catch {
-            status.textContent =
-                "We couldn't send your feedback. Your answers are still here. Please try again.";
+            status.textContent = App.I18n.t('feedback.error');
         } finally {
             window.clearTimeout(timeout);
             isSending = false;
             fields.disabled = false;
             sendButton.disabled = false;
-            sendButton.textContent = 'Send feedback';
+            sendButton.textContent = App.I18n.t('feedback.send');
             form.removeAttribute('aria-busy');
         }
     });

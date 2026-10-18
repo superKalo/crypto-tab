@@ -13,6 +13,34 @@ const socialPreviewImage =
 const socialPreviewAlt =
   "Crypto Tab showing cryptocurrency prices and a chart on a laptop in a sunlit workspace.";
 
+function readLocaleCatalogs() {
+  const catalogs = {};
+  for (const file of fs.readdirSync("./src/locales").filter((name) => name.endsWith(".json"))) {
+    catalogs[file.slice(0, -5)] = JSON.parse(fs.readFileSync(`./src/locales/${file}`, "utf8"));
+  }
+  const english = catalogs.en;
+  if (!english) throw new Error("The English locale catalog is required");
+  const keys = Object.keys(english).sort();
+  const placeholders = (text) => (text.match(/\{[a-zA-Z][a-zA-Z0-9]*\}/g) || []).sort().join(",");
+  for (const [locale, catalog] of Object.entries(catalogs)) {
+    if (Object.keys(catalog).sort().join("\n") !== keys.join("\n")) {
+      throw new Error(`Locale ${locale} must contain the same keys as English`);
+    }
+    for (const key of keys) {
+      if (typeof catalog[key] !== "string" || !catalog[key].trim()) {
+        throw new Error(`Locale ${locale} has an empty or invalid message: ${key}`);
+      }
+      if (placeholders(catalog[key]) !== placeholders(english[key])) {
+        throw new Error(`Locale ${locale} has mismatched placeholders: ${key}`);
+      }
+    }
+    if (catalog["metadata.extensionDescription"].length > 132) {
+      throw new Error(`Locale ${locale} extension description exceeds 132 characters`);
+    }
+  }
+  return catalogs;
+}
+
 const filesArr = [
   "./src/js/**/*",
   "./src/css/**/*",
@@ -41,6 +69,26 @@ gulp.task("copy-files", function () {
   return gulp
     .src(filesArr, { base: "./src", encoding: false })
     .pipe(gulp.dest(distPath));
+});
+
+// Package translations locally for both transports; no translation service is needed at runtime.
+gulp.task("build-locales", async function () {
+  const catalogs = readLocaleCatalogs();
+  await fs.promises.mkdir(`${distPath}/js`, { recursive: true });
+  await fs.promises.writeFile(
+    `${distPath}/js/localeCatalogs.js`,
+    `globalThis.App = globalThis.App || {};\nglobalThis.App.LocaleCatalogs = ${JSON.stringify(catalogs)};\n`
+  );
+  if (ENV.includes("extension")) {
+    for (const [locale, catalog] of Object.entries(catalogs)) {
+      const directory = `${distPath}/_locales/${locale.replace(/-/g, "_")}`;
+      await fs.promises.mkdir(directory, { recursive: true });
+      await fs.promises.writeFile(
+        `${directory}/messages.json`,
+        JSON.stringify({ extensionDescription: { message: catalog["metadata.extensionDescription"] } }, null, 2) + "\n"
+      );
+    }
+  }
 });
 
 // Copy favicons from src to dist directory
@@ -164,6 +212,7 @@ gulp.task("preprocess-manifest", function () {
                   "lib/utc.js",
                   "lib/index.js",
                   "js/storageMigration.js",
+                  "js/localeConfig.js",
                   "js/cryptoTokens.js",
                   "js/priceApi.js",
                   "js/priceRepositoryFactory.js",
@@ -196,6 +245,11 @@ gulp.task("copy-npm-dependencies", function () {
       "node_modules/dayjs/plugin/utc.js",
       "node_modules/dayjs/plugin/localizedFormat.js",
       "node_modules/dayjs/plugin/calendar.js",
+      "node_modules/dayjs/locale/pt-br.js",
+      "node_modules/dayjs/locale/pt.js",
+      "node_modules/dayjs/locale/es.js",
+      "node_modules/dayjs/locale/fr.js",
+      "node_modules/dayjs/locale/id.js",
     ])
     .pipe(gulp.dest(`${distPath}/lib/`));
 });
@@ -203,7 +257,7 @@ gulp.task("copy-npm-dependencies", function () {
 // Define the build tasks based on the environment
 const buildTasks = gulp.series(
   "clean",
-  gulp.parallel("copy-files", "preprocess-index", "copy-npm-dependencies", "set-env"),
+  gulp.parallel("copy-files", "preprocess-index", "copy-npm-dependencies", "set-env", "build-locales"),
   ENV.includes("extension") ? "preprocess-manifest" : (done) => done(),
   ENV === "website" ? gulp.parallel("copy-favicons", "build-privacy") : (done) => done()
 );

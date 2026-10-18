@@ -9,6 +9,7 @@
 
     <meta
       name="description"
+      data-i18n-content="metadata.pageDescription"
       content="Replace your New Tab page with crypto prices, charts, and a clock. Follow Bitcoin, Ether, and more in USD."
     />
     @@socialMediaTags
@@ -16,6 +17,9 @@
     <script src="js/browser-extension-api.js"></script>
     <script src="env/env.js"></script>
     <script src="js/settings.js"></script>
+    <script src="js/localeConfig.js"></script>
+    <script src="js/localeCatalogs.js"></script>
+    <script src="js/i18n.js"></script>
     <script src="js/accentColor.js"></script>
     <script src="js/themeManager.js"></script>
 
@@ -42,6 +46,7 @@
             aria-expanded="false"
             aria-controls="price-token-menu"
             title="Change token"
+            data-i18n-title="ui.changeToken"
           >
             <span class="price-token-mark" aria-hidden="true">
               <img
@@ -71,7 +76,8 @@
             </span>
             <span id="crypto-type">Bitcoin</span>
           </button>
-          <span id="price-prefix">price is</span> <span id="price-now">loading…</span>
+          <span id="price-prefix" data-i18n="ui.priceIs">price is</span>
+          <span id="price-now" data-i18n="ui.loading">loading…</span>
           <span id="change"></span>
         </h2>
         <aside
@@ -85,19 +91,27 @@
             class="token-intro-close"
             type="button"
             aria-label="Dismiss token introduction"
+            data-i18n-aria-label="ui.dismissTokenIntroduction"
           >
             &times;
           </button>
-          <h3 id="token-intro-title">Choose your token</h3>
-          <p id="token-intro-description">Click the token name above to switch tokens.</p>
+          <h3 id="token-intro-title" data-i18n="ui.chooseYourToken">Choose your token</h3>
+          <p id="token-intro-description" data-i18n="ui.tokenIntroduction">
+            Click the token name above to switch tokens.
+          </p>
         </aside>
         <div id="price-token-menu" class="price-token-menu" hidden>
-          <p class="price-token-menu-title">Choose a token</p>
-          <ul id="price-token-options" class="token-options" aria-label="Available tokens">
+          <p class="price-token-menu-title" data-i18n="ui.chooseToken">Choose a token</p>
+          <ul
+            id="price-token-options"
+            class="token-options"
+            aria-label="Available tokens"
+            data-i18n-aria-label="ui.availableTokens"
+          >
             <!-- Options share the Customize picker. -->
           </ul>
           <div class="token-request">
-            <p class="token-request-title">Missing a token?</p>
+            <p class="token-request-title" data-i18n="ui.missingToken">Missing a token?</p>
             <a
               class="token-request-link"
               href="https://github.com/superKalo/crypto-tab/issues"
@@ -105,7 +119,7 @@
               rel="noopener noreferrer"
               draggable="false"
             >
-              Request it on GitHub
+              <span data-i18n="ui.requestToken">Request it on GitHub</span>
               <svg
                 width="16"
                 height="16"
@@ -127,12 +141,44 @@
       </div>
 
       <p id="periods" class="text-center mb+">
-        <button data-period="ONE_HOUR" type="button" class="btn js-period">1H</button>
-        <button data-period="ONE_DAY" type="button" class="btn js-period">1D</button>
-        <button data-period="ONE_WEEK" type="button" class="btn js-period">1W</button>
-        <button data-period="ONE_MONTH" type="button" class="btn js-period">1M</button>
-        <button data-period="ONE_YEAR" type="button" class="btn js-period">1Y</button>
-        <button data-period="ALL" type="button" class="btn js-period">ALL</button>
+        <button
+          data-period="ONE_HOUR"
+          type="button"
+          class="btn js-period"
+          data-i18n="ui.period.hour"
+        >
+          1H
+        </button>
+        <button data-period="ONE_DAY" type="button" class="btn js-period" data-i18n="ui.period.day">
+          1D
+        </button>
+        <button
+          data-period="ONE_WEEK"
+          type="button"
+          class="btn js-period"
+          data-i18n="ui.period.week"
+        >
+          1W
+        </button>
+        <button
+          data-period="ONE_MONTH"
+          type="button"
+          class="btn js-period"
+          data-i18n="ui.period.month"
+        >
+          1M
+        </button>
+        <button
+          data-period="ONE_YEAR"
+          type="button"
+          class="btn js-period"
+          data-i18n="ui.period.year"
+        >
+          1Y
+        </button>
+        <button data-period="ALL" type="button" class="btn js-period" data-i18n="ui.period.all">
+          ALL
+        </button>
       </p>
 
       <div class="chart-container mb+">
@@ -141,9 +187,15 @@
         <span id="message" class="message" role="status"></span>
       </div>
 
-      <div id="last-updated" class="data-updates mb" role="group" aria-label="Data freshness">
+      <div
+        id="last-updated"
+        class="data-updates mb"
+        role="group"
+        aria-label="Data freshness"
+        data-i18n-aria-label="ui.dataFreshness"
+      >
         <span id="combined-update-status" class="update-status" hidden>
-          <span class="update-muted">updated</span>
+          <span class="update-muted" data-i18n="ui.updated">updated</span>
           <span class="update-trigger">
             <span
               id="combined-update-time"
@@ -151,8 +203,7 @@
               tabindex="0"
               aria-describedby="combined-update-details"
             >
-              <span id="combined-update-age">a moment</span>
-              <span class="update-muted">ago</span>
+              <span id="combined-update-age" data-i18n="ui.aMoment">a moment</span>
             </span>
             <span
               id="combined-update-details"
@@ -161,7 +212,7 @@
             >
               <span class="update-details-section">
                 <span class="update-details-row">
-                  <span class="update-details-title">Price now</span>
+                  <span class="update-details-title" data-i18n="ui.priceNow">Price now</span>
                   <span id="combined-price-time" class="update-details-time positive"></span>
                 </span>
                 <span id="combined-price-description" class="update-details-description"></span>
@@ -169,7 +220,7 @@
               <span class="update-details-section">
                 <span class="update-details-row">
                   <span class="update-details-title">
-                    Chart
+                    <span data-i18n="ui.chartTitle">Chart</span>
                     <span class="update-details-context"
                       >(<span id="combined-chart-summary"></span>)</span
                     >
@@ -181,6 +232,7 @@
               <span
                 id="combined-next-refresh"
                 class="update-details-section update-details-footnote"
+                data-i18n="ui.automaticUpdates"
               >
                 Updates automatically while this tab is visible.
               </span>
@@ -189,17 +241,23 @@
         </span>
         <span class="update-status-group">
           <span id="price-update-status" class="update-status">
-            <span id="price-update-label">price</span>
+            <span id="price-update-label" data-i18n="ui.priceLabel">price</span>
             <span class="update-trigger">
               <span
                 id="price-update-time"
+                data-i18n="ui.loading"
                 class="update-time"
                 tabindex="0"
                 aria-describedby="price-update-details"
               >
                 loading…
               </span>
-              <span id="price-update-details" class="update-details" role="tooltip">
+              <span
+                id="price-update-details"
+                class="update-details"
+                role="tooltip"
+                data-i18n="ui.checkingPrice"
+              >
                 Checking the current price…
               </span>
             </span>
@@ -208,17 +266,23 @@
         <span class="update-status-group">
           <span class="update-separator" aria-hidden="true">·</span>
           <span id="chart-update-status" class="update-status">
-            <span id="chart-update-label">chart</span>
+            <span id="chart-update-label" data-i18n="ui.chartLabel">chart</span>
             <span class="update-trigger">
               <span
                 id="chart-update-time"
+                data-i18n="ui.loading"
                 class="update-time"
                 tabindex="0"
                 aria-describedby="chart-update-details"
               >
                 loading…
               </span>
-              <span id="chart-update-details" class="update-details" role="tooltip">
+              <span
+                id="chart-update-details"
+                class="update-details"
+                role="tooltip"
+                data-i18n="ui.checkingChart"
+              >
                 Checking chart data…
               </span>
             </span>
@@ -228,29 +292,40 @@
 
       <div id="settings-panel" class="settings hidden" aria-labelledby="settings-title">
         <div class="settings-header">
-          <h2 id="settings-title" class="settings-title">Customize</h2>
+          <h2 id="settings-title" class="settings-title" data-i18n="ui.customize">Customize</h2>
           <button
             id="close-settings"
             type="button"
             class="close-button"
             aria-label="Close customization panel"
+            data-i18n-aria-label="ui.closeCustomization"
           >
             &times;
           </button>
         </div>
         <div class="settings-body">
           <section class="settings-section" aria-labelledby="token-heading">
-            <h3 id="token-heading" class="settings-section-title">Token</h3>
+            <h3 id="token-heading" class="settings-section-title" data-i18n="ui.token">Token</h3>
             <details id="token-picker" class="token-picker">
-              <summary id="token-select" class="token-select" aria-label="Change token">
+              <summary
+                id="token-select"
+                class="token-select"
+                aria-label="Change token"
+                data-i18n-aria-label="ui.changeToken"
+              >
                 <span id="selected-token" class="token-identity"></span>
                 <span class="token-chevron" aria-hidden="true"></span>
               </summary>
-              <ul id="token-options" class="token-options" aria-label="Available tokens">
+              <ul
+                id="token-options"
+                class="token-options"
+                aria-label="Available tokens"
+                data-i18n-aria-label="ui.availableTokens"
+              >
                 <!-- Options will be populated from cryptoTokens.js. -->
               </ul>
               <div class="token-request">
-                <p class="token-request-title">Missing a token?</p>
+                <p class="token-request-title" data-i18n="ui.missingToken">Missing a token?</p>
                 <a
                   class="token-request-link"
                   href="https://github.com/superKalo/crypto-tab/issues"
@@ -258,7 +333,7 @@
                   rel="noopener noreferrer"
                   draggable="false"
                 >
-                  Request it on GitHub
+                  <span data-i18n="ui.requestToken">Request it on GitHub</span>
                   <svg
                     width="16"
                     height="16"
@@ -310,52 +385,70 @@
             class="settings-section"
             aria-labelledby="appearance-heading"
           >
-            <h3 id="appearance-heading" class="settings-section-title">Appearance</h3>
+            <h3 id="appearance-heading" class="settings-section-title" data-i18n="ui.appearance">
+              Appearance
+            </h3>
+            <div class="settings-choice language-setting">
+              <label for="language-select" data-i18n="ui.language">Language</label>
+              <select id="language-select" name="language">
+                <option value="system" data-i18n="ui.languageSystem">System</option>
+                <option value="en" lang="en">English</option>
+                <option value="pt-BR" lang="pt-BR">Português (Brasil)</option>
+                <option value="pt-PT" lang="pt-PT">Português (Portugal)</option>
+                <option value="es" lang="es">Español</option>
+                <option value="fr" lang="fr">Français</option>
+                <option value="id" lang="id">Bahasa Indonesia</option>
+              </select>
+            </div>
             <fieldset id="theme-toggle" class="settings-choice">
-              <legend>Theme</legend>
+              <legend data-i18n="ui.theme">Theme</legend>
               <div class="segmented-control">
                 <label class="segmented-option">
                   <input type="radio" name="theme" value="light" />
-                  <span>Light</span>
+                  <span data-i18n="ui.light">Light</span>
                 </label>
                 <label class="segmented-option">
                   <input type="radio" name="theme" value="system" checked />
-                  <span>System</span>
+                  <span data-i18n="ui.system">System</span>
                 </label>
                 <label class="segmented-option">
                   <input type="radio" name="theme" value="dark" />
-                  <span>Dark</span>
+                  <span data-i18n="ui.dark">Dark</span>
                 </label>
               </div>
             </fieldset>
             <fieldset id="clock-format" class="settings-choice">
-              <legend>Clock Format</legend>
+              <legend data-i18n="ui.clockFormat">Clock Format</legend>
               <div class="segmented-control">
                 <label class="segmented-option">
                   <input type="radio" name="clockFormat" value="24h" />
-                  <span>24h</span>
+                  <span data-i18n="ui.clock24">24h</span>
                 </label>
                 <label class="segmented-option">
                   <input type="radio" name="clockFormat" value="system" checked />
-                  <span>System</span>
+                  <span data-i18n="ui.system">System</span>
                 </label>
                 <label class="segmented-option">
                   <input type="radio" name="clockFormat" value="12h" />
-                  <span>12h (AM/PM)</span>
+                  <span data-i18n="ui.clock12">12h (AM/PM)</span>
                 </label>
               </div>
             </fieldset>
             <fieldset class="settings-choice color-settings">
-              <legend>Colors</legend>
+              <legend data-i18n="ui.colors">Colors</legend>
               <div class="color-options">
                 <div class="color-row">
                   <div class="color-label-group">
-                    <label for="color-accent" class="color-label">Accent color</label>
+                    <label for="color-accent" class="color-label" data-i18n="ui.accentColor"
+                      >Accent color</label
+                    >
                     <button
                       id="reset-accent-color"
+                      data-i18n="ui.restoreDefault"
                       type="button"
                       class="reset-color"
                       aria-label="Restore default accent color"
+                      data-i18n-aria-label="ui.restoreAccent"
                       hidden
                     >
                       Restore default
@@ -368,6 +461,7 @@
                       name="accentColor"
                       value="#4f78e2"
                       title="Choose an accent color"
+                      data-i18n-title="ui.chooseAccent"
                     />
                     <span class="color-control-face" aria-hidden="true">
                       <span class="color-swatch"></span>
@@ -390,12 +484,16 @@
                 </div>
                 <div class="color-row">
                   <div class="color-label-group">
-                    <label for="color-up" class="color-label">Price increase</label>
+                    <label for="color-up" class="color-label" data-i18n="ui.priceIncrease"
+                      >Price increase</label
+                    >
                     <button
                       id="reset-up-color"
+                      data-i18n="ui.restoreDefault"
                       type="button"
                       class="reset-color"
                       aria-label="Restore default price increase color"
+                      data-i18n-aria-label="ui.restoreIncrease"
                       hidden
                     >
                       Restore default
@@ -409,6 +507,7 @@
                       name="colorup"
                       value="#428600"
                       title="Choose a color for price increases"
+                      data-i18n-title="ui.chooseIncrease"
                     />
                     <span class="color-control-face" aria-hidden="true">
                       <span class="color-swatch"></span>
@@ -431,12 +530,16 @@
                 </div>
                 <div class="color-row">
                   <div class="color-label-group">
-                    <label for="color-down" class="color-label">Price decrease</label>
+                    <label for="color-down" class="color-label" data-i18n="ui.priceDecrease"
+                      >Price decrease</label
+                    >
                     <button
                       id="reset-down-color"
+                      data-i18n="ui.restoreDefault"
                       type="button"
                       class="reset-color"
                       aria-label="Restore default price decrease color"
+                      data-i18n-aria-label="ui.restoreDecrease"
                       hidden
                     >
                       Restore default
@@ -450,6 +553,7 @@
                       name="colordown"
                       value="#ff4949"
                       title="Choose a color for price decreases"
+                      data-i18n-title="ui.chooseDecrease"
                     />
                     <span class="color-control-face" aria-hidden="true">
                       <span class="color-swatch"></span>
@@ -522,7 +626,7 @@
               mask="url(#footer-about-orbit-cutout)"
             />
           </svg>
-          <span>About</span>
+          <span data-i18n="ui.about">About</span>
         </button>
         <span class="footer-separator" aria-hidden="true"></span>
         <button
@@ -549,7 +653,7 @@
             <circle cx="9" cy="7" r="3" />
             <circle cx="15" cy="17" r="3" />
           </svg>
-          <span>Customize</span>
+          <span data-i18n="ui.customize">Customize</span>
         </button>
       </footer>
     </div>
@@ -563,13 +667,14 @@
       <div class="about-header">
         <h2 id="about-title">
           <img class="about-logo" src="img/logo.svg" alt="" width="32" height="32" />
-          <span>About Crypto Tab</span>
+          <span data-i18n="about.title">About Crypto Tab</span>
         </h2>
         <button
           id="close-about"
           class="close-button"
           type="button"
           aria-label="Close About Crypto Tab"
+          data-i18n-aria-label="about.close"
           autofocus
         >
           &times;
@@ -577,25 +682,29 @@
       </div>
       <div class="about-body">
         <p id="about-description" class="about-description">
-          Back in 2017, two friends got curious about Bitcoin.<br />Crypto Tab came out of a simple
-          wish - open a new tab, check the price, and get on with the day.
+          <span data-i18n="about.origin">Back in 2017, two friends got curious about Bitcoin.</span
+          ><br />
+          <span data-i18n="about.wish"
+            >Crypto Tab came out of a simple wish - open a new tab, check the price, and get on with
+            the day.</span
+          >
         </p>
         <section class="about-averages" aria-labelledby="averages-title">
-          <h3 id="averages-title">Why we use averages</h3>
-          <p class="about-story">
+          <h3 id="averages-title" data-i18n="about.averagesTitle">Why we use averages</h3>
+          <p class="about-story" data-i18n="about.averagesExplanation">
             It’s made for vibe investors who want a feel for the bigger picture. Averaging prices
             over a day or month softens brief spikes and dips. That makes price trends easier to
             follow at a glance.
           </p>
-          <p class="about-story">
+          <p class="about-story" data-i18n="about.averagesExtremes">
             The longer views show daily averages (1W/1M) or monthly averages (1Y/ALL). Their
             highlighted highs and lows are averages too, so they can differ from an asset’s recorded
             price extremes.
           </p>
         </section>
         <section class="about-contributors" aria-labelledby="contributors-title">
-          <h3 id="contributors-title">Contributors</h3>
-          <p class="about-story">
+          <h3 id="contributors-title" data-i18n="about.contributors">Contributors</h3>
+          <p class="about-story" data-i18n="about.history">
             First shipped in October 2017, maintained on and off ever since, and somehow grew
             organically to thousands of active installs! Now with dark mode, custom colors and
             finally an option to switch to Ether.
@@ -628,21 +737,29 @@
           </ul>
         </section>
         <p class="about-contact">
-          We’ve worked together for 10+ years, building browser extensions, wallets and Web3 dApps
-          as the
+          <span data-i18n="about.contactBefore"
+            >We’ve worked together for 10+ years, building browser extensions, wallets and Web3
+            dApps as the</span
+          >
           <a href="https://goodmorning.dev" target="_blank" rel="noopener noreferrer"
             >goodmorning.dev</a
           >
-          team. Got a project? Let’s talk 🤝
+          <span data-i18n="about.contactAfter">team. Got a project? Let’s talk 🤝</span>
         </p>
         <div class="about-meta">
-          <nav class="about-links" aria-label="Project links">
+          <nav
+            class="about-links"
+            aria-label="Project links"
+            data-i18n-aria-label="about.projectLinks"
+          >
             <a
               href="https://github.com/superKalo/crypto-tab"
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Open source on GitHub"
+              data-i18n-aria-label="about.openSourceLabel"
               title="Open source on GitHub"
+              data-i18n-title="about.openSourceLabel"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -657,7 +774,7 @@
                   d="M12 .297C5.37.297 0 5.67 0 12.297c0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.043-1.61-4.043-1.61-.546-1.387-1.333-1.756-1.333-1.756-1.09-.745.083-.73.083-.73 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.807 1.305 3.492.998.108-.776.418-1.305.762-1.605-2.665-.3-5.467-1.334-5.467-5.93 0-1.31.468-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23a11.5 11.5 0 0 1 3-.404c1.02.005 2.045.138 3 .404 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"
                 />
               </svg>
-              <span>open source</span>
+              <span data-i18n="about.openSource">open source</span>
             </a>
             <span class="about-links-separator" aria-hidden="true">·</span>
             <a
@@ -682,7 +799,7 @@
                 <rect x="6" y="8" width="12" height="13" rx="6" />
                 <path d="M12 11v10M3 7l3 3m-4 4h4m-3 7 3-3m15-11-3 3m4 4h-4m3 7-3-3" />
               </svg>
-              <span>report a bug</span>
+              <span data-i18n="about.reportBug">report a bug</span>
             </a>
           </nav>
           <span class="about-details">v@@version</span>
@@ -695,6 +812,11 @@
 
     <script defer src="lib/chart.umd.min.js"></script>
     <script defer src="lib/dayjs.min.js"></script>
+    <script defer src="lib/pt-br.js"></script>
+    <script defer src="lib/pt.js"></script>
+    <script defer src="lib/es.js"></script>
+    <script defer src="lib/fr.js"></script>
+    <script defer src="lib/id.js"></script>
     <script defer src="lib/utc.js"></script>
     <script defer src="lib/localizedFormat.js"></script>
     <script defer src="lib/relativeTime.js"></script>
