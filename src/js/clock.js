@@ -1,10 +1,11 @@
 window.App = window.App || {};
 
 /**
- * Simple and efficient clock with 12h/24h format support.
+ * Simple and efficient clock with system, 12h, and 24h format preferences.
  */
 window.App.Clock = {
     format: '24h',
+    formatPreference: 'system',
     timer: null,
     isInitialized: false,
     isPageActive: false,
@@ -22,6 +23,7 @@ window.App.Clock = {
 
         this.handleVisibilityChange = () => this.update();
         this.handleFocus = () => this.update();
+        this.handleLanguageChange = () => this.update();
         this.handlePageHide = (event) => {
             this.isPageActive = false;
             this.stop();
@@ -38,6 +40,7 @@ window.App.Clock = {
 
         document.addEventListener('visibilitychange', this.handleVisibilityChange);
         window.addEventListener('focus', this.handleFocus);
+        window.addEventListener('languagechange', this.handleLanguageChange);
         window.addEventListener('pagehide', this.handlePageHide);
         window.addEventListener('pageshow', this.handlePageShow);
         this.unsubscribeSettings = window.App.Settings.subscribe((settings, changedKeys) => {
@@ -61,7 +64,18 @@ window.App.Clock = {
     },
 
     normalizeFormat(format) {
-        return format === '12h' ? '12h' : '24h';
+        return ['system', '12h', '24h'].includes(format) ? format : 'system';
+    },
+
+    resolveFormat(format) {
+        if (format !== 'system') {
+            return format;
+        }
+
+        // Browsers expose the default locale's hour cycle through Intl.
+        return new Intl.DateTimeFormat(undefined, { hour: 'numeric' }).resolvedOptions().hour12
+            ? '12h'
+            : '24h';
     },
 
     formatTime(date, format) {
@@ -75,20 +89,25 @@ window.App.Clock = {
     },
 
     updateFormat(format) {
-        const previousFormat = this.format;
         this.settingsGeneration += 1;
-        this.format = this.normalizeFormat(format);
+        this.formatPreference = this.normalizeFormat(format);
         this.update();
-
-        if (this.format !== previousFormat) {
-            window.dispatchEvent(new Event('clockformatchange'));
-        }
     },
 
     update() {
         this.stop();
 
-        if (!this.isInitialized || !this.isPageActive || document.hidden) {
+        if (!this.isInitialized) {
+            return;
+        }
+
+        const previousFormat = this.format;
+        this.format = this.resolveFormat(this.formatPreference);
+        if (this.format !== previousFormat) {
+            window.dispatchEvent(new Event('clockformatchange'));
+        }
+
+        if (!this.isPageActive || document.hidden) {
             return;
         }
 
@@ -122,6 +141,7 @@ window.App.Clock = {
         this.stop();
         document.removeEventListener('visibilitychange', this.handleVisibilityChange);
         window.removeEventListener('focus', this.handleFocus);
+        window.removeEventListener('languagechange', this.handleLanguageChange);
         window.removeEventListener('pagehide', this.handlePageHide);
         window.removeEventListener('pageshow', this.handlePageShow);
         this.unsubscribeSettings();

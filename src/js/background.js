@@ -57,7 +57,7 @@ function registerUninstallFeedback() {
 function handleSettingsUpdate(patch, sendResponse) {
     const validators = {
         theme: (value) => ['light', 'system', 'dark'].includes(value),
-        clockFormat: (value) => ['12h', '24h'].includes(value),
+        clockFormat: (value) => ['system', '12h', '24h'].includes(value),
         cryptoType: (value) => globalThis.App.CryptoTokens.isSupportedToken(value),
         period: (value) => globalThis.App.CryptoTokens.isChartPeriod(value),
         colorup: (value) => /^#[\da-f]{6}$/i.test(value),

@@ -19,8 +19,8 @@
 
 -   Choose Bitcoin (BTC), Ether (ETH), Ambire Wallet (WALLET), or Hedera (HBAR) to see its price in USD.
 -   View the past hour, day, week, month, year, or all available history in a single chart.
--   Make the page your own with light, dark, or system themes and custom colors for price changes.
--   Read the time in your preferred 12-hour or 24-hour format.
+-   Follow your system theme by default, or choose light or dark and custom colors for price changes.
+-   Follow your browser's regional clock format by default, or choose 12-hour or 24-hour time.
 -   Pick up where you left off with your selected token, chart period, and preferences saved locally.
 
 Prices update automatically while Crypto Tab is visible. Preference changes are shared between open
