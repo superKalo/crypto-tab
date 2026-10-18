@@ -1,7 +1,7 @@
 globalThis.App = globalThis.App || {};
 
 globalThis.App.LocaleConfig = {
-    SUPPORTED_LOCALES: ['en', 'pt-BR', 'pt-PT', 'es', 'fr', 'id'],
+    SUPPORTED_LOCALES: ['en', 'pt-BR', 'pt-PT', 'es', 'fr', 'id', 'bg'],
 
     normalizePreference(value) {
         return value === 'system' || this.SUPPORTED_LOCALES.includes(value) ? value : 'system';

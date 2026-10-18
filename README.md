@@ -22,7 +22,7 @@
 -   Follow your system theme by default, or choose light or dark.
 -   Customize the chart and interface accent color, with separate colors for price changes.
 -   Follow your browser's regional clock format by default, or choose 12-hour or 24-hour time.
--   Use English, Brazilian or European Portuguese, Spanish, French, or Indonesian. The interface
+-   Use English, Brazilian or European Portuguese, Spanish, French, Indonesian, or Bulgarian. The interface
     follows your browser language by default, with a language selector in Customize.
 -   Pick up where you left off with your selected token, chart period, and preferences saved locally.
 

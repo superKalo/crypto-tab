@@ -250,6 +250,7 @@ gulp.task("copy-npm-dependencies", function () {
       "node_modules/dayjs/locale/es.js",
       "node_modules/dayjs/locale/fr.js",
       "node_modules/dayjs/locale/id.js",
+      "node_modules/dayjs/locale/bg.js",
     ])
     .pipe(gulp.dest(`${distPath}/lib/`));
 });
