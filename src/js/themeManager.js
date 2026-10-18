@@ -2,12 +2,12 @@ window.App = window.App || {};
 
 window.App.ThemeManager = (function () {
     let themeOptions = [];
-    let currentTheme = 'light';
+    let currentTheme = 'system';
     let isInitialized = false;
     let themeChanged = false;
 
     function normalizeTheme(theme) {
-        return ['light', 'system', 'dark'].includes(theme) ? theme : 'light';
+        return ['light', 'system', 'dark'].includes(theme) ? theme : 'system';
     }
 
     async function init() {
@@ -45,7 +45,7 @@ window.App.ThemeManager = (function () {
             }
         } catch (error) {
             if (!themeChanged) {
-                applyTheme('light');
+                applyTheme('system');
             }
             console.warn('Unable to load the theme preference. Keeping the current theme.', error);
         }

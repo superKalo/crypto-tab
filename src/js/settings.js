@@ -3,6 +3,8 @@ window.App = window.App || {};
 window.App.Settings = {
     initialState: {
         period: '',
+        theme: 'system',
+        clockFormat: 'system',
     },
     listeners: new Set(),
     changeGeneration: 0,
