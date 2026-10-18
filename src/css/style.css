@@ -556,7 +556,7 @@ small {
 }
 #open-about:hover svg,
 #open-about:focus-visible svg {
-    color: var(--accent-color);
+    color: #4f78e2;
 }
 .footer-action:hover,
 .footer-action:focus-visible {
@@ -858,16 +858,18 @@ small {
 }
 /* Settings Panel */
 .settings {
+    /* Leave the 44px footer button and a 12px gap clear below the panel. */
+    --settings-bottom: calc(max(20px, env(safe-area-inset-bottom)) + 56px);
     position: fixed;
-    bottom: 50px;
-    right: 20px;
+    bottom: var(--settings-bottom);
+    right: max(24px, env(safe-area-inset-right));
     background: var(--background-color);
     border-radius: 10px;
     border: 1px solid var(--border-color);
     width: 420px;
     max-width: calc(100vw - 40px);
-    max-height: calc(100vh - 70px);
-    max-height: calc(100dvh - 70px);
+    max-height: calc(100vh - var(--settings-bottom) - 20px);
+    max-height: calc(100dvh - var(--settings-bottom) - 20px);
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
@@ -1621,13 +1623,12 @@ body.about-open {
         min-height: 44px;
     }
     .settings {
-        bottom: max(12px, env(safe-area-inset-bottom));
         left: max(12px, env(safe-area-inset-left));
         right: max(12px, env(safe-area-inset-right));
         width: auto;
         max-width: 420px;
-        max-height: calc(100vh - 24px - env(safe-area-inset-bottom));
-        max-height: calc(100dvh - 24px - env(safe-area-inset-bottom));
+        max-height: calc(100vh - var(--settings-bottom) - 12px);
+        max-height: calc(100dvh - var(--settings-bottom) - 12px);
         margin-left: auto;
     }
     .settings-header {
