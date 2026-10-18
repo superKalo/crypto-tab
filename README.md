@@ -77,7 +77,9 @@ Load a local extension build:
 -   **Firefox:** Open `about:debugging`, select **This Firefox**, click **Load Temporary Add-on**, and select
     `dist/extension-gecko/manifest.json`. This installation lasts until Firefox restarts.
 
-Open a new tab to see Crypto Tab. After rebuilding, reload the extension and open a fresh tab.
+Crypto Tab opens its own page in a new tab automatically on first installation. If your browser asks
+whether to keep the new tab change, confirm it to continue using Crypto Tab. After rebuilding, reload
+the extension and open a fresh tab.
 For the website, serve `dist/website/` with a local static web server.
 
 Edit files in `src/`; the generated `dist/` directories are replaced on each build.

@@ -60,7 +60,7 @@ window.App.TokenPickerIntro = {
                 this.$card.hidden = false;
                 this.$trigger.setAttribute('aria-describedby', 'token-intro-description');
                 this.position();
-            }, 500);
+            }, 1000);
         } catch (error) {
             this.hide();
             console.warn('Unable to read the token introduction preference.', error);
