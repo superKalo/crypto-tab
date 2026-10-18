@@ -1,6 +1,6 @@
 # Crypto Tab Privacy Policy
 
-Last updated: October 11, 2026
+Last updated: October 18, 2026
 
 ## 1. Scope and purpose
 
@@ -77,6 +77,16 @@ The extension also declares a New Tab page replacement so that opening a new tab
 
 Crypto Tab includes links to external websites, such as CoinGecko, GitHub, and contributor websites.
 Following a link opens that website, where its own privacy policy applies.
+
+After you uninstall Crypto Tab, the browser opens an optional feedback page on
+`https://crypto-tab.com/feedback/`. The extension registers this URL with its version and distribution
+family (Chrome Web Store, including other Chromium browsers, or Firefox Add-ons) after the `#` in the
+URL. This context is not sent in the initial website request; it is included only if you submit
+feedback. The extension does not attach a unique installation identifier or your saved preferences.
+The website host receives ordinary web request information when the page opens. Feedback answers are
+sent only if you submit the form; an email address for a reply is optional. The separate
+[Feedback Privacy notice](https://crypto-tab.com/feedback/privacy.html) describes submission through
+Web3Forms, email delivery, and data handling on that page.
 
 If you contact the maintainers by email, we receive your email address and whatever information you
 choose to include. We use that information to respond to your request. If you open a GitHub issue,

@@ -5,7 +5,7 @@ const pluginJs = require('@eslint/js');
 module.exports = [
     { files: ['**/*.js'], languageOptions: { sourceType: 'script' } },
     {
-        files: ['src/js/*.js'],
+        files: ['src/js/*.js', 'src/feedback/*.js'],
         languageOptions: {
             globals: {
                 ...globals.browser,
