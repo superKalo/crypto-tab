@@ -127,6 +127,22 @@ function handleLegacyRequest(period, cryptoType, sendResponse) {
         .catch((error) => sendResponse({ error: error.message }));
 }
 
+extensionApi.runtime.onInstalled.addListener(async ({ reason }) => {
+    if (reason !== 'install') {
+        return;
+    }
+
+    try {
+        // Show Crypto Tab even if another extension controls the new-tab page.
+        await extensionApi.tabs.create({
+            active: true,
+            url: extensionApi.runtime.getURL('index.html'),
+        });
+    } catch (error) {
+        console.warn('Could not open Crypto Tab after installation:', error);
+    }
+});
+
 extensionApi.runtime.onMessage.addListener((request, _sender, sendResponse) => {
     if (!request || typeof request !== 'object') {
         return false;
