@@ -34,7 +34,7 @@ let settingsWriteQueue = Promise.resolve();
 
 function registerUninstallFeedback() {
     try {
-        const url = new URL('https://crypto-tab.com/goodbye/');
+        const url = new URL('https://crypto-tab.com/feedback/');
         // This identifies the distribution family, including other Chromium browsers.
         const store =
             typeof extensionApi.runtime.getBrowserInfo === 'function'

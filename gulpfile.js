@@ -27,7 +27,7 @@ if (ENV.includes("extension")) {
     "./src/img/browsers/*.svg",
     "./src/img/logo.png",
     "./src/mockups/social/crypto-tab-social-preview.jpg",
-    "./src/goodbye/**/*"
+    "./src/feedback/**/*"
   );
 }
 

@@ -23,13 +23,13 @@ main {
     padding: 0 24px;
 }
 
-.goodbye-page {
+.feedback-page {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
 }
 
-.goodbye-page main {
+.feedback-page main {
     margin-bottom: 32px;
 }
 
