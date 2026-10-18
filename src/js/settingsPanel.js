@@ -103,22 +103,26 @@ window.App.SettingsPanel = (function () {
             window.App.Clock.updateFormat(newFormat);
         });
 
-        document.getElementById('color-up').addEventListener('input', (e) => {
-            const color = e.target.value;
-            changedPreferences.add('colorup');
-            applyColor('up', color);
-            window.App.Settings.set('colorup', color);
+        ['up', 'down'].forEach((direction) => {
+            const input = document.getElementById(`color-${direction}`);
+            input.addEventListener('input', (event) => {
+                changePriceColor(direction, event.target.value);
+            });
+            document.getElementById(`reset-${direction}-color`).addEventListener('click', () => {
+                changePriceColor(
+                    direction,
+                    direction === 'up' ? DEFAULT_UP_COLOR : DEFAULT_DOWN_COLOR
+                );
+                input.focus();
+            });
         });
 
-        document.getElementById('color-down').addEventListener('input', (e) => {
-            const color = e.target.value;
-            changedPreferences.add('colordown');
-            applyColor('down', color);
-            window.App.Settings.set('colordown', color);
+        document.getElementById('color-accent').addEventListener('input', (event) => {
+            changeAccentColor(event.target.value);
         });
-
-        document.getElementById('reset-colors').addEventListener('click', () => {
-            resetColors();
+        document.getElementById('reset-accent-color').addEventListener('click', () => {
+            changeAccentColor(null);
+            document.getElementById('color-accent').focus();
         });
 
         // Close settings panel when clicking outside of it
@@ -128,6 +132,10 @@ window.App.SettingsPanel = (function () {
             if (changedKeys.includes('clockFormat')) {
                 changedPreferences.add('clockFormat');
                 renderClockFormat(settings.clockFormat);
+            }
+            if (changedKeys.includes('accentColor')) {
+                changedPreferences.add('accentColor');
+                renderAccentColor(settings.accentColor);
             }
             ['up', 'down'].forEach((direction) => {
                 const key = `color${direction}`;
@@ -186,16 +194,23 @@ window.App.SettingsPanel = (function () {
         hidePanel();
     }
 
-    function resetColors() {
-        changedPreferences.add('colorup');
-        changedPreferences.add('colordown');
-        applyColor('up', DEFAULT_UP_COLOR);
-        applyColor('down', DEFAULT_DOWN_COLOR);
+    function changePriceColor(direction, color) {
+        const key = `color${direction}`;
+        if (direction === 'up' && color.toLowerCase() === getDefaultPriceColor(direction)) {
+            color = DEFAULT_UP_COLOR;
+        }
+        changedPreferences.add(key);
+        applyColor(direction, color);
+        window.App.Settings.set(key, color);
+    }
 
-        window.App.Settings.setMultiple({
-            colorup: DEFAULT_UP_COLOR,
-            colordown: DEFAULT_DOWN_COLOR,
-        });
+    function getDefaultPriceColor(direction) {
+        return direction === 'up'
+            ? getComputedStyle(document.documentElement)
+                  .getPropertyValue('--positive-color')
+                  .trim()
+                  .toLowerCase()
+            : DEFAULT_DOWN_COLOR;
     }
 
     async function loadSettings() {
@@ -217,6 +232,9 @@ window.App.SettingsPanel = (function () {
             if (!changedPreferences.has('clockFormat')) {
                 renderClockFormat(settings.clockFormat);
             }
+            if (!changedPreferences.has('accentColor')) {
+                renderAccentColor(settings.accentColor);
+            }
         } catch (error) {
             console.warn('Unable to load preferences. Keeping the current appearance.', error);
         }
@@ -229,10 +247,25 @@ window.App.SettingsPanel = (function () {
         });
     }
 
+    function renderAccentColor(value) {
+        const color = window.App.AccentColor.normalize(value);
+        document.getElementById('color-accent').value =
+            color || window.App.AccentColor.DEFAULT_COLOR;
+        document.getElementById('reset-accent-color').hidden = color === null;
+    }
+
+    function changeAccentColor(value) {
+        const color = window.App.AccentColor.normalize(value);
+        changedPreferences.add('accentColor');
+        window.App.AccentColor.apply(color);
+        renderAccentColor(color);
+        window.App.Settings.set('accentColor', color);
+    }
+
     function applyColor(direction, value) {
         const fallback = direction === 'up' ? DEFAULT_UP_COLOR : DEFAULT_DOWN_COLOR;
-        const color = /^#[\da-f]{6}$/i.test(value) ? value : fallback;
-        const usesThemeColor = direction === 'up' && color.toLowerCase() === DEFAULT_UP_COLOR;
+        const color = /^#[\da-f]{6}$/i.test(value) ? value.toLowerCase() : fallback;
+        const usesThemeColor = direction === 'up' && color === DEFAULT_UP_COLOR;
         const root = document.documentElement;
 
         if (direction === 'up') {
@@ -245,10 +278,11 @@ window.App.SettingsPanel = (function () {
             root.style.setProperty(`--color-${direction}`, color);
         }
 
-        const displayedColor = usesThemeColor
-            ? getComputedStyle(root).getPropertyValue('--positive-color').trim()
-            : color;
+        const defaultColor = getDefaultPriceColor(direction);
+        const displayedColor = usesThemeColor ? defaultColor : color;
         document.getElementById(`color-${direction}`).value = displayedColor;
+        document.getElementById(`reset-${direction}-color`).hidden =
+            displayedColor === defaultColor;
     }
 
     return {

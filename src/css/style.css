@@ -94,8 +94,8 @@ small {
     text-decoration: underline;
 }
 .btn.active {
-    color: #fff;
-    background: #4f78e2;
+    color: var(--accent-text-color);
+    background: var(--accent-color);
 }
 
 .positive {
@@ -376,9 +376,8 @@ small {
     z-index: 1000;
     padding: 8px 12px;
     min-width: 120px;
-    background-color: var(--theme-color);
-    background-color: rgba(79, 120, 226, 0.85);
-    color: #fff;
+    background-color: var(--accent-tooltip-bg, rgba(79, 120, 226, 0.85));
+    color: var(--tooltip-text-color);
     content: attr(data-tooltip);
     font-size: 12px;
     line-height: 1.2;
@@ -402,8 +401,7 @@ small {
 .tooltip-top:before {
     margin-left: -6px;
     margin-bottom: -12px;
-    border-top-color: var(--theme-color);
-    border-top-color: rgba(79, 120, 226, 0.85);
+    border-top-color: var(--accent-tooltip-bg, rgba(79, 120, 226, 0.85));
 }
 
 /* Horizontally align top/bottom tooltips */
@@ -443,8 +441,7 @@ small {
     margin-right: -12px;
     margin-bottom: 0;
     border-top-color: transparent;
-    border-left-color: var(--theme-color);
-    border-left-color: rgba(79, 120, 226, 0.85);
+    border-left-color: var(--accent-tooltip-bg, rgba(79, 120, 226, 0.85));
 }
 
 .tooltip-left:hover:before,
@@ -468,8 +465,7 @@ small {
     margin-top: -12px;
     margin-bottom: 0;
     border-top-color: transparent;
-    border-bottom-color: var(--theme-color);
-    border-bottom-color: rgba(79, 120, 226, 0.85);
+    border-bottom-color: var(--accent-tooltip-bg, rgba(79, 120, 226, 0.85));
 }
 
 .tooltip-bottom:hover:before,
@@ -492,8 +488,7 @@ small {
     margin-bottom: 0;
     margin-left: -12px;
     border-top-color: transparent;
-    border-right-color: var(--theme-color);
-    border-right-color: rgba(79, 120, 226, 0.85);
+    border-right-color: var(--accent-tooltip-bg, rgba(79, 120, 226, 0.85));
 }
 
 .tooltip-right:hover:before,
@@ -561,7 +556,7 @@ small {
 }
 #open-about:hover svg,
 #open-about:focus-visible svg {
-    color: #4f78e2;
+    color: var(--accent-color);
 }
 .footer-action:hover,
 .footer-action:focus-visible {
@@ -1243,22 +1238,32 @@ small {
     }
 }
 
-.price-color-options {
+.color-options {
     display: flex;
     flex-direction: column;
     gap: 8px;
 }
-.price-color-row {
+.color-row {
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto auto;
     align-items: center;
-    gap: 12px;
+    column-gap: 12px;
+    row-gap: 4px;
     padding: 6px 10px 6px 12px;
     border: 1px solid var(--border-color);
     border-radius: 8px;
     background: var(--input-bg);
 }
-.settings .price-color-label {
+.color-row > .color-control {
+    grid-column: 3;
+}
+.color-label-group {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    column-gap: 6px;
+}
+.settings .color-label {
     color: var(--text-color);
     font-weight: normal;
     line-height: 1.4;
@@ -1298,6 +1303,9 @@ small {
 }
 .color-control-down .color-swatch {
     background: var(--color-down, var(--negative-color));
+}
+.color-control-accent .color-swatch {
+    background: var(--accent-input-color, #4f78e2);
 }
 .color-control input[type='color'] {
     box-sizing: border-box;
@@ -1491,20 +1499,27 @@ body.about-open {
     border-radius: 2px;
 }
 
-.reset-colors {
-    margin-top: 6px;
-    padding: 6px 0;
+.reset-color {
+    padding: 4px 0;
     border: 0;
     border-radius: 2px;
     background: none;
     color: var(--text-color-secondary);
     font: inherit;
+    font-size: 12px;
+    white-space: nowrap;
     text-decoration: underline;
     text-underline-offset: 3px;
     cursor: pointer;
     touch-action: manipulation;
 }
-.reset-colors:hover {
+.reset-color::before {
+    display: inline-block;
+    margin-right: 6px;
+    content: '·';
+    text-decoration: none;
+}
+.reset-color:hover {
     color: var(--text-color);
 }
 .apply-button {
@@ -1600,7 +1615,7 @@ body.about-open {
     }
     .token-option,
     .token-request-link,
-    .reset-colors,
+    .reset-color,
     .about-links a,
     .contributors a {
         min-height: 44px;
@@ -1640,8 +1655,8 @@ body.about-open {
     .segmented-option span {
         line-height: 44px;
     }
-    .price-color-row {
-        gap: 8px;
+    .color-row {
+        column-gap: 8px;
     }
     .color-control {
         height: 44px;

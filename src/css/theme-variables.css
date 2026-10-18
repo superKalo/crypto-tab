@@ -23,6 +23,8 @@
     --light-chart-line-color: #b0c4f6;
     --light-chart-point-color: #4f78e2;
     --light-chart-label-color: #777;
+    --light-accent-color: #4f78e2;
+    --light-accent-text-color: #fff;
 
     /* Dark theme values */
     --dark-theme-color: #fff;
@@ -47,6 +49,8 @@
     --dark-chart-line-color: #52678f;
     --dark-chart-point-color: #6f8bc2;
     --dark-chart-label-color: #888;
+    --dark-accent-color: #4f78e2;
+    --dark-accent-text-color: #fff;
 
     /* Shared colors (same in both themes) */
     --negative-color: #ff4949;
@@ -74,6 +78,8 @@
     --chart-line-color: var(--light-chart-line-color);
     --chart-point-color: var(--light-chart-point-color);
     --chart-label-color: var(--light-chart-label-color);
+    --accent-color: var(--light-accent-color);
+    --accent-text-color: var(--light-accent-text-color);
 }
 
 /* System Dark Theme Preference */
@@ -101,6 +107,8 @@
         --chart-line-color: var(--dark-chart-line-color);
         --chart-point-color: var(--dark-chart-point-color);
         --chart-label-color: var(--dark-chart-label-color);
+        --accent-color: var(--dark-accent-color);
+        --accent-text-color: var(--dark-accent-text-color);
     }
 }
 
@@ -128,6 +136,8 @@
     --chart-line-color: var(--light-chart-line-color);
     --chart-point-color: var(--light-chart-point-color);
     --chart-label-color: var(--light-chart-label-color);
+    --accent-color: var(--light-accent-color);
+    --accent-text-color: var(--light-accent-text-color);
 }
 
 /* Dark Theme Override */
@@ -154,4 +164,6 @@
     --chart-line-color: var(--dark-chart-line-color);
     --chart-point-color: var(--dark-chart-point-color);
     --chart-label-color: var(--dark-chart-label-color);
+    --accent-color: var(--dark-accent-color);
+    --accent-text-color: var(--dark-accent-text-color);
 }
