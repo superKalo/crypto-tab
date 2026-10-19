@@ -390,8 +390,7 @@
             </h3>
             <div class="settings-choice language-setting">
               <label for="language-select" data-i18n="ui.language">Language</label>
-              <select id="language-select" name="language">
-                <option value="system" data-i18n="ui.languageSystem">System</option>
+              <select id="language-select" name="language" translate="no">
                 <option value="en" lang="en">English</option>
                 <option value="pt-BR" lang="pt-BR">Português (Brasil)</option>
                 <option value="pt-PT" lang="pt-PT">Português (Portugal)</option>
@@ -400,6 +399,23 @@
                 <option value="id" lang="id">Bahasa Indonesia</option>
                 <option value="bg" lang="bg">Български</option>
               </select>
+              <p
+                id="language-browser-default"
+                class="language-browser-default"
+                data-i18n="ui.languageBrowserDefault"
+                hidden
+              >
+                Browser default
+              </p>
+              <button
+                id="language-use-browser"
+                class="language-use-browser"
+                type="button"
+                data-i18n="ui.languageUseBrowser"
+                hidden
+              >
+                Use browser language
+              </button>
             </div>
             <fieldset id="theme-toggle" class="settings-choice">
               <legend data-i18n="ui.theme">Theme</legend>

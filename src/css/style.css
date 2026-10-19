@@ -1203,6 +1203,28 @@ small {
     color: var(--text-color);
     font: inherit;
 }
+.language-browser-default,
+.language-use-browser {
+    margin-top: 6px;
+    color: var(--text-color-secondary);
+    font-size: 12px;
+    line-height: 1.5;
+}
+.language-use-browser {
+    padding: 4px 0;
+    border: 0;
+    border-radius: 2px;
+    background: none;
+    font-family: inherit;
+    text-align: left;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    cursor: pointer;
+    touch-action: manipulation;
+}
+.language-use-browser:hover {
+    color: var(--text-color);
+}
 .settings-choice legend {
     margin-bottom: 12px;
     font-weight: bold;
@@ -1639,6 +1661,7 @@ body.about-open {
     }
     .token-option,
     .token-request-link,
+    .language-use-browser,
     .reset-color,
     .about-links a,
     .contributors a {
@@ -1659,6 +1682,10 @@ body.about-open {
     .settings-body {
         padding: 16px;
         overscroll-behavior: contain;
+    }
+    .language-setting select {
+        min-height: 44px;
+        font-size: 16px;
     }
     .close-button,
     .about-header .close-button,

@@ -108,21 +108,49 @@ window.App.SettingsPanel = (function () {
         });
 
         const languageSelect = document.getElementById('language-select');
-        languageSelect.value = App.I18n.preference;
-        document.querySelectorAll('.price-color-preview').forEach((preview, index) => {
-            preview.textContent = App.Utils.formatPercent(index === 0 ? 2.5 : -2.5);
-        });
-        languageSelect.addEventListener('change', async () => {
-            const language = App.I18n.normalizePreference(languageSelect.value);
+        const languageBrowserDefault = document.getElementById('language-browser-default');
+        const languageUseBrowser = document.getElementById('language-use-browser');
+
+        function renderLanguagePreference() {
+            const followsBrowser = App.I18n.preference === 'system';
+            languageSelect.value = App.I18n.locale;
+            languageBrowserDefault.hidden = !followsBrowser;
+            languageUseBrowser.hidden = followsBrowser;
+            if (followsBrowser) {
+                languageSelect.setAttribute('aria-describedby', languageBrowserDefault.id);
+            } else {
+                languageSelect.removeAttribute('aria-describedby');
+            }
+        }
+
+        async function saveLanguagePreference(preference, control) {
+            if (languageSelect.disabled) {
+                return;
+            }
+            const language = App.I18n.normalizePreference(preference);
             languageSelect.disabled = true;
+            languageUseBrowser.disabled = true;
             const saved = await App.Settings.set('language', language);
             if (saved) {
                 App.I18n.reload();
             } else {
-                languageSelect.value = App.I18n.preference;
+                renderLanguagePreference();
                 languageSelect.disabled = false;
+                languageUseBrowser.disabled = false;
+                control.focus();
                 App.Message.fireError(App.I18n.t('errors.languageSave'));
             }
+        }
+
+        renderLanguagePreference();
+        document.querySelectorAll('.price-color-preview').forEach((preview, index) => {
+            preview.textContent = App.Utils.formatPercent(index === 0 ? 2.5 : -2.5);
+        });
+        languageSelect.addEventListener('change', () => {
+            saveLanguagePreference(languageSelect.value, languageSelect);
+        });
+        languageUseBrowser.addEventListener('click', () => {
+            saveLanguagePreference('system', languageUseBrowser);
         });
 
         ['up', 'down'].forEach((direction) => {
