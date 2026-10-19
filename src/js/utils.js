@@ -2,7 +2,11 @@ window.App = window.App || {};
 
 window.App.Utils = (function () {
     const priceFormatters = new Map();
-    const percentFormatters = new Map();
+    const percentFormatter = new Intl.NumberFormat('en-US', {
+        style: 'percent',
+        signDisplay: 'exceptZero',
+        maximumFractionDigits: 10,
+    });
 
     return {
         formatPrice(price, tokenId) {
@@ -32,19 +36,7 @@ window.App.Utils = (function () {
         },
 
         formatPercent(value) {
-            const locale = App.I18n.locale;
-            if (!percentFormatters.has(locale)) {
-                percentFormatters.set(
-                    locale,
-                    new Intl.NumberFormat(locale, {
-                        style: 'percent',
-                        signDisplay: 'exceptZero',
-                        maximumFractionDigits: 10,
-                    })
-                );
-            }
-
-            return percentFormatters.get(locale).format(value / 100);
+            return percentFormatter.format(value / 100);
         },
     };
 })();
