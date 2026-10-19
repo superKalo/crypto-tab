@@ -2,7 +2,7 @@
   "name": "Crypto Tab",
   "description": "__MSG_extensionDescription__",
   "default_locale": "en",
-  "version": "2.2.0",
+  "version": "2.3.0",
   "browser_specific_settings": {
     "gecko": {
       "id": "{904ad0ba-0f9e-4b2d-a868-a467138ba9df}",
