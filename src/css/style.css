@@ -262,10 +262,11 @@ small {
 }
 
 .install {
-    width: 320px;
+    width: max-content;
+    min-width: min(320px, 100%);
     max-width: 100%;
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     gap: 10px;
     flex-shrink: 0;
 }
@@ -1716,5 +1717,16 @@ body.about-open {
         flex: 1;
         min-height: 0;
         padding-top: 24px;
+    }
+}
+
+@media (max-width: 480px) {
+    .install__link {
+        flex-basis: auto;
+        min-width: 0;
+    }
+    .install_title {
+        min-width: 0;
+        white-space: normal;
     }
 }
