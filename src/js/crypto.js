@@ -143,7 +143,7 @@ window.App.Crypto = {
         this.chart.destroy();
         this.setRepositoryStatus(cryptoType, 'NOW', null);
         this.$priceNow.textContent = App.I18n.t('price.loading');
-        this.renderPriceHeading();
+        this.renderPriceHeading('price.headingLoading');
         this.$priceNow.removeAttribute('aria-label');
         this.$change.textContent = '';
         this.updateCryptoTypeLabel();
@@ -180,7 +180,7 @@ window.App.Crypto = {
         if (tokenChanged) {
             this.setRepositoryStatus(cryptoType, 'NOW', null);
             this.$priceNow.textContent = App.I18n.t('price.loading');
-            this.renderPriceHeading();
+            this.renderPriceHeading('price.headingLoading');
             this.$priceNow.removeAttribute('aria-label');
             this.updateCryptoTypeLabel();
         }
@@ -288,7 +288,7 @@ window.App.Crypto = {
             'aria-label',
             App.I18n.t('token.changeLabel', { name: token.displayName, symbol: token.symbol })
         );
-        this.renderPriceHeading();
+        this.renderPriceHeading(this.priceHeadingKey || 'price.headingLoading');
         this.tokenPicker?.renderSelected(this.currentCrypto);
         App.SettingsPanel?.renderSelectedToken(this.currentCrypto);
     },
