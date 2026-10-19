@@ -16,13 +16,10 @@ window.App.Utils = (function () {
                 App.CryptoTokens.getToken(tokenId)?.priceFractionDigits ?? 8,
                 numericPrice > 0 && numericPrice < 1 ? 2 : 0
             );
-            const locale = App.I18n.locale;
-            const formatterKey = `${locale}:${fractionDigits}`;
-
-            if (!priceFormatters.has(formatterKey)) {
+            if (!priceFormatters.has(fractionDigits)) {
                 priceFormatters.set(
-                    formatterKey,
-                    new Intl.NumberFormat(locale, {
+                    fractionDigits,
+                    new Intl.NumberFormat('en-US', {
                         style: 'currency',
                         currency: 'USD',
                         minimumFractionDigits: 0,
@@ -31,7 +28,7 @@ window.App.Utils = (function () {
                 );
             }
 
-            return priceFormatters.get(formatterKey).format(numericPrice);
+            return priceFormatters.get(fractionDigits).format(numericPrice);
         },
 
         formatPercent(value) {
