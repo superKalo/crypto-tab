@@ -1299,7 +1299,16 @@ small {
         background-color 0.2s;
 }
 #clock-format .segmented-option {
-    flex-basis: auto;
+    display: flex;
+}
+#clock-format .segmented-option span {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    justify-content: center;
+    min-height: 29px;
+    line-height: 1.3;
+    white-space: normal;
 }
 .segmented-option input:checked + span {
     color: var(--toggle-active-color);
@@ -1742,6 +1751,9 @@ body.about-open {
     }
     .segmented-option span {
         line-height: 44px;
+    }
+    #clock-format .segmented-option span {
+        min-height: 44px;
     }
     .color-row {
         column-gap: 8px;
