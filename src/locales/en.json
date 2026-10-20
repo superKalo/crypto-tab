@@ -35,7 +35,7 @@
   "ui.clock24": "24h",
   "ui.clock12": "12h (AM/PM)",
   "ui.colors": "Colors",
-  "ui.accentColor": "Accent color",
+  "ui.accentColor": "Accent",
   "ui.priceIncrease": "Price increase",
   "ui.priceDecrease": "Price decrease",
   "ui.about": "About",
