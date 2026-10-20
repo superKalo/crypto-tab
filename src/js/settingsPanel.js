@@ -26,11 +26,15 @@ window.App.SettingsPanel = (function () {
             .getElementById('selected-token')
             .replaceChildren(window.App.TokenPicker.createIdentity(token));
         tokenPickerControl.renderSelected(tokenId);
-        document.getElementById('token-description').textContent = token.description;
+        document.getElementById('token-description').textContent = App.I18n.t(
+            `token.description.${tokenId}`
+        );
 
         const link = document.getElementById('token-coingecko-link');
         link.href = token.coinGeckoUrl;
-        const linkLabel = `View ${token.selectionName || token.displayName} on CoinGecko (opens in a new tab)`;
+        const linkLabel = App.I18n.t('token.viewOnCoinGecko', {
+            token: token.selectionName || token.displayName,
+        });
         link.setAttribute('aria-label', linkLabel);
         link.title = linkLabel;
     }
@@ -101,6 +105,52 @@ window.App.SettingsPanel = (function () {
             const newFormat = window.App.Clock.normalizeFormat(e.target.value);
             window.App.Settings.set('clockFormat', newFormat);
             window.App.Clock.updateFormat(newFormat);
+        });
+
+        const languageSelect = document.getElementById('language-select');
+        const languageBrowserDefault = document.getElementById('language-browser-default');
+        const languageUseBrowser = document.getElementById('language-use-browser');
+
+        function renderLanguagePreference() {
+            const followsBrowser = App.I18n.preference === 'system';
+            languageSelect.value = App.I18n.locale;
+            languageBrowserDefault.hidden = !followsBrowser;
+            languageUseBrowser.hidden = followsBrowser;
+            if (followsBrowser) {
+                languageSelect.setAttribute('aria-describedby', languageBrowserDefault.id);
+            } else {
+                languageSelect.removeAttribute('aria-describedby');
+            }
+        }
+
+        async function saveLanguagePreference(preference, control) {
+            if (languageSelect.disabled) {
+                return;
+            }
+            const language = App.I18n.normalizePreference(preference);
+            languageSelect.disabled = true;
+            languageUseBrowser.disabled = true;
+            const saved = await App.Settings.set('language', language);
+            if (saved) {
+                App.I18n.reload();
+            } else {
+                renderLanguagePreference();
+                languageSelect.disabled = false;
+                languageUseBrowser.disabled = false;
+                control.focus();
+                App.Message.fireError(App.I18n.t('errors.languageSave'));
+            }
+        }
+
+        renderLanguagePreference();
+        document.querySelectorAll('.price-color-preview').forEach((preview, index) => {
+            preview.textContent = App.Utils.formatPercent(index === 0 ? 2.5 : -2.5);
+        });
+        languageSelect.addEventListener('change', () => {
+            saveLanguagePreference(languageSelect.value, languageSelect);
+        });
+        languageUseBrowser.addEventListener('click', () => {
+            saveLanguagePreference('system', languageUseBrowser);
         });
 
         ['up', 'down'].forEach((direction) => {
@@ -291,6 +341,6 @@ window.App.SettingsPanel = (function () {
     };
 })();
 
-document.addEventListener('DOMContentLoaded', () => {
+App.I18n.ready.then(() => {
     window.App.SettingsPanel.init();
 });

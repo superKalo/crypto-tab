@@ -302,3 +302,6 @@ button:disabled {
         font-size: 29px;
     }
 }
+html.i18n-pending [data-i18n] {
+    visibility: hidden;
+}

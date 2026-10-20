@@ -153,5 +153,6 @@ window.App.Clock = {
 
 // Render before the deferred chart scripts load; the clock has no chart dependencies.
 window.App.Clock.init().catch((error) => {
-    window.App.Message.fireError(`Unable to initialize the clock. ${error.message}`);
+    console.error('Unable to initialize the clock.', error);
+    App.I18n.ready.then(() => window.App.Message.fireError(App.I18n.t('errors.clock')));
 });

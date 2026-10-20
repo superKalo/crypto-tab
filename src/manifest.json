@@ -1,6 +1,7 @@
 {
   "name": "Crypto Tab",
-  "description": "Replace your New Tab page with crypto prices, charts, and a clock. Follow Bitcoin, Ether, and more in USD.",
+  "description": "__MSG_extensionDescription__",
+  "default_locale": "en",
   "version": "2.3.0",
   "browser_specific_settings": {
     "gecko": {

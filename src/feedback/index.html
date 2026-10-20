@@ -6,10 +6,13 @@
     <meta name="robots" content="noindex, nofollow" />
     <meta name="referrer" content="origin" />
     <meta name="color-scheme" content="light dark" />
-    <title>Help me improve · Crypto Tab</title>
+    <title data-i18n="feedback.pageTitle">Help me improve · Crypto Tab</title>
     <link rel="icon" type="image/svg+xml" href="../img/logo.svg" />
     <link rel="stylesheet" href="../css/theme-variables.css" />
     <link rel="stylesheet" href="feedback.css" />
+    <script defer src="../js/localeConfig.js"></script>
+    <script defer src="../js/localeCatalogs.js"></script>
+    <script defer src="../js/i18n.js"></script>
     <script defer src="feedback.js"></script>
   </head>
   <body class="feedback-page">
@@ -18,44 +21,57 @@
         <img src="../img/contributors/superkalo.webp" alt="" width="40" height="40" />
         <p>
           <span class="author-name">Kalo</span>
-          <span class="author-role">Maker of Crypto Tab</span>
+          <span class="author-role" data-i18n="feedback.authorRole">Maker of Crypto Tab</span>
         </p>
       </div>
 
       <section id="feedback-content" aria-labelledby="feedback-title">
-        <h1 id="feedback-title">Help me improve Crypto Tab</h1>
-        <p class="intro">Thanks for giving it a try. What made you uninstall?</p>
+        <h1 id="feedback-title" data-i18n="feedback.title">Help me improve Crypto Tab</h1>
+        <p class="intro" data-i18n="feedback.intro">
+          Thanks for giving it a try. What made you uninstall?
+        </p>
 
         <form id="feedback-form" action="https://api.web3forms.com/submit" method="post">
           <fieldset id="feedback-fields">
-            <legend class="visually-hidden">What was the main reason?</legend>
+            <legend class="visually-hidden" data-i18n="feedback.mainReason">
+              What was the main reason?
+            </legend>
             <div class="reasons">
               <label class="reason">
                 <input type="radio" name="reason" value="default-new-tab" required />
-                <span>I prefer the default New Tab page.</span>
+                <span data-i18n="feedback.reason.defaultNewTab"
+                  >I prefer the default New Tab page.</span
+                >
               </label>
               <label class="reason">
                 <input type="radio" name="reason" value="another-new-tab" required />
-                <span>I prefer another New Tab extension.</span>
+                <span data-i18n="feedback.reason.anotherNewTab"
+                  >I prefer another New Tab extension.</span
+                >
               </label>
               <div id="alternative-fields" class="follow-up" hidden>
-                <label for="alternative">Which one? <span class="optional">(optional)</span></label>
+                <label for="alternative"
+                  ><span data-i18n="feedback.whichAlternative">Which one?</span>
+                  <span class="optional" data-i18n="feedback.optional">(optional)</span></label
+                >
                 <select id="alternative" name="alternative" disabled>
-                  <option value="">Please choose</option>
+                  <option value="" data-i18n="feedback.choose">Please choose</option>
                   <option value="Momentum">Momentum</option>
                   <option value="Bonjourr">Bonjourr</option>
                   <option value="Tabliss">Tabliss</option>
-                  <option value="Other">Other</option>
+                  <option value="Other" data-i18n="feedback.other">Other</option>
                 </select>
                 <div id="alternative-other-field" class="extra-field" hidden>
                   <label for="alternative-other">
-                    Which extension? <span class="optional">(optional)</span>
+                    <span data-i18n="feedback.whichExtension">Which extension?</span>
+                    <span class="optional" data-i18n="feedback.optional">(optional)</span>
                   </label>
                   <input
                     id="alternative-other"
                     name="alternative_other"
                     type="text"
                     placeholder="Extension name"
+                    data-i18n-placeholder="feedback.extensionPlaceholder"
                     maxlength="120"
                     disabled
                   />
@@ -63,49 +79,67 @@
               </div>
               <label class="reason">
                 <input type="radio" name="reason" value="missing-cryptocurrency" required />
-                <span>A cryptocurrency I want is missing.</span>
+                <span data-i18n="feedback.reason.missingCryptocurrency"
+                  >A cryptocurrency I want is missing.</span
+                >
               </label>
               <div id="cryptocurrency-field" class="follow-up" hidden>
                 <label for="cryptocurrency">
-                  Which cryptocurrency? <span class="optional">(optional)</span>
+                  <span data-i18n="feedback.whichCryptocurrency">Which cryptocurrency?</span>
+                  <span class="optional" data-i18n="feedback.optional">(optional)</span>
                 </label>
                 <input
                   id="cryptocurrency"
                   name="cryptocurrency"
                   type="text"
                   placeholder="Name or ticker"
+                  data-i18n-placeholder="feedback.cryptocurrencyPlaceholder"
                   maxlength="120"
                   disabled
                 />
               </div>
               <label class="reason">
                 <input type="radio" name="reason" value="design-customization" required />
-                <span>The design or customization wasn't for me.</span>
+                <span data-i18n="feedback.reason.designCustomization"
+                  >The design or customization wasn't for me.</span
+                >
               </label>
               <label class="reason">
                 <input type="radio" name="reason" value="other" required />
-                <span>Other</span>
+                <span data-i18n="feedback.other">Other</span>
               </label>
             </div>
 
             <details id="message-details" class="message-field">
-              <summary>Add a note <span class="optional">(optional)</span></summary>
-              <label for="message" class="visually-hidden">Your note (optional)</label>
+              <summary>
+                <span data-i18n="feedback.addNote">Add a note</span>
+                <span class="optional" data-i18n="feedback.optional">(optional)</span>
+              </summary>
+              <label for="message" class="visually-hidden" data-i18n="feedback.noteLabel"
+                >Your note (optional)</label
+              >
               <textarea
                 id="message"
                 name="message"
                 rows="2"
                 maxlength="2000"
                 placeholder="What could I do better?"
+                data-i18n-placeholder="feedback.notePlaceholder"
               ></textarea>
             </details>
 
             <label class="reply-choice">
               <input id="reply-requested" type="checkbox" aria-controls="email-field" />
-              <span>I'm open to a reply <span class="optional">(optional)</span></span>
+              <span
+                ><span data-i18n="feedback.replyChoice">I'm open to a reply</span>
+                <span class="optional" data-i18n="feedback.optional">(optional)</span></span
+              >
             </label>
             <div id="email-field" class="extra-field" hidden>
-              <label for="email">Email address <span class="optional">(optional)</span></label>
+              <label for="email"
+                ><span data-i18n="feedback.email">Email address</span>
+                <span class="optional" data-i18n="feedback.optional">(optional)</span></label
+              >
               <input
                 id="email"
                 name="email"
@@ -115,7 +149,9 @@
                 aria-describedby="email-note"
                 disabled
               />
-              <p id="email-note" class="field-note">I'll only use it to reply to your feedback.</p>
+              <p id="email-note" class="field-note" data-i18n="feedback.emailNote">
+                I'll only use it to reply to your feedback.
+              </p>
             </div>
 
             <input
@@ -128,7 +164,9 @@
             />
           </fieldset>
 
-          <button id="send-feedback" type="submit" disabled>Send feedback</button>
+          <button id="send-feedback" type="submit" disabled data-i18n="feedback.send">
+            Send feedback
+          </button>
           <p id="feedback-status" class="status" role="status" aria-live="polite"></p>
         </form>
         <noscript>
@@ -140,14 +178,18 @@
       </section>
 
       <section id="feedback-success" aria-labelledby="success-title" hidden>
-        <h1 id="success-title" tabindex="-1">Thanks for sharing.</h1>
-        <p class="intro">I appreciate your feedback 🙏</p>
+        <h1 id="success-title" tabindex="-1" data-i18n="feedback.successTitle">
+          Thanks for sharing.
+        </h1>
+        <p class="intro" data-i18n="feedback.successMessage">I appreciate your feedback 🙏</p>
       </section>
     </main>
     <footer class="page-footer">
       <p class="privacy-note">
-        Your feedback goes straight to me via Web3Forms.
-        <a href="privacy.html">Feedback privacy</a>
+        <span data-i18n="feedback.privacyNote"
+          >Your feedback goes straight to me via Web3Forms.</span
+        >
+        <a href="privacy.html" data-i18n="feedback.privacyLink">Feedback privacy (English)</a>
       </p>
     </footer>
   </body>
