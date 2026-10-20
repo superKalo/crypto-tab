@@ -103,6 +103,7 @@
   "metadata.newTabTitle": "Нов раздел",
   "ui.language": "Език",
   "ui.languageBrowserDefault": "От браузъра",
+  "ui.languageReset": "Възстанови по подразбиране",
   "ui.languageUseBrowser": "Използвай езика на браузъра",
   "errors.languageSave": "Избраният език не можа да бъде запазен. Опитай отново.",
   "price.heading": "{token} се търгува за {price}",

@@ -103,6 +103,7 @@
   "metadata.newTabTitle": "Novo separador",
   "ui.language": "Idioma",
   "ui.languageBrowserDefault": "Predefinição do navegador",
+  "ui.languageReset": "Repor predefinição do navegador",
   "ui.languageUseBrowser": "Usar o idioma do navegador",
   "errors.languageSave": "Não foi possível guardar a sua preferência de idioma. Tente novamente.",
   "price.heading": "{token} está cotado a {price}",

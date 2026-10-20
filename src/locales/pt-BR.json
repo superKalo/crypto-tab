@@ -103,6 +103,7 @@
   "metadata.newTabTitle": "Nova guia",
   "ui.language": "Idioma",
   "ui.languageBrowserDefault": "Padrão do navegador",
+  "ui.languageReset": "Restaurar padrão do navegador",
   "ui.languageUseBrowser": "Usar o idioma do navegador",
   "errors.languageSave": "Não foi possível salvar sua preferência de idioma. Tente novamente.",
   "price.heading": "{token} está cotado a {price}",

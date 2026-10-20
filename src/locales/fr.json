@@ -103,6 +103,7 @@
   "metadata.newTabTitle": "Nouvel onglet",
   "ui.language": "Langue",
   "ui.languageBrowserDefault": "Langue du navigateur",
+  "ui.languageReset": "Rétablir la langue du navigateur",
   "ui.languageUseBrowser": "Utiliser la langue du navigateur",
   "errors.languageSave": "Impossible d’enregistrer votre choix de langue. Veuillez réessayer.",
   "price.heading": "{token} s’échange à {price}",

@@ -103,6 +103,7 @@
   "metadata.newTabTitle": "Nueva pestaña",
   "ui.language": "Idioma",
   "ui.languageBrowserDefault": "Predeterminado del navegador",
+  "ui.languageReset": "Restablecer idioma del navegador",
   "ui.languageUseBrowser": "Usar el idioma del navegador",
   "errors.languageSave": "No se pudo guardar tu preferencia de idioma. Inténtalo de nuevo.",
   "price.heading": "{token} cotiza a {price}",

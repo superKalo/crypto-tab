@@ -389,33 +389,54 @@
               Appearance
             </h3>
             <div class="settings-choice language-setting">
-              <label for="language-select" data-i18n="ui.language">Language</label>
-              <select id="language-select" name="language" translate="no">
-                <option value="en" lang="en">English</option>
-                <option value="pt-BR" lang="pt-BR">Português (Brasil)</option>
-                <option value="pt-PT" lang="pt-PT">Português (Portugal)</option>
-                <option value="es" lang="es">Español</option>
-                <option value="fr" lang="fr">Français</option>
-                <option value="id" lang="id">Bahasa Indonesia</option>
-                <option value="bg" lang="bg">Български</option>
-              </select>
-              <p
-                id="language-browser-default"
-                class="language-browser-default"
-                data-i18n="ui.languageBrowserDefault"
-                hidden
-              >
-                Browser default
-              </p>
-              <button
-                id="language-use-browser"
-                class="language-use-browser"
-                type="button"
-                data-i18n="ui.languageUseBrowser"
-                hidden
-              >
-                Use browser language
-              </button>
+              <div class="language-setting-heading">
+                <label for="language-select" data-i18n="ui.language">Language</label>
+                <span
+                  id="language-browser-default"
+                  class="language-browser-default"
+                  data-i18n="ui.languageBrowserDefault"
+                  hidden
+                >
+                  Browser default
+                </span>
+                <button
+                  id="language-use-browser"
+                  class="language-use-browser"
+                  type="button"
+                  title="Use browser language"
+                  data-i18n="ui.languageReset"
+                  data-i18n-title="ui.languageUseBrowser"
+                  hidden
+                >
+                  Reset to browser default
+                </button>
+              </div>
+              <div class="language-select-control">
+                <select id="language-select" name="language" translate="no">
+                  <option value="en" lang="en">English</option>
+                  <option value="pt-BR" lang="pt-BR">Português (Brasil)</option>
+                  <option value="pt-PT" lang="pt-PT">Português (Portugal)</option>
+                  <option value="es" lang="es">Español</option>
+                  <option value="fr" lang="fr">Français</option>
+                  <option value="id" lang="id">Bahasa Indonesia</option>
+                  <option value="bg" lang="bg">Български</option>
+                </select>
+                <svg
+                  class="language-select-chevron"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                  focusable="false"
+                >
+                  <path d="m6 9 6 6 6-6" />
+                </svg>
+              </div>
             </div>
             <fieldset id="theme-toggle" class="settings-choice">
               <legend data-i18n="ui.theme">Theme</legend>

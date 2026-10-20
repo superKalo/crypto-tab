@@ -103,6 +103,7 @@
   "metadata.newTabTitle": "Tab Baru",
   "ui.language": "Bahasa",
   "ui.languageBrowserDefault": "Bahasa browser",
+  "ui.languageReset": "Pulihkan bahasa browser",
   "ui.languageUseBrowser": "Gunakan bahasa browser",
   "errors.languageSave": "Pilihan bahasa Anda belum tersimpan. Silakan coba lagi.",
   "price.heading": "{token} diperdagangkan pada harga {price}",

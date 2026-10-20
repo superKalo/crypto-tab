@@ -1189,23 +1189,58 @@ small {
 .settings-choice {
     min-width: 0;
 }
-.language-setting label {
-    margin-bottom: 12px;
+.language-setting-heading {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 4px 8px;
+    min-height: 26px;
+    margin-bottom: 8px;
+}
+.language-select-control {
+    position: relative;
 }
 .language-setting select {
+    -webkit-appearance: none;
+    appearance: none;
     box-sizing: border-box;
+    display: block;
     width: 100%;
-    min-height: 36px;
-    padding: 6px 10px;
-    border: 1px solid var(--input-border-color);
-    border-radius: 6px;
-    background: var(--background-color);
+    min-height: 44px;
+    padding: 10px 40px 10px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    background: var(--input-bg);
     color: var(--text-color);
     font: inherit;
+    line-height: 1.4;
+    cursor: pointer;
+    touch-action: manipulation;
+}
+.language-setting select:hover {
+    border-color: var(--toggle-inactive-color);
+}
+.language-setting select:focus-visible {
+    border-color: var(--theme-color);
+}
+.language-setting select:disabled {
+    opacity: 0.6;
+    cursor: wait;
+}
+.language-select-chevron {
+    position: absolute;
+    top: 50%;
+    right: 14px;
+    transform: translateY(-50%);
+    color: var(--text-color-secondary);
+    pointer-events: none;
+}
+.language-setting select:disabled + .language-select-chevron {
+    opacity: 0.6;
 }
 .language-browser-default,
 .language-use-browser {
-    margin-top: 6px;
     color: var(--text-color-secondary);
     font-size: 12px;
     line-height: 1.5;
@@ -1686,6 +1721,9 @@ body.about-open {
     .language-setting select {
         min-height: 44px;
         font-size: 16px;
+    }
+    .language-setting-heading {
+        min-height: 44px;
     }
     .close-button,
     .about-header .close-button,
