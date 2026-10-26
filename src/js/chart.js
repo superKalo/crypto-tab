@@ -175,10 +175,10 @@ window.App.Chart.prototype.formatTickLabel = function (label) {
         .join('');
 };
 
-window.App.Chart.prototype.getDateFormatter = function (options) {
-    const key = `${App.I18n.locale}:${JSON.stringify(options)}`;
+window.App.Chart.prototype.getDateFormatter = function (options, locale = App.I18n.locale) {
+    const key = `${locale}:${JSON.stringify(options)}`;
     if (!this.dateFormatters.has(key)) {
-        this.dateFormatters.set(key, new Intl.DateTimeFormat(App.I18n.locale, options));
+        this.dateFormatters.set(key, new Intl.DateTimeFormat(locale, options));
     }
 
     return this.dateFormatters.get(key);
@@ -215,7 +215,8 @@ window.App.Chart.prototype.getTickLabelParts = function (label) {
         options.minute = '2-digit';
     }
 
-    return this.getDateFormatter(options)
+    // Keep 12-hour labels consistent, including AM/PM, separators, and their placement.
+    return this.getDateFormatter(options, is12Hour ? 'en-US' : App.I18n.locale)
         .formatToParts(Date.UTC(2024, 0, 1, hours, Number(time[2])))
         .map(({ type, value }) => ({
             value,

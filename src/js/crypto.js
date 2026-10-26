@@ -466,13 +466,18 @@ window.App.Crypto = {
     },
 
     formatUpdateTime(timestamp, options = { timeStyle: 'medium' }) {
-        return new Intl.DateTimeFormat(App.I18n.locale, {
+        const is12Hour = App.Clock?.format === '12h';
+        if (is12Hour && options.dateStyle) {
+            // Translate the date while keeping the time in the same English AM/PM format.
+            const { dateStyle, ...timeOptions } = options;
+            const date = new Intl.DateTimeFormat(App.I18n.locale, { dateStyle }).format(timestamp);
+            return `${date}, ${this.formatUpdateTime(timestamp, timeOptions)}`;
+        }
+
+        return new Intl.DateTimeFormat(is12Hour ? 'en-US' : App.I18n.locale, {
             ...options,
-            hourCycle: App.Clock?.format === '12h' ? 'h12' : 'h23',
-        })
-            .formatToParts(timestamp)
-            .map(({ type, value }) => (type === 'dayPeriod' ? value.toUpperCase() : value))
-            .join('');
+            hourCycle: is12Hour ? 'h12' : 'h23',
+        }).format(timestamp);
     },
 
     getRelativeTimeLocale() {
