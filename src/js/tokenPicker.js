@@ -97,7 +97,12 @@ window.App.TokenPicker = (function () {
 
                 const description = document.createElement('span');
                 description.className = 'token-option-description';
-                description.textContent = token.description;
+                const descriptionKey = `token.description.${token.id}`;
+                const translatedDescription = App.I18n.t(descriptionKey);
+                description.textContent =
+                    translatedDescription === descriptionKey
+                        ? token.description
+                        : translatedDescription;
                 content.appendChild(description);
                 option.appendChild(content);
 
@@ -140,7 +145,7 @@ window.App.TokenPicker = (function () {
 
             this.trigger.setAttribute(
                 'aria-label',
-                `Change token: ${selectionName} (${token.symbol})`
+                App.I18n.t('token.changeLabel', { name: selectionName, symbol: token.symbol })
             );
             this.optionButtons.forEach((option) => {
                 const isSelected = option.dataset.token === token.id;

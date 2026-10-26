@@ -2,6 +2,11 @@ window.App = window.App || {};
 
 window.App.Utils = (function () {
     const priceFormatters = new Map();
+    const percentFormatter = new Intl.NumberFormat('en-US', {
+        style: 'percent',
+        signDisplay: 'exceptZero',
+        maximumFractionDigits: 10,
+    });
 
     return {
         formatPrice(price, tokenId) {
@@ -15,7 +20,6 @@ window.App.Utils = (function () {
                 App.CryptoTokens.getToken(tokenId)?.priceFractionDigits ?? 8,
                 numericPrice > 0 && numericPrice < 1 ? 2 : 0
             );
-
             if (!priceFormatters.has(fractionDigits)) {
                 priceFormatters.set(
                     fractionDigits,
@@ -29,6 +33,10 @@ window.App.Utils = (function () {
             }
 
             return priceFormatters.get(fractionDigits).format(numericPrice);
+        },
+
+        formatPercent(value) {
+            return percentFormatter.format(value / 100);
         },
     };
 })();

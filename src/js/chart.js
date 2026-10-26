@@ -10,6 +10,7 @@ window.App.Chart = function (el) {
     this.cryptoType = App.CryptoTokens.getDefaultToken();
     this.period = App.CryptoTokens.getDefaultPeriod();
     this.labelColor = '#777';
+    this.dateFormatters = new Map();
     this.handleThemeChange = () => {
         this.updateTheme();
         this.chartInstance.update('theme');
@@ -94,8 +95,9 @@ window.App.Chart = function (el) {
             layout: {
                 padding: () => {
                     const sidePadding =
-                        parseFloat(getComputedStyle(this.el).getPropertyValue('--chart-side-padding')) ||
-                        0;
+                        parseFloat(
+                            getComputedStyle(this.el).getPropertyValue('--chart-side-padding')
+                        ) || 0;
 
                     return {
                         left: sidePadding,
@@ -168,32 +170,108 @@ window.App.Chart.prototype.update = function (_labels, _data) {
 };
 
 window.App.Chart.prototype.formatTickLabel = function (label) {
+    return this.getTickLabelParts(label)
+        .map(({ value }) => value)
+        .join('');
+};
+
+window.App.Chart.prototype.getDateFormatter = function (options) {
+    const key = `${App.I18n.locale}:${JSON.stringify(options)}`;
+    if (!this.dateFormatters.has(key)) {
+        this.dateFormatters.set(key, new Intl.DateTimeFormat(App.I18n.locale, options));
+    }
+
+    return this.dateFormatters.get(key);
+};
+
+window.App.Chart.prototype.getTickLabelParts = function (label) {
     if (this.period === App.CryptoTokens.PERIODS.ALL) {
-        return label.match(/\d{4}$/)?.[0] || label;
+        return [{ value: label.match(/\d{4}$/)?.[0] || label }];
     }
 
     if (this.period === App.CryptoTokens.PERIODS.ONE_YEAR) {
-        return label.replace(/ \d{2}(\d{2})$/, ' ’$1');
+        return this.getCalendarLabelParts(label, true);
     }
 
     const isDay = this.period === App.CryptoTokens.PERIODS.ONE_DAY;
     if (!isDay && this.period !== App.CryptoTokens.PERIODS.ONE_HOUR) {
-        return label;
+        return this.getCalendarLabelParts(label);
     }
 
     const time = /^([01]\d|2[0-3]):([0-5]\d)$/.exec(label);
     if (!time) {
-        return label;
+        return [{ value: label }];
     }
 
     const hours = Number(time[1]);
     const is12Hour = App.Clock.format === '12h';
-    const displayHour = String(is12Hour ? hours % 12 || 12 : hours).padStart(2, '0');
-    const minutes = isDay && is12Hour && time[2] === '00' ? '' : `:${time[2]}`;
-    const suffix = is12Hour ? (hours < 12 ? 'AM' : 'PM') : '';
-    const separator = is12Hour ? ' ' : '';
+    const omitMinutes = isDay && is12Hour && time[2] === '00';
+    const options = {
+        hour: '2-digit',
+        hourCycle: is12Hour ? 'h12' : 'h23',
+        timeZone: 'UTC',
+    };
+    if (!omitMinutes) {
+        options.minute = '2-digit';
+    }
 
-    return `${displayHour}${minutes}${separator}${suffix}`;
+    return this.getDateFormatter(options)
+        .formatToParts(Date.UTC(2024, 0, 1, hours, Number(time[2])))
+        .map(({ type, value }) => ({
+            value,
+            muted: type === 'dayPeriod' || (isDay && (type === 'minute' || type === 'literal')),
+        }));
+};
+
+window.App.Chart.prototype.getCalendarLabelParts = function (label, shortYear = false) {
+    const months = [
+        'Jan',
+        'Feb',
+        'Mar',
+        'Apr',
+        'May',
+        'Jun',
+        'Jul',
+        'Aug',
+        'Sep',
+        'Oct',
+        'Nov',
+        'Dec',
+    ];
+    const weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const monthYear = /^([A-Z][a-z]{2}) (\d{4})$/.exec(label);
+    const monthDay = /^(\d{1,2}) ([A-Z][a-z]{2})$/.exec(label);
+    const weekday = weekdays.indexOf(label);
+    let timestamp;
+    let options;
+    let mutedType;
+
+    if (monthYear && months.includes(monthYear[1])) {
+        const month = months.indexOf(monthYear[1]);
+        timestamp = Date.UTC(Number(monthYear[2]), month, 1);
+        options = { month: 'short', year: shortYear ? '2-digit' : 'numeric' };
+        mutedType = 'year';
+        if (App.I18n.locale === 'en' && shortYear) {
+            return [{ value: monthYear[1] }, { value: ` ’${monthYear[2].slice(-2)}`, muted: true }];
+        }
+    } else if (monthDay && months.includes(monthDay[2])) {
+        timestamp = Date.UTC(2024, months.indexOf(monthDay[2]), Number(monthDay[1]));
+        options = { month: 'short', day: 'numeric' };
+        mutedType = 'month';
+        if (App.I18n.locale === 'en') {
+            return [{ value: monthDay[1] }, { value: ` ${monthDay[2]}`, muted: true }];
+        }
+    } else if (weekday !== -1) {
+        timestamp = Date.UTC(2024, 0, 7 + weekday);
+        options = { weekday: 'long' };
+    } else {
+        return [{ value: label }];
+    }
+
+    // Repository labels stay canonical: localization never changes persisted cache data.
+    return this.getDateFormatter({ ...options, timeZone: 'UTC' })
+        .formatToParts(timestamp)
+        .map(({ type, value }) => ({ value, muted: type === mutedType || type === 'literal' }));
 };
 
 window.App.Chart.prototype.formatTooltipLabel = function (tooltipItem) {
@@ -202,7 +280,9 @@ window.App.Chart.prototype.formatTooltipLabel = function (tooltipItem) {
         return price;
     }
 
-    const date = tooltipItem.label.replace(/ \d{2}(\d{2})$/, ' ’$1');
+    const date = this.getCalendarLabelParts(tooltipItem.label, true)
+        .map(({ value }) => value)
+        .join('');
     return `${date} · ${price}`;
 };
 
@@ -239,26 +319,14 @@ window.App.Chart.prototype.usesCustomTimeLabels = function () {
 
 window.App.Chart.prototype.drawTimeLabels = function (chart) {
     const scale = chart.scales.x;
-    if (
-        !this.usesCustomTimeLabels() ||
-        !scale.options.display ||
-        !scale.options.ticks.display
-    ) {
+    if (!this.usesCustomTimeLabels() || !scale.options.display || !scale.options.ticks.display) {
         return;
     }
 
     const ctx = chart.ctx;
-    const isDay = this.period === App.CryptoTokens.PERIODS.ONE_DAY;
-    const isMonth = this.period === App.CryptoTokens.PERIODS.ONE_MONTH;
-    const isYear = this.period === App.CryptoTokens.PERIODS.ONE_YEAR;
-    let labelPattern = /^(\d{2})(:\d{2})?( AM| PM)?$/;
-    if (isYear) {
-        labelPattern = /^(.+)( ’\d{2})$/;
-    } else if (isMonth) {
-        labelPattern = /^(\d{1,2})( .+)$/;
-    }
-    scale.getLabelItems().forEach(({ label, font, textOffset, options }) => {
-        const parts = labelPattern.exec(label)?.slice(1) || [label];
+    scale.getLabelItems().forEach(({ label, font, textOffset, options }, index) => {
+        const canonicalLabel = this.config.data.labels[scale.ticks[index].value];
+        const parts = this.getTickLabelParts(canonicalLabel);
 
         ctx.save();
         ctx.font = font.string;
@@ -277,12 +345,11 @@ window.App.Chart.prototype.drawTimeLabels = function (chart) {
             x = -width / 2;
         }
 
-        parts.forEach((part, index) => {
-            if (part) {
-                const isMuted = index === 2 || ((isDay || isMonth || isYear) && index === 1);
-                ctx.globalAlpha = opacity * (isMuted ? 0.5 : 1);
-                ctx.fillText(part, x, textOffset);
-                x += ctx.measureText(part).width;
+        parts.forEach(({ value, muted }) => {
+            if (value) {
+                ctx.globalAlpha = opacity * (muted ? 0.5 : 1);
+                ctx.fillText(value, x, textOffset);
+                x += ctx.measureText(value).width;
             }
         });
         ctx.restore();
@@ -318,10 +385,10 @@ window.App.Chart.prototype.alwaysVisibleTooltipsPlugin = function () {
             const maxValue = Math.max(...data);
             const minValue = Math.min(...data);
             const averageLabel = {
-                ONE_WEEK: '(daily avg)',
-                ONE_MONTH: '(daily avg)',
-                ONE_YEAR: '(monthly avg)',
-                ALL: '(monthly avg)',
+                ONE_WEEK: App.I18n.t('chart.dailyAverage'),
+                ONE_MONTH: App.I18n.t('chart.dailyAverage'),
+                ONE_YEAR: App.I18n.t('chart.monthlyAverage'),
+                ALL: App.I18n.t('chart.monthlyAverage'),
             }[this.period];
 
             let foundMax = false;

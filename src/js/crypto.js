@@ -16,12 +16,12 @@ window.App.Crypto = {
     $lastUpdated: document.getElementById('last-updated'),
     $priceHeading: document.getElementById('price-token-picker'),
     $priceNow: document.getElementById('price-now'),
-    $pricePrefix: document.getElementById('price-prefix'),
 
     chart: null,
     currentCrypto: '',
     currentPeriod: '',
     isInitialized: false,
+    priceHeadingKey: null,
     refreshTimer: null,
     repositoryClient: null,
     repositoryStatuses: {},
@@ -142,8 +142,8 @@ window.App.Crypto = {
 
         this.chart.destroy();
         this.setRepositoryStatus(cryptoType, 'NOW', null);
-        this.$priceNow.textContent = 'loading…';
-        this.$pricePrefix.textContent = 'price is';
+        this.$priceNow.textContent = App.I18n.t('price.loading');
+        this.renderPriceHeading('price.headingLoading');
         this.$priceNow.removeAttribute('aria-label');
         this.$change.textContent = '';
         this.updateCryptoTypeLabel();
@@ -179,8 +179,8 @@ window.App.Crypto = {
 
         if (tokenChanged) {
             this.setRepositoryStatus(cryptoType, 'NOW', null);
-            this.$priceNow.textContent = 'loading…';
-            this.$pricePrefix.textContent = 'price is';
+            this.$priceNow.textContent = App.I18n.t('price.loading');
+            this.renderPriceHeading('price.headingLoading');
             this.$priceNow.removeAttribute('aria-label');
             this.updateCryptoTypeLabel();
         }
@@ -202,7 +202,7 @@ window.App.Crypto = {
 
         if (!this.chart.isInitiated()) {
             this.setRepositoryStatus(cryptoType, period, null);
-            App.Message.show('Loading chart…');
+            App.Message.show(App.I18n.t('chart.loading'));
             this.updateLastUpdated();
         }
 
@@ -232,7 +232,10 @@ window.App.Crypto = {
     renderChartResult(result, cryptoType) {
         if (!result.ok) {
             App.Message.fireError(
-                `Unable to load ${App.CryptoTokens.getDisplayName(cryptoType)} chart data. Retrying every ${this.REFRESH_INTERVAL / 1000} seconds while this tab is visible.`
+                App.I18n.t('errors.chartUnavailable', {
+                    token: App.CryptoTokens.getDisplayName(cryptoType),
+                    seconds: this.REFRESH_INTERVAL / 1000,
+                })
             );
             this.updateLastUpdated();
             return;
@@ -250,9 +253,9 @@ window.App.Crypto = {
             this.setPriceNow(result.data.price);
             this.setPriceChange(result.data.changePercent);
         } else {
-            this.$pricePrefix.textContent = 'price';
-            this.$priceNow.textContent = 'couldn’t be loaded';
-            this.$priceNow.setAttribute('aria-label', 'Price temporarily unavailable');
+            this.$priceNow.textContent = App.I18n.t('price.unavailable');
+            this.$priceNow.setAttribute('aria-label', App.I18n.t('price.unavailableLabel'));
+            this.renderPriceHeading('price.headingUnavailable');
             this.$change.textContent = '';
         }
 
@@ -281,7 +284,11 @@ window.App.Crypto = {
         const trigger = document.getElementById('price-token-select');
         trigger.style.setProperty('--token-color', token.textColor);
         trigger.style.setProperty('--token-color-dark', token.darkTextColor);
-        trigger.setAttribute('aria-label', `Change token: ${token.displayName} (${token.symbol})`);
+        trigger.setAttribute(
+            'aria-label',
+            App.I18n.t('token.changeLabel', { name: token.displayName, symbol: token.symbol })
+        );
+        this.renderPriceHeading(this.priceHeadingKey || 'price.headingLoading');
         this.tokenPicker?.renderSelected(this.currentCrypto);
         App.SettingsPanel?.renderSelectedToken(this.currentCrypto);
     },
@@ -305,39 +312,89 @@ window.App.Crypto = {
     },
 
     setPriceNow(price) {
-        this.$pricePrefix.textContent = 'price is';
         this.$priceNow.removeAttribute('aria-label');
         this.$priceNow.textContent = App.Utils.formatPrice(price, this.currentCrypto);
+        this.renderPriceHeading();
+    },
+
+    renderPriceHeading(key = 'price.heading') {
+        if (this.priceHeadingKey === key) {
+            return;
+        }
+
+        const token = document.getElementById('price-token-select');
+        const heading = this.$priceHeading.querySelector('h2');
+        const focusedElement = heading.contains(document.activeElement)
+            ? document.activeElement
+            : null;
+        const template = App.I18n.t(key);
+        const parts = template.split(/(\{token\}|\{price\})/).map((part) => {
+            if (part === '{token}') {
+                return token;
+            }
+            if (part === '{price}') {
+                return this.$priceNow;
+            }
+            return document.createTextNode(part);
+        });
+
+        // Preserve the picker and price nodes while allowing each language its own word order.
+        heading.replaceChildren(...parts, this.$change);
+        this.priceHeadingKey = key;
+        focusedElement?.focus({ preventScroll: true });
     },
 
     setPriceChange(changePercent) {
         const changesByPeriod = {
-            ONE_DAY: { value: changePercent.dayAgo, label: 'since yesterday' },
-            ONE_WEEK: { value: changePercent.weekAgo, label: 'since last week' },
-            ONE_MONTH: { value: changePercent.monthAgo, label: 'since last month' },
+            ONE_DAY: changePercent.dayAgo,
+            ONE_WEEK: changePercent.weekAgo,
+            ONE_MONTH: changePercent.monthAgo,
         };
         const selectedChange = changesByPeriod[this.currentPeriod];
 
         this.$change.textContent = '';
 
-        if (!selectedChange || !Number.isFinite(selectedChange.value)) {
+        if (!Number.isFinite(selectedChange)) {
             return;
         }
 
-        const isZero = selectedChange.value === 0;
+        const isZero = selectedChange === 0;
         const changeElement = document.createElement('span');
-        changeElement.className = isZero ? '' : selectedChange.value > 0 ? 'positive' : 'negative';
-        changeElement.textContent = `${selectedChange.value > 0 ? '+' : ''}${selectedChange.value}%`;
+        changeElement.className = isZero ? '' : selectedChange > 0 ? 'positive' : 'negative';
+        changeElement.textContent = App.Utils.formatPercent(selectedChange);
 
-        this.$change.appendChild(document.createTextNode(' ('));
-        this.$change.appendChild(changeElement);
-        this.$change.appendChild(document.createTextNode(` ${selectedChange.label})`));
+        const [before, after] = App.I18n.t(`price.change.${this.currentPeriod}`).split('{change}');
+        this.$change.append(
+            document.createTextNode(before),
+            changeElement,
+            document.createTextNode(after)
+        );
     },
 
     updateLastUpdated() {
-        this.renderUpdateStatus('price', 'NOW', 'price');
-        this.renderUpdateStatus('chart', this.currentPeriod, 'chart');
+        this.renderUpdateStatus('price', 'NOW');
+        this.renderUpdateStatus('chart', this.currentPeriod);
         this.renderCombinedUpdateStatus();
+    },
+
+    getLocalizedRefreshPolicy(period) {
+        const policies = {
+            NOW: 'current',
+            ONE_HOUR: 'samples',
+            ONE_DAY: 'hourly',
+            ONE_WEEK: 'daily',
+            ONE_MONTH: 'daily',
+            ONE_YEAR: 'monthly',
+            ALL: 'monthly',
+        };
+        const policy = App.CryptoTokens.getRefreshPolicy(period);
+        const type = policies[period];
+        const values = { minutes: policy.interval / (60 * 1000) };
+
+        return {
+            summary: App.I18n.t(`status.policy.${type}.summary`, values),
+            description: App.I18n.t(`status.policy.${type}.description`, values),
+        };
     },
 
     renderCombinedUpdateStatus() {
@@ -372,25 +429,22 @@ window.App.Crypto = {
 
         // The older refresh represents how recently both sets of data were updated.
         const lastFetched = Math.min(...statuses.map((status) => status.lastFetched));
-        const age = dayjs(lastFetched).fromNow(true).replace('a few seconds', 'a moment');
+        const age = dayjs(lastFetched).locale(this.getRelativeTimeLocale()).fromNow();
         document.getElementById('combined-update-age').textContent = age;
         document
             .getElementById('combined-update-time')
-            .setAttribute('aria-label', `Price and chart updated ${age} ago`);
+            .setAttribute('aria-label', App.I18n.t('status.combinedAgeLabel', { age }));
 
         ['price', 'chart'].forEach((label, index) => {
             document.getElementById(`combined-${label}-time`).textContent = this.formatUpdateTime(
                 statuses[index].lastFetched
             );
-            const [summary, ...description] = App.CryptoTokens.getRefreshPolicy(
-                periods[index]
-            ).description.split('. ');
+            const policy = this.getLocalizedRefreshPolicy(periods[index]);
             if (label === 'chart') {
-                document.getElementById('combined-chart-summary').textContent =
-                    summary.toLowerCase();
+                document.getElementById('combined-chart-summary').textContent = policy.summary;
             }
             document.getElementById(`combined-${label}-description`).textContent =
-                description.join('. ');
+                policy.description;
         });
 
         const nextRefreshAt = Math.min(
@@ -405,14 +459,14 @@ window.App.Crypto = {
                 hour: '2-digit',
                 minute: '2-digit',
             });
-            footnote.textContent = `Next refresh around ${time}, while this tab is visible.`;
+            footnote.textContent = App.I18n.t('status.nextRefresh', { time });
         } else {
-            footnote.textContent = 'Checking for updates while this tab is visible…';
+            footnote.textContent = App.I18n.t('status.checkingVisible');
         }
     },
 
     formatUpdateTime(timestamp, options = { timeStyle: 'medium' }) {
-        return new Intl.DateTimeFormat(undefined, {
+        return new Intl.DateTimeFormat(App.I18n.locale, {
             ...options,
             hourCycle: App.Clock?.format === '12h' ? 'h12' : 'h23',
         })
@@ -421,43 +475,49 @@ window.App.Crypto = {
             .join('');
     },
 
-    renderUpdateStatus(label, period, elementPrefix) {
-        const status = this.getRepositoryStatus(this.currentCrypto, period);
-        const policy = App.CryptoTokens.getRefreshPolicy(period);
-        const statusLabel = document.getElementById(`${elementPrefix}-update-label`);
-        const age = document.getElementById(`${elementPrefix}-update-time`);
-        const details = document.getElementById(`${elementPrefix}-update-details`);
-        const description = [policy?.description || 'Checking data…'];
+    getRelativeTimeLocale() {
+        if (App.I18n.locale === 'sr') {
+            return 'sr-cyrl';
+        }
+        return App.I18n.locale === 'pt-PT' ? 'pt' : App.I18n.locale.toLowerCase();
+    },
 
-        statusLabel.textContent = label;
+    renderUpdateStatus(label, period) {
+        const status = this.getRepositoryStatus(this.currentCrypto, period);
+        const policy = this.getLocalizedRefreshPolicy(period);
+        const statusLabel = document.getElementById(`${label}-update-label`);
+        const age = document.getElementById(`${label}-update-time`);
+        const details = document.getElementById(`${label}-update-details`);
+        const notices = [];
+        let lastRefreshedLabel = '';
+
+        statusLabel.textContent = App.I18n.t(`status.${label}.label`);
         age.classList.toggle('negative', Boolean(status && (!status.ok || status.isStale)));
 
         if (!status) {
-            age.textContent = 'loading…';
-            description.push('Checking for data…');
+            age.textContent = App.I18n.t('status.loading');
+            notices.push(App.I18n.t('status.checkingData'));
         } else if (!status.ok) {
-            age.textContent = 'unavailable';
-            description.push(
-                'The latest refresh failed. Retrying automatically while this tab is visible.'
-            );
+            age.textContent = App.I18n.t('status.unavailable');
+            notices.push(App.I18n.t('status.refreshFailed'));
         } else if (!status.lastFetched) {
-            age.textContent = 'update time unavailable';
+            age.textContent = App.I18n.t('status.timeUnavailable');
         } else {
             const updatedAt = this.formatUpdateTime(status.lastFetched, {
                 dateStyle: 'medium',
                 timeStyle: 'short',
             });
-            statusLabel.textContent = `${label} updated`;
+            statusLabel.textContent = App.I18n.t(`status.${label}.updated`);
             age.textContent = dayjs(status.lastFetched)
-                .fromNow()
-                .replace('a few seconds', 'few sec')
-                .replace('a minute', '1 min')
-                .replace(/\bminutes?\b/g, 'min');
-            description.push(`Last refreshed: ${updatedAt}.`);
+                .locale(this.getRelativeTimeLocale())
+                .fromNow();
+            lastRefreshedLabel = App.I18n.t('status.lastRefreshed', { time: updatedAt });
 
             if (status.isStale) {
-                description.push(
-                    `Showing cached ${label} data because the latest refresh failed. Retrying every ${this.REFRESH_INTERVAL / 1000} seconds while this tab is visible.`
+                notices.push(
+                    App.I18n.t(`status.cached.${label}`, {
+                        seconds: this.REFRESH_INTERVAL / 1000,
+                    })
                 );
             } else {
                 const nextRefreshAt = App.CryptoTokens.getNextRefreshAt(period, status.lastFetched);
@@ -466,40 +526,45 @@ window.App.Crypto = {
                         hour: '2-digit',
                         minute: '2-digit',
                     });
-                    description.push(`Next refresh around ${time}, while this tab is visible.`);
+                    notices.push(App.I18n.t('status.nextRefresh', { time }));
                 } else {
-                    description.push('Checking for updates…');
+                    notices.push(App.I18n.t('status.checkingUpdates'));
                 }
             }
         }
 
-        age.setAttribute('aria-label', `${statusLabel.textContent} ${age.textContent}`);
-        this.renderUpdateDetails(details, description, label, status);
+        age.setAttribute(
+            'aria-label',
+            App.I18n.t('status.ageLabel', { label: statusLabel.textContent, age: age.textContent })
+        );
+        this.renderUpdateDetails(details, { policy, notices, lastRefreshedLabel }, label, status);
     },
 
-    renderUpdateDetails(details, description, label, status) {
+    renderUpdateDetails(details, { policy, notices, lastRefreshedLabel }, label, status) {
         const formatted = Boolean(status);
         details.classList.toggle('update-details-formatted', formatted);
 
         if (!formatted) {
-            details.textContent = description.join('\n\n');
+            details.textContent = [App.I18n.t('status.policyOverview', policy), ...notices].join(
+                '\n\n'
+            );
             return;
         }
 
-        const [policy, ...messages] = description;
-        const [summary, ...explanation] = policy.split('. ');
         const section = document.createElement('span');
         section.className = 'update-details-section';
         const header = document.createElement('span');
         header.className = 'update-details-row';
         const title = document.createElement('span');
         title.className = 'update-details-title';
-        title.textContent = label === 'price' ? 'Price now' : 'Chart';
+        title.textContent = App.I18n.t(
+            label === 'price' ? 'status.priceTitle' : 'status.chartTitle'
+        );
 
         if (label === 'chart') {
             const context = document.createElement('span');
             context.className = 'update-details-context';
-            context.textContent = ` (${summary.toLowerCase()})`;
+            context.textContent = App.I18n.t('status.context', { summary: policy.summary });
             title.appendChild(context);
         }
 
@@ -513,29 +578,26 @@ window.App.Crypto = {
             time.textContent = this.formatUpdateTime(status.lastFetched);
             time.setAttribute(
                 'aria-label',
-                messages.find((text) => text.startsWith('Last refreshed:')) ||
-                    `Last refreshed: ${time.textContent}`
+                lastRefreshedLabel || App.I18n.t('status.lastRefreshed', { time: time.textContent })
             );
             header.appendChild(time);
         }
 
         const body = document.createElement('span');
         body.className = 'update-details-description';
-        body.textContent = explanation.join('. ');
+        body.textContent = policy.description;
         section.appendChild(header);
         section.appendChild(body);
 
-        const notices = messages
-            .filter((text) => !text.startsWith('Last refreshed:'))
-            .map((text) => {
-                const notice = document.createElement('span');
-                notice.className =
-                    'update-details-section update-details-description update-details-notice';
-                notice.textContent = text;
-                return notice;
-            });
+        const noticeElements = notices.map((text) => {
+            const notice = document.createElement('span');
+            notice.className =
+                'update-details-section update-details-description update-details-notice';
+            notice.textContent = text;
+            return notice;
+        });
 
-        details.replaceChildren(section, ...notices);
+        details.replaceChildren(section, ...noticeElements);
     },
 
     startRefreshTimer() {

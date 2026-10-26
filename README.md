@@ -22,6 +22,9 @@
 -   Follow your system theme by default, or choose light or dark.
 -   Customize the chart and interface accent color, with separate colors for price changes.
 -   Follow your browser's regional clock format by default, or choose 12-hour or 24-hour time.
+-   Available in Indonesian, German, English, Spanish, French, Italian, Polish, Brazilian and
+    European Portuguese, Slovenian, Bulgarian, Serbian, and Japanese. The interface follows your
+    browser language by default, with a language selector in Customize.
 -   Pick up where you left off with your selected token, chart period, and preferences saved locally.
 
 Prices update automatically while Crypto Tab is visible. Preference changes are shared between open
