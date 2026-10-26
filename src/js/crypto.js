@@ -476,6 +476,9 @@ window.App.Crypto = {
     },
 
     getRelativeTimeLocale() {
+        if (App.I18n.locale === 'sr') {
+            return 'sr-cyrl';
+        }
         return App.I18n.locale === 'pt-PT' ? 'pt' : App.I18n.locale.toLowerCase();
     },
 

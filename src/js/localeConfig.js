@@ -14,6 +14,7 @@ globalThis.App.LocaleConfig = {
         'de',
         'ja',
         'sl',
+        'sr',
     ],
 
     normalizePreference(value) {

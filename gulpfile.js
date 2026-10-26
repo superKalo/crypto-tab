@@ -256,6 +256,7 @@ gulp.task("copy-npm-dependencies", function () {
       "node_modules/dayjs/locale/de.js",
       "node_modules/dayjs/locale/ja.js",
       "node_modules/dayjs/locale/sl.js",
+      "node_modules/dayjs/locale/sr-cyrl.js",
     ])
     .pipe(gulp.dest(`${distPath}/lib/`));
 });
