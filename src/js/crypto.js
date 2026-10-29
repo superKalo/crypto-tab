@@ -27,6 +27,8 @@ window.App.Crypto = {
     repositoryStatuses: {},
     requestGeneration: 0,
     tokenPicker: null,
+    celebrationDayChange: null,
+    celebrationDemo: false,
 
     async init() {
         if (this.isInitialized) {
@@ -34,6 +36,20 @@ window.App.Crypto = {
         }
 
         this.isInitialized = true;
+        const preview = new URLSearchParams(window.location.search);
+        this.celebration = new App.TokenCelebration(
+            document.getElementById('token-fire'),
+            document.getElementById('price-token-select'),
+            preview.get('effect') === 'fire' ? 'fire' : 'confetti'
+        );
+        // Temporary opt-in preview; simulated values never enter the repository or storage.
+        this.celebrationDemo = preview.get('celebration') === 'demo';
+        if (this.celebrationDemo) {
+            this.$celebrationDemo = document.createElement('p');
+            this.$celebrationDemo.className = 'celebration-demo';
+            this.$celebrationDemo.textContent = 'Demo: +6% (24h)';
+            this.$priceHeading.querySelector('.chart-period').after(this.$celebrationDemo);
+        }
         this.chart = new App.Chart(this.$chart);
         this.repositoryClient = new App.PriceRepositoryClient();
 
@@ -98,19 +114,23 @@ window.App.Crypto = {
         window.addEventListener('clockformatchange', this.handleClockFormatChange);
 
         this.handleVisibilityChange = () => {
+            this.updateCelebration();
             if (!document.hidden) {
                 this.refreshActiveData();
             }
         };
         this.handlePageHide = (event) => {
+            this.celebration.setActive(false);
             // A cached page keeps its settings subscription; the browser pauses its timers.
             if (!event.persisted) {
                 this.destroy();
             }
         };
+        this.handlePageShow = () => this.updateCelebration();
 
         document.addEventListener('visibilitychange', this.handleVisibilityChange);
         window.addEventListener('pagehide', this.handlePageHide);
+        window.addEventListener('pageshow', this.handlePageShow);
     },
 
     async changePeriod(period) {
@@ -249,9 +269,16 @@ window.App.Crypto = {
     },
 
     renderCurrentPriceResult(result) {
+        this.celebrationDayChange =
+            result.ok && !result.isStale ? result.data.changePercent.dayAgo : null;
+        this.updateCelebration();
         if (result.ok) {
             this.setPriceNow(result.data.price);
-            this.setPriceChange(result.data.changePercent);
+            this.setPriceChange(
+                this.celebrationDemo
+                    ? { ...result.data.changePercent, dayAgo: 6 }
+                    : result.data.changePercent
+            );
         } else {
             this.$priceNow.textContent = App.I18n.t('price.unavailable');
             this.$priceNow.setAttribute('aria-label', App.I18n.t('price.unavailableLabel'));
@@ -277,6 +304,8 @@ window.App.Crypto = {
     },
 
     updateCryptoTypeLabel() {
+        this.celebrationDayChange = null;
+        this.updateCelebration();
         const token = App.CryptoTokens.getToken(this.currentCrypto);
         this.$cryptoTypeLabel.textContent = token.displayName;
         document.getElementById('price-token-logo').src = token.logoPath;
@@ -291,6 +320,13 @@ window.App.Crypto = {
         this.renderPriceHeading(this.priceHeadingKey || 'price.headingLoading');
         this.tokenPicker?.renderSelected(this.currentCrypto);
         App.SettingsPanel?.renderSelectedToken(this.currentCrypto);
+    },
+
+    updateCelebration() {
+        const qualifies =
+            this.celebrationDemo ||
+            (Number.isFinite(this.celebrationDayChange) && this.celebrationDayChange >= 5);
+        this.celebration?.setActive(this.isInitialized && !document.hidden && qualifies);
     },
 
     updateActivePeriod() {
@@ -623,6 +659,12 @@ window.App.Crypto = {
     },
 
     destroy() {
+        this.isInitialized = false;
+        this.celebrationDayChange = null;
+        this.celebrationDemo = false;
+        this.updateCelebration();
+        this.$celebrationDemo?.remove();
+        this.celebration?.destroy();
         if (this.refreshTimer) {
             window.clearInterval(this.refreshTimer);
             this.refreshTimer = null;
@@ -633,6 +675,9 @@ window.App.Crypto = {
         }
         if (this.handlePageHide) {
             window.removeEventListener('pagehide', this.handlePageHide);
+        }
+        if (this.handlePageShow) {
+            window.removeEventListener('pageshow', this.handlePageShow);
         }
         if (this.handleTooltipEscape) {
             document.removeEventListener('keydown', this.handleTooltipEscape);
