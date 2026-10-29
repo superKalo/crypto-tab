@@ -2,6 +2,8 @@
 
 These SVGs identify the supported cryptocurrencies. They are bundled locally in every build.
 Artwork and colors are preserved from the providers' downloadable assets.
+Hedera's mark includes a white circular backing and rim inside the SVG so it stays smooth on dark
+backgrounds without relying on a separate CSS circle.
 
 - `bitcoin.svg`: [Bitcoin Design Guide](https://github.com/BitcoinDesign/Guide/blob/master/assets/images/guide/getting-started/visual-language/bitcoin-symbol.svg), the standard Bitcoin symbol by Bitboy.
 - `ethereum.svg`: [ethereum.org brand assets](https://github.com/ethereum/ethereum-org-website/blob/ce9f3b710486132ef9a2f21236cea56d9c543e7f/public/images/assets/svgs/eth-diamond-purple.svg). The source repository's MIT notice is included in `ethereum-LICENSE.txt`.
@@ -10,7 +12,7 @@ Artwork and colors are preserved from the providers' downloadable assets.
 - `solana.svg`: [Solana's official gradient logomark](https://github.com/solana-foundation/solana-com/blob/2ef6a260158445c3f9c71789fefd27e7615ba2bd/apps/web/public/src/img/branding/solanaLogoMark.svg). See the [brand guidelines](https://solana.com/branding).
 - `bnb.svg`: [BNB Chain's official BNB symbol](https://github.com/bnb-chain/bnb-chain.github.io/blob/6d8f262d7ed6462d91046f8802719d8fdc4264d4/docs/assets/bnb.svg). See the [brand guidelines](https://www.bnbchain.org/en/brand-guidelines).
 - `xrp.svg`: [The XRP community's black currency symbol](https://github.com/xrpsymbol/xrpsymbol.github.io/blob/6391d8aa4f28110826827f17bf1558849a9732bc/xrp-symbol/symbol/xrp-symbol-black.svg).
-- `doge.svg`: [Dogecoin Core's official icon](https://github.com/dogecoin/dogecoin/blob/038bcfe03e856843b435c52717596ad2dc2c59c0/share/pixmaps/dogecoin32.svg). The source repository's MIT notice is included in `doge-LICENSE.txt`.
+- `doge.svg`: [The Doge illustration from Dogecoin's official website](https://dogecoin.com/assets/images/doge.svg), framed and clipped to the head so the face stays clear at small sizes. The original vector artwork and colors are retained inside the crop.
 
 The logos belong to their respective owners. Crypto Tab is independent and is not affiliated with,
 sponsored by, or endorsed by these projects.

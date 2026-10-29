@@ -966,6 +966,10 @@ small {
     height: 32px;
     flex-shrink: 0;
     object-fit: contain;
+}
+/* Only these dark marks need a light backing; the other SVGs supply their own artwork. */
+.token-logo[src$='/ethereum.svg'],
+.token-logo[src$='/xrp.svg'] {
     border-radius: 50%;
     background: #fff;
 }
