@@ -42,7 +42,10 @@ globalThis.App.PriceApi = (function () {
             };
             const isValidChange =
                 normalizedChange &&
-                Object.values(normalizedChange).every((value) => value !== null);
+                // A null percentage means there is not enough history for that comparison.
+                Object.entries(normalizedChange).every(
+                    ([key, value]) => value !== null || changePercent[key] === null
+                );
 
             if (value === null || !isValidChange) {
                 throw new Error('The price API returned an invalid current-price payload');
