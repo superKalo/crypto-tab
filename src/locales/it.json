@@ -155,6 +155,10 @@
   "token.description.ethereum": "La moneta nativa della rete Ethereum.",
   "token.description.wallet": "Il token di governance del wallet Ambire.",
   "token.description.hedera": "La moneta nativa della rete Hedera.",
+  "token.description.solana": "La moneta nativa della rete Solana.",
+  "token.description.bnb": "La moneta nativa di BNB Chain.",
+  "token.description.xrp": "La moneta nativa di XRP Ledger.",
+  "token.description.doge": "La valuta digitale della rete Dogecoin.",
   "errors.chartUnavailable": "Impossibile caricare il grafico di {token}. Riproviamo ogni {seconds} secondi mentre questa scheda è visibile.",
   "errors.initialization": "Impossibile avviare Crypto Tab. Ricarica questa scheda.",
   "errors.clock": "Impossibile avviare l’orologio."

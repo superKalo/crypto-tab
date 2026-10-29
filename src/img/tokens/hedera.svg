@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" fill="none" height="116" overflow="visible" preserveAspectRatio="none" style="display: block;" viewBox="0 0 116 116" width="116">
+<svg xmlns="http://www.w3.org/2000/svg" fill="none" height="124" viewBox="-4 -4 124 124" width="124">
+<circle cx="58" cy="58" r="62" fill="white"/>
 <g id="Icon">
 <g id="Vector">
 <path d="M74.3221 53.8308H41.6849V62.1657H74.3221V53.8308Z" fill="black"/>

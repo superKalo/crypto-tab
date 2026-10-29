@@ -17,7 +17,8 @@
 
 ## Features
 
--   Choose Bitcoin (BTC), Ether (ETH), Ambire Wallet (WALLET), or Hedera (HBAR) to see its price in USD.
+-   Choose Bitcoin (BTC), Ether (ETH), BNB, XRP, Solana (SOL), Dogecoin (DOGE), Hedera (HBAR),
+    or Ambire Wallet (WALLET) to see its price in USD.
 -   View the past hour, day, week, month, year, or all available history in a single chart.
 -   Follow your system theme by default, or choose light or dark.
 -   Customize the chart and interface accent color, with separate colors for price changes.

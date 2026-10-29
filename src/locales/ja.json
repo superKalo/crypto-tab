@@ -155,6 +155,10 @@
   "token.description.ethereum": "Ethereumネットワークのネイティブ通貨。",
   "token.description.wallet": "Ambire Walletのガバナンストークン。",
   "token.description.hedera": "Hederaネットワークのネイティブ通貨。",
+  "token.description.solana": "Solanaネットワークのネイティブ通貨。",
+  "token.description.bnb": "BNB Chainのネイティブ通貨。",
+  "token.description.xrp": "XRP Ledgerのネイティブ通貨。",
+  "token.description.doge": "Dogecoinネットワークのデジタル通貨。",
   "errors.chartUnavailable": "{token}のチャートを読み込めません。このタブの表示中は{seconds}秒ごとに再試行します。",
   "errors.initialization": "Crypto Tabを起動できません。このタブを再読み込みしてください。",
   "errors.clock": "時計を起動できません。"

@@ -155,6 +155,10 @@
   "token.description.ethereum": "Die native Kryptowährung des Ethereum-Netzwerks.",
   "token.description.wallet": "Der Governance-Token der Ambire Wallet.",
   "token.description.hedera": "Die native Kryptowährung des Hedera-Netzwerks.",
+  "token.description.solana": "Die native Kryptowährung des Solana-Netzwerks.",
+  "token.description.bnb": "Die native Kryptowährung von BNB Chain.",
+  "token.description.xrp": "Die native Kryptowährung des XRP Ledgers.",
+  "token.description.doge": "Die digitale Währung des Dogecoin-Netzwerks.",
   "errors.chartUnavailable": "Der Chart für {token} konnte nicht geladen werden. Wir versuchen es alle {seconds} Sekunden erneut, solange dieser Tab sichtbar ist.",
   "errors.initialization": "Crypto Tab konnte nicht gestartet werden. Lade diesen Tab neu.",
   "errors.clock": "Die Uhr konnte nicht gestartet werden."
