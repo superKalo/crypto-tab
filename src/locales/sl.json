@@ -155,6 +155,10 @@
   "token.description.ethereum": "Osnovna kriptovaluta omrežja Ethereum.",
   "token.description.wallet": "Upravljavski žeton denarnice Ambire.",
   "token.description.hedera": "Osnovna kriptovaluta omrežja Hedera.",
+  "token.description.solana": "Osnovna kriptovaluta omrežja Solana.",
+  "token.description.bnb": "Osnovna kriptovaluta BNB Chain.",
+  "token.description.xrp": "Osnovna kriptovaluta omrežja XRP Ledger.",
+  "token.description.doge": "Digitalna valuta omrežja Dogecoin.",
   "errors.chartUnavailable": "Grafa za {token} ni mogoče naložiti. Znova poskusimo vsakih {seconds} sekund, ko je ta zavihek viden.",
   "errors.initialization": "Crypto Tab ni mogoče zagnati. Ponovno naloži ta zavihek.",
   "errors.clock": "Ure ni mogoče zagnati."

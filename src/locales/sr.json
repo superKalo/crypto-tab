@@ -155,6 +155,10 @@
   "token.description.ethereum": "Изворна криптовалута мреже Ethereum.",
   "token.description.wallet": "Управљачки токен новчаника Ambire Wallet.",
   "token.description.hedera": "Изворна криптовалута мреже Hedera.",
+  "token.description.solana": "Изворна криптовалута мреже Solana.",
+  "token.description.bnb": "Изворна криптовалута BNB Chain-а.",
+  "token.description.xrp": "Изворна криптовалута XRP Ledger-а.",
+  "token.description.doge": "Дигитална валута мреже Dogecoin.",
   "errors.chartUnavailable": "Није могуће учитати графикон за {token}. Покушавамо поново сваких {seconds} секунди док је ова картица видљива.",
   "errors.initialization": "Није могуће покренути Crypto Tab. Поново учитај ову картицу.",
   "errors.clock": "Није могуће покренути сат."
