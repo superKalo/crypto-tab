@@ -155,6 +155,10 @@
   "token.description.ethereum": "Основната криптовалута на мрежата Ethereum.",
   "token.description.wallet": "Токенът за управление на Ambire Wallet.",
   "token.description.hedera": "Основната криптовалута на мрежата Hedera.",
+  "token.description.solana": "Основната криптовалута на мрежата Solana.",
+  "token.description.bnb": "Основната криптовалута на BNB Chain.",
+  "token.description.xrp": "Основната криптовалута на XRP Ledger.",
+  "token.description.doge": "Дигиталната валута на мрежата Dogecoin.",
   "errors.chartUnavailable": "Данните за графиката на {token} не могат да се заредят. Опитваме отново на всеки {seconds} секунди, докато този раздел е видим.",
   "errors.initialization": "Crypto Tab не може да стартира. Презареди този раздел.",
   "errors.clock": "Часовникът не може да стартира."

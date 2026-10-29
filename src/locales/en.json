@@ -155,6 +155,10 @@
   "token.description.ethereum": "The native coin of the Ethereum network.",
   "token.description.wallet": "The governance token of Ambire wallet.",
   "token.description.hedera": "The native coin of the Hedera network.",
+  "token.description.solana": "The native coin of the Solana network.",
+  "token.description.bnb": "The native coin of BNB Chain.",
+  "token.description.xrp": "The native coin of the XRP Ledger.",
+  "token.description.doge": "The digital currency on the Dogecoin network.",
   "errors.chartUnavailable": "Unable to load {token} chart data. Retrying every {seconds} seconds while this tab is visible.",
   "errors.initialization": "Unable to initialize Crypto Tab. Please reload this tab.",
   "errors.clock": "Unable to initialize the clock."

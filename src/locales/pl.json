@@ -155,6 +155,10 @@
   "token.description.ethereum": "Natywna kryptowaluta sieci Ethereum.",
   "token.description.wallet": "Token zarządzania portfelem Ambire.",
   "token.description.hedera": "Natywna kryptowaluta sieci Hedera.",
+  "token.description.solana": "Natywna kryptowaluta sieci Solana.",
+  "token.description.bnb": "Natywna kryptowaluta BNB Chain.",
+  "token.description.xrp": "Natywna kryptowaluta XRP Ledger.",
+  "token.description.doge": "Cyfrowa waluta sieci Dogecoin.",
   "errors.chartUnavailable": "Nie udało się wczytać wykresu {token}. Ponawiamy próbę co {seconds} sekund, gdy ta karta jest widoczna.",
   "errors.initialization": "Nie udało się uruchomić Crypto Tab. Odśwież tę kartę.",
   "errors.clock": "Nie udało się uruchomić zegara."
