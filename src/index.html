@@ -37,6 +37,13 @@
       </h1>
 
       <div id="price-token-picker" class="price-heading mb text-center" aria-busy="true">
+        <canvas
+          id="price-celebration"
+          class="price-celebration"
+          width="1400"
+          height="440"
+          aria-hidden="true"
+        ></canvas>
         <h2 class="chart-period">
           <button
             id="price-token-select"
@@ -49,7 +56,6 @@
             data-i18n-title="ui.changeToken"
           >
             <span class="price-token-mark" aria-hidden="true">
-              <canvas id="token-fire" class="token-fire" width="192" height="240"></canvas>
               <img
                 id="price-token-logo"
                 class="token-logo"

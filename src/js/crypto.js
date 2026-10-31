@@ -38,9 +38,8 @@ window.App.Crypto = {
         this.isInitialized = true;
         const preview = new URLSearchParams(window.location.search);
         this.celebration = new App.TokenCelebration(
-            document.getElementById('token-fire'),
-            document.getElementById('price-token-select'),
-            preview.get('effect') === 'fire' ? 'fire' : 'confetti'
+            document.getElementById('price-celebration'),
+            document.getElementById('price-token-select')
         );
         // Temporary opt-in preview; simulated values never enter the repository or storage.
         this.celebrationDemo = preview.get('celebration') === 'demo';
@@ -397,6 +396,7 @@ window.App.Crypto = {
         const isZero = selectedChange === 0;
         const changeElement = document.createElement('span');
         changeElement.className = isZero ? '' : selectedChange > 0 ? 'positive' : 'negative';
+        changeElement.dataset.period = this.currentPeriod;
         changeElement.textContent = App.Utils.formatPercent(selectedChange);
 
         const [before, after] = App.I18n.t(`price.change.${this.currentPeriod}`).split('{change}');

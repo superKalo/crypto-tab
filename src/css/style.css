@@ -639,6 +639,8 @@ small {
 /* Token selection beside the price */
 .price-heading {
     position: relative;
+    isolation: isolate;
+    z-index: 1;
     width: 100%;
     line-height: 1.5;
     transition: opacity 140ms ease-out;
@@ -697,52 +699,19 @@ small {
         opacity 180ms ease,
         transform 180ms cubic-bezier(0.2, 0.7, 0.2, 1);
 }
-/* The field is painted behind the logo and never changes the heading's layout. */
-.token-fire {
+/* Keep the celebration behind the whole price sentence and outside its layout. */
+.price-celebration {
     display: none;
     position: absolute;
-    width: 96px;
-    height: 120px;
-    left: -38px;
-    bottom: -8px;
-    pointer-events: none;
-    z-index: -1;
-}
-.is-celebrating .token-fire {
-    display: block;
-}
-.token-confetti {
-    display: none;
-    position: absolute;
-    left: 0;
-    top: -140px;
     width: 100%;
-    height: 230px;
+    height: 220px;
+    left: 0;
+    top: -104px;
     pointer-events: none;
-    z-index: 1;
-}
-.token-confetti.is-active {
-    display: block;
-}
-.is-celebrating .price-token-mark::after {
-    content: '';
-    position: absolute;
-    inset: -16px;
     z-index: -1;
-    border-radius: 50%;
-    pointer-events: none;
-    background: radial-gradient(circle, #ffac3e44, transparent 70%);
 }
-.celebration-confetti.is-celebrating .price-token-mark::after {
-    display: none;
-}
-.price-token-select:hover .token-fire,
-.price-token-select:focus-visible .token-fire,
-.price-token-select[aria-expanded='true'] .token-fire,
-.price-token-select:hover .price-token-mark::after,
-.price-token-select:focus-visible .price-token-mark::after,
-.price-token-select[aria-expanded='true'] .price-token-mark::after {
-    display: none;
+.is-celebrating .price-celebration {
+    display: block;
 }
 .celebration-demo {
     margin-top: 8px;
@@ -750,8 +719,7 @@ small {
     color: var(--text-color-secondary);
 }
 @media (prefers-reduced-motion: reduce) {
-    .is-celebrating .token-fire,
-    .token-confetti.is-active {
+    .is-celebrating .price-celebration {
         display: none;
     }
 }
