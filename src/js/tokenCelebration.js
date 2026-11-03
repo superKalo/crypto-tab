@@ -675,10 +675,11 @@ window.App.TokenCelebration = class TokenCelebration {
         ctx.closePath();
         ctx.fill();
         ctx.stroke();
-        ctx.strokeStyle = this.color('gold', 0.7);
+        ctx.strokeStyle = this.color('gold', 0.58);
+        ctx.lineWidth = 0.6;
         ctx.beginPath();
-        ctx.moveTo(-4.8, -7.8);
-        ctx.quadraticCurveTo(0, -9.5, 5.8, -6.8);
+        ctx.moveTo(-4.7, -10.4);
+        ctx.quadraticCurveTo(0.9, -12, 6.5, -10.4);
         ctx.stroke();
         ctx.fillStyle = this.color('ink', 0.95);
         ctx.beginPath();
