@@ -651,8 +651,8 @@
                 </div>
               </div>
             </fieldset>
-            <label class="color-row celebration-row" for="celebration-enabled">
-              <span class="color-label-group">
+            <div class="color-row celebration-row">
+              <label class="color-label-group" for="celebration-enabled">
                 <span id="celebration-label" class="color-label" data-i18n="celebration.title">
                   Celebration Mode
                 </span>
@@ -663,7 +663,16 @@
                 >
                   Shows a rocket when the selected token is up at least 5% over the past 24 hours.
                 </span>
-              </span>
+              </label>
+              <button
+                id="celebration-preview"
+                class="celebration-preview"
+                type="button"
+                aria-describedby="celebration-label"
+                data-i18n="celebration.preview"
+              >
+                Preview
+              </button>
               <span class="color-control celebration-switch">
                 <input
                   id="celebration-enabled"
@@ -676,7 +685,7 @@
                 />
                 <span class="celebration-switch-track" aria-hidden="true"></span>
               </span>
-            </label>
+            </div>
           </section>
         </div>
       </div>

@@ -1,5 +1,12 @@
 window.App = window.App || {};
 
+const CELEBRATION_FLIGHT = { kickSeconds: 0.24, approachSeconds: 8, passSeconds: 4.5 };
+const CELEBRATION_PREVIEW_SECONDS =
+    CELEBRATION_FLIGHT.kickSeconds +
+    CELEBRATION_FLIGHT.approachSeconds +
+    CELEBRATION_FLIGHT.passSeconds +
+    1;
+
 window.App.TokenCelebration = class TokenCelebration {
     constructor(canvas, trigger) {
         this.canvas = canvas;
@@ -7,14 +14,18 @@ window.App.TokenCelebration = class TokenCelebration {
         this.container = canvas.parentElement;
         this.rocketTarget = document.querySelector('.celebration-rocket-target');
         const rocketTip = this.rocketTarget.querySelector('.celebration-rocket-tip');
+        this.rocketTipTitle = rocketTip.querySelector('.update-details-title');
+        this.rocketTipDescription = rocketTip.querySelector('.update-details-description');
         this.rocketTipWidth = 0;
         this.heading = this.container.querySelector('.chart-period');
+        this.price = document.getElementById('price-now');
         this.context = canvas.getContext('2d');
         this.motion = window.matchMedia('(prefers-reduced-motion: reduce)');
         this.active = false;
         this.frame = null;
         this.lastFrame = null;
         this.elapsed = 0;
+        this.previewElapsed = null;
         this.palette = null;
         this.needsLayout = true;
         this.particles = [];
@@ -36,10 +47,19 @@ window.App.TokenCelebration = class TokenCelebration {
                 return;
             }
             if (this.lastFrame === null || now - this.lastFrame >= 1000 / 24) {
-                if (this.lastFrame !== null) {
-                    this.elapsed += Math.min(now - this.lastFrame, 100) / 1000;
+                const delta =
+                    this.lastFrame === null ? 0 : Math.min(now - this.lastFrame, 100) / 1000;
+                if (this.previewElapsed === null) {
+                    this.elapsed += delta;
+                    this.render(this.elapsed);
+                } else {
+                    this.previewElapsed += delta;
+                    if (this.previewElapsed >= CELEBRATION_PREVIEW_SECONDS) {
+                        this.setPreview(false);
+                        return;
+                    }
+                    this.render(this.previewElapsed);
                 }
-                this.render(this.elapsed);
                 this.lastFrame = now;
             }
             this.frame = window.requestAnimationFrame(this.tick);
@@ -79,17 +99,36 @@ window.App.TokenCelebration = class TokenCelebration {
             return;
         }
         this.active = active;
-        this.container.classList.toggle('is-celebrating', active);
         this.update();
+    }
+
+    setPreview(active) {
+        if (this.destroyed || (active && (!this.context || this.motion.matches))) {
+            return false;
+        }
+        if (!active && this.previewElapsed === null) {
+            return false;
+        }
+
+        this.previewElapsed = active ? 0 : null;
+        this.rocketTipTitle.textContent = App.I18n.t(
+            active ? 'celebration.previewTitle' : 'celebration.activated'
+        );
+        this.rocketTipDescription.classList.toggle('hidden', active);
+        this.needsLayout = true;
+        this.lastFrame = null;
+        this.update();
+        return true;
     }
 
     canAnimate() {
         return (
             !this.destroyed &&
-            this.active &&
+            (this.active || this.previewElapsed !== null) &&
             this.context &&
             !document.hidden &&
             !this.motion.matches &&
+            this.container.getAttribute('aria-busy') !== 'true' &&
             !this.trigger.matches(':focus-visible, [aria-expanded="true"]')
         );
     }
@@ -98,6 +137,10 @@ window.App.TokenCelebration = class TokenCelebration {
         if (this.destroyed) {
             return;
         }
+        this.container.classList.toggle(
+            'is-celebrating',
+            this.active || this.previewElapsed !== null
+        );
         if (this.canAnimate()) {
             this.prepare();
             if (!this.textBounds) {
@@ -138,7 +181,7 @@ window.App.TokenCelebration = class TokenCelebration {
         if (!this.palette) {
             const styles = window.getComputedStyle(this.canvas);
             this.palette = {};
-            ['gold', 'lilac', 'pearl', 'ink'].forEach((name) => {
+            ['gold', 'lilac', 'pearl', 'ink', 'shell'].forEach((name) => {
                 this.palette[name] = styles.getPropertyValue(`--celebration-${name}`).trim();
             });
         }
@@ -231,30 +274,33 @@ window.App.TokenCelebration = class TokenCelebration {
         this.needsLayout = false;
     }
 
-    placeRocket(canvasRect) {
-        this.rocket = null;
+    getGainAnchor() {
         const comparison = this.heading.querySelector('#change .positive[data-period="ONE_DAY"]');
-        if (!comparison) {
-            return;
-        }
-        const text = comparison.firstChild;
+        const text = comparison?.firstChild;
         const firstDigit = text?.textContent.match(/\p{Decimal_Number}/u);
         if (!firstDigit) {
-            return;
+            return null;
         }
         const digitRange = document.createRange();
         digitRange.setStart(text, firstDigit.index);
         digitRange.setEnd(text, firstDigit.index + firstDigit[0].length);
         const digit = digitRange.getBoundingClientRect();
-        if (!digit.width || !digit.height) {
+        return digit.width && digit.height ? digit : null;
+    }
+
+    placeRocket(canvasRect) {
+        this.rocket = null;
+        const anchor =
+            this.getGainAnchor() ??
+            (this.previewElapsed !== null ? this.price.getBoundingClientRect() : null);
+        if (!anchor?.width || !anchor.height) {
             return;
         }
         const clock = document.getElementById('clock').getBoundingClientRect();
         const scale = this.width < 420 ? 0.76 : 1;
-        // Align the exhaust with the first digit, just after the plus sign.
-        const origin = (digit.left + digit.right) / 2 - canvasRect.left;
+        const origin = (anchor.left + anchor.right) / 2 - canvasRect.left;
         const x = Math.max(20 * scale, Math.min(this.width - 40 * scale, origin + 22 * scale));
-        const y = digit.top - canvasRect.top - 13 * scale;
+        const y = anchor.top - canvasRect.top - 13 * scale;
         const endX = Math.min(
             this.width - 24 * scale,
             Math.max(x + 44 * scale, clock.right - canvasRect.left + 14 * scale)
@@ -304,9 +350,7 @@ window.App.TokenCelebration = class TokenCelebration {
 
     getRocketPose(rocket, time) {
         const { x, y, scale, drift, rise, clockEntry } = rocket;
-        const kickSeconds = 0.24;
-        const approachSeconds = 8;
-        const passSeconds = 4.5;
+        const { kickSeconds, approachSeconds, passSeconds } = CELEBRATION_FLIGHT;
         const kickDistance = 7 * scale;
         const approachSpeed = (clockEntry - kickDistance) / approachSeconds;
         const kick = Math.min(1, time / kickSeconds);
@@ -592,7 +636,7 @@ window.App.TokenCelebration = class TokenCelebration {
         }
         const ctx = this.context;
         const { scale } = this.rocket;
-        const flightTime = time / 3;
+        const flightTime = this.previewElapsed === null ? time / 3 : time;
         const pose = this.getRocketPose(this.rocket, flightTime);
         const shake = 3.5 * Math.sin(time * Math.PI * 16) * Math.max(0, 1 - time / 0.5) ** 2;
         const rocketX = pose.x + shake * scale;
@@ -663,8 +707,8 @@ window.App.TokenCelebration = class TokenCelebration {
         ctx.stroke();
         const shell = ctx.createLinearGradient(-8, 0, 8, 0);
         shell.addColorStop(0, this.color('gold', 0.75));
-        shell.addColorStop(0.38, this.color('pearl', 1));
-        shell.addColorStop(1, this.color('pearl', 1));
+        shell.addColorStop(0.38, this.color('shell', 1));
+        shell.addColorStop(1, this.color('shell', 1));
         ctx.fillStyle = shell;
         ctx.beginPath();
         ctx.moveTo(0, -18);
@@ -711,6 +755,7 @@ window.App.TokenCelebration = class TokenCelebration {
 
     destroy() {
         this.setActive(false);
+        this.setPreview(false);
         this.destroyed = true;
         this.observer.disconnect();
         this.layoutObserver.disconnect();

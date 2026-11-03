@@ -9,6 +9,7 @@
     /* RGB channels let the canvas renderer vary the celebration's transparency. */
     --light-celebration-gold: 163, 92, 18;
     --light-celebration-pearl: 255, 246, 226;
+    --light-celebration-shell: var(--light-celebration-pearl);
     --light-celebration-lilac: 116, 61, 173;
     --light-celebration-ink: 86, 73, 106;
     --light-border-color: #dddddd;
@@ -39,6 +40,7 @@
     --dark-positive-color: #82ad6b;
     --dark-celebration-gold: 246, 196, 118;
     --dark-celebration-pearl: 255, 244, 219;
+    --dark-celebration-shell: 239, 235, 228;
     --dark-celebration-lilac: 187, 146, 226;
     --dark-celebration-ink: 91, 78, 110;
     --dark-border-color: #444444;
@@ -72,6 +74,7 @@
     --positive-color: var(--light-positive-color);
     --celebration-gold: var(--light-celebration-gold);
     --celebration-pearl: var(--light-celebration-pearl);
+    --celebration-shell: var(--light-celebration-shell);
     --celebration-lilac: var(--light-celebration-lilac);
     --celebration-ink: var(--light-celebration-ink);
     --border-color: var(--light-border-color);
@@ -105,6 +108,7 @@
         --positive-color: var(--dark-positive-color);
         --celebration-gold: var(--dark-celebration-gold);
         --celebration-pearl: var(--dark-celebration-pearl);
+        --celebration-shell: var(--dark-celebration-shell);
         --celebration-lilac: var(--dark-celebration-lilac);
         --celebration-ink: var(--dark-celebration-ink);
         --border-color: var(--dark-border-color);
@@ -138,6 +142,7 @@
     --positive-color: var(--light-positive-color);
     --celebration-gold: var(--light-celebration-gold);
     --celebration-pearl: var(--light-celebration-pearl);
+    --celebration-shell: var(--light-celebration-shell);
     --celebration-lilac: var(--light-celebration-lilac);
     --celebration-ink: var(--light-celebration-ink);
     --border-color: var(--light-border-color);
@@ -170,6 +175,7 @@
     --positive-color: var(--dark-positive-color);
     --celebration-gold: var(--dark-celebration-gold);
     --celebration-pearl: var(--dark-celebration-pearl);
+    --celebration-shell: var(--dark-celebration-shell);
     --celebration-lilac: var(--dark-celebration-lilac);
     --celebration-ink: var(--dark-celebration-ink);
     --border-color: var(--dark-border-color);

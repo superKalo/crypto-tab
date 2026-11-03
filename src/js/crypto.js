@@ -8,7 +8,6 @@ window.App = window.App || {};
 window.App.Crypto = {
     PERIODS: window.App.CryptoTokens.PERIODS,
     REFRESH_INTERVAL: 30 * 1000,
-    CELEBRATION_DEMO_GAIN: 6,
 
     $chart: document.getElementById('chart'),
     $change: document.getElementById('change'),
@@ -29,7 +28,6 @@ window.App.Crypto = {
     requestGeneration: 0,
     tokenPicker: null,
     celebrationDayChange: null,
-    celebrationDemo: false,
 
     async init() {
         if (this.isInitialized) {
@@ -47,21 +45,10 @@ window.App.Crypto = {
         document.getElementById('celebration-message').textContent = App.I18n.t(
             celebrationMessages[Math.floor(Math.random() * celebrationMessages.length)]
         );
-        const preview = new URLSearchParams(window.location.search);
         this.celebration = new App.TokenCelebration(
             document.getElementById('price-celebration'),
             document.getElementById('price-token-select')
         );
-        // Temporary opt-in preview; simulated values never enter the repository or storage.
-        this.celebrationDemo = preview.get('celebration') === 'demo';
-        if (this.celebrationDemo) {
-            this.$celebrationDemo = document.createElement('p');
-            this.$celebrationDemo.className = 'celebration-demo';
-            this.$celebrationDemo.textContent = App.I18n.t('celebration.demo', {
-                change: this.formatCelebrationGain(this.CELEBRATION_DEMO_GAIN),
-            });
-            document.body.append(this.$celebrationDemo);
-        }
         this.chart = new App.Chart(this.$chart);
         this.repositoryClient = new App.PriceRepositoryClient();
 
@@ -84,6 +71,9 @@ window.App.Crypto = {
         this.updateCryptoTypeLabel();
         this.updateActivePeriod();
         this.initEvents();
+        if (new URLSearchParams(window.location.search).get('celebration') === 'preview') {
+            this.celebration.setPreview(true);
+        }
         this.unsubscribeSettings = App.Settings.subscribe((updated, changedKeys) => {
             this.applySettings(updated, changedKeys);
         });
@@ -135,6 +125,7 @@ window.App.Crypto = {
         };
         this.handlePageHide = (event) => {
             this.celebration.setActive(false);
+            this.celebration.setPreview(false);
             // A cached page keeps its settings subscription; the browser pauses its timers.
             if (!event.persisted) {
                 this.destroy();
@@ -289,14 +280,9 @@ window.App.Crypto = {
     renderCurrentPriceResult(result) {
         this.celebrationDayChange =
             result.ok && !result.isStale ? result.data.changePercent.dayAgo : null;
-        this.updateCelebration();
         if (result.ok) {
             this.setPriceNow(result.data.price);
-            this.setPriceChange(
-                this.celebrationDemo
-                    ? { ...result.data.changePercent, dayAgo: this.CELEBRATION_DEMO_GAIN }
-                    : result.data.changePercent
-            );
+            this.setPriceChange(result.data.changePercent);
         } else {
             this.$priceNow.textContent = App.I18n.t('price.unavailable');
             this.$priceNow.setAttribute('aria-label', App.I18n.t('price.unavailableLabel'));
@@ -307,6 +293,7 @@ window.App.Crypto = {
         // Reveal the complete first result without recentering a visible loading placeholder.
         const isFirstPriceResult = this.$priceHeading.getAttribute('aria-busy') === 'true';
         this.$priceHeading.setAttribute('aria-busy', 'false');
+        this.updateCelebration();
         if (isFirstPriceResult) {
             App.TokenPickerIntro.init();
         }
@@ -354,9 +341,7 @@ window.App.Crypto = {
     },
 
     updateCelebration() {
-        const dayChange = this.celebrationDemo
-            ? this.CELEBRATION_DEMO_GAIN
-            : this.celebrationDayChange;
+        const dayChange = this.celebrationDayChange;
         const qualifies = Number.isFinite(dayChange) && dayChange >= 5;
         if (qualifies) {
             const gain = document.getElementById('celebration-gain');
@@ -702,9 +687,6 @@ window.App.Crypto = {
     destroy() {
         this.isInitialized = false;
         this.celebrationDayChange = null;
-        this.celebrationDemo = false;
-        this.updateCelebration();
-        this.$celebrationDemo?.remove();
         this.celebration?.destroy();
         if (this.refreshTimer) {
             window.clearInterval(this.refreshTimer);

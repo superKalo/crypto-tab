@@ -746,16 +746,9 @@ small {
     width: 12px;
     height: 100%;
 }
-.celebration-demo {
-    position: fixed;
-    bottom: 12px;
-    left: 12px;
-    margin: 0;
-    font-size: 12px;
-    color: var(--text-color-secondary);
-}
 @media (prefers-reduced-motion: reduce) {
-    .is-celebrating .price-celebration {
+    .is-celebrating .price-celebration,
+    .celebration-preview {
         display: none;
     }
 }
@@ -1307,12 +1300,14 @@ small {
     opacity: 0.6;
 }
 .language-browser-default,
-.language-use-browser {
+.language-use-browser,
+.celebration-preview {
     color: var(--text-color-secondary);
     font-size: 12px;
     line-height: 1.5;
 }
-.language-use-browser {
+.language-use-browser,
+.celebration-preview {
     padding: 4px 0;
     border: 0;
     border-radius: 2px;
@@ -1324,7 +1319,8 @@ small {
     cursor: pointer;
     touch-action: manipulation;
 }
-.language-use-browser:hover {
+.language-use-browser:hover,
+.celebration-preview:hover {
     color: var(--text-color);
 }
 .settings-choice legend {
@@ -1437,13 +1433,14 @@ small {
     height: 36px;
 }
 .settings .celebration-row {
+    column-gap: 8px;
+}
+.settings .celebration-row .color-label-group {
+    display: grid;
+    gap: 2px;
     font-weight: normal;
     cursor: pointer;
     touch-action: manipulation;
-}
-.celebration-row .color-label-group {
-    display: grid;
-    gap: 2px;
 }
 .celebration-description {
     font-size: 12px;
@@ -1840,6 +1837,7 @@ body.about-open {
     .token-option,
     .token-request-link,
     .language-use-browser,
+    .celebration-preview,
     .reset-color,
     .about-links a,
     .contributors a {

@@ -118,6 +118,11 @@ window.App.SettingsPanel = (function () {
             celebrationToggle.checked = App.Crypto.celebrationEnabled !== false;
             celebrationToggle.disabled = false;
         });
+        document.getElementById('celebration-preview').addEventListener('click', () => {
+            if (App.Crypto.celebration?.setPreview(true)) {
+                hidePanel(true);
+            }
+        });
 
         const languageSelect = document.getElementById('language-select');
         const languageBrowserDefault = document.getElementById('language-browser-default');
