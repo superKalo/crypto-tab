@@ -22,6 +22,8 @@
 -   View the past hour, day, week, month, year, or all available history in a single chart.
 -   Follow your system theme by default, or choose light or dark.
 -   Customize the chart and interface accent color, with separate colors for price changes.
+-   Watch Celebration Mode launch a rocket in the 1D view when your token is up at least 5% over
+    the past 24 hours, or preview the animation in Customize.
 -   Follow your browser's regional clock format by default, or choose 12-hour or 24-hour time.
 -   Available in Indonesian, German, English, Spanish, French, Italian, Polish, Brazilian and
     European Portuguese, Slovenian, Bulgarian, Serbian, and Japanese. The interface follows your
