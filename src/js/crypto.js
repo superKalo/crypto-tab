@@ -8,6 +8,7 @@ window.App = window.App || {};
 window.App.Crypto = {
     PERIODS: window.App.CryptoTokens.PERIODS,
     REFRESH_INTERVAL: 30 * 1000,
+    CELEBRATION_DEMO_GAIN: 6,
 
     $chart: document.getElementById('chart'),
     $change: document.getElementById('change'),
@@ -36,9 +37,16 @@ window.App.Crypto = {
         }
 
         this.isInitialized = true;
-        const celebrationMessages = ['To the moon!', 'Moon soon!', 'Bullish!', 'LFG!', 'Pump it!'];
-        document.getElementById('celebration-message').textContent =
-            celebrationMessages[Math.floor(Math.random() * celebrationMessages.length)];
+        const celebrationMessages = [
+            'celebration.message.toTheMoon',
+            'celebration.message.moonSoon',
+            'celebration.message.bullish',
+            'celebration.message.lfg',
+            'celebration.message.pumpIt',
+        ];
+        document.getElementById('celebration-message').textContent = App.I18n.t(
+            celebrationMessages[Math.floor(Math.random() * celebrationMessages.length)]
+        );
         const preview = new URLSearchParams(window.location.search);
         this.celebration = new App.TokenCelebration(
             document.getElementById('price-celebration'),
@@ -49,7 +57,9 @@ window.App.Crypto = {
         if (this.celebrationDemo) {
             this.$celebrationDemo = document.createElement('p');
             this.$celebrationDemo.className = 'celebration-demo';
-            this.$celebrationDemo.textContent = 'Demo: +6% (24h)';
+            this.$celebrationDemo.textContent = App.I18n.t('celebration.demo', {
+                change: this.formatCelebrationGain(this.CELEBRATION_DEMO_GAIN),
+            });
             document.body.append(this.$celebrationDemo);
         }
         this.chart = new App.Chart(this.$chart);
@@ -284,7 +294,7 @@ window.App.Crypto = {
             this.setPriceNow(result.data.price);
             this.setPriceChange(
                 this.celebrationDemo
-                    ? { ...result.data.changePercent, dayAgo: 6 }
+                    ? { ...result.data.changePercent, dayAgo: this.CELEBRATION_DEMO_GAIN }
                     : result.data.changePercent
             );
         } else {
@@ -335,13 +345,24 @@ window.App.Crypto = {
         this.updateCelebration();
     },
 
+    formatCelebrationGain(value) {
+        const formatter = new Intl.NumberFormat(App.I18n.locale, {
+            style: 'percent',
+            maximumFractionDigits: 2,
+        });
+        return formatter.format(value / 100).replace(/\s+%$/, '%');
+    },
+
     updateCelebration() {
-        const dayChange = this.celebrationDemo ? 6 : this.celebrationDayChange;
+        const dayChange = this.celebrationDemo
+            ? this.CELEBRATION_DEMO_GAIN
+            : this.celebrationDayChange;
         const qualifies = Number.isFinite(dayChange) && dayChange >= 5;
         if (qualifies) {
-            document.getElementById('celebration-gain').textContent = App.Utils.formatPercent(
-                Number(dayChange.toFixed(2))
-            ).slice(1);
+            const gain = document.getElementById('celebration-gain');
+            gain.textContent = App.I18n.t('celebration.gain', {
+                change: this.formatCelebrationGain(dayChange),
+            });
         }
         this.celebration?.setActive(
             this.isInitialized && this.celebrationEnabled && !document.hidden && qualifies

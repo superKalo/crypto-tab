@@ -6,6 +6,8 @@ window.App.TokenCelebration = class TokenCelebration {
         this.trigger = trigger;
         this.container = canvas.parentElement;
         this.rocketTarget = document.querySelector('.celebration-rocket-target');
+        const rocketTip = this.rocketTarget.querySelector('.celebration-rocket-tip');
+        this.rocketTipWidth = 0;
         this.heading = this.container.querySelector('.chart-period');
         this.context = canvas.getContext('2d');
         this.motion = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -55,12 +57,18 @@ window.App.TokenCelebration = class TokenCelebration {
             characterData: true,
             subtree: true,
         });
-        this.resizeObserver = new ResizeObserver(this.handleLayoutChange);
+        this.resizeObserver = new ResizeObserver((entries) => {
+            this.rocketTipWidth = rocketTip.offsetWidth;
+            if (entries.some(({ target }) => target !== rocketTip)) {
+                this.handleLayoutChange();
+            }
+        });
         [
             this.container,
             this.heading,
             document.getElementById('clock'),
             document.getElementById('periods'),
+            rocketTip,
         ].forEach((element) => {
             this.resizeObserver.observe(element);
         });
@@ -592,10 +600,13 @@ window.App.TokenCelebration = class TokenCelebration {
         const targetX = canvasRect.left + rocketX;
         const targetY = canvasRect.top + pose.y;
         const viewportWidth = document.documentElement.clientWidth;
-        const tipInset = Math.min(128, viewportWidth / 2);
+        const tipInset = Math.min(this.rocketTipWidth / 2 + 8, viewportWidth / 2);
         const tipCenter = Math.max(tipInset, Math.min(viewportWidth - tipInset, targetX));
         this.rocketTarget.style.setProperty('--rocket-tip-offset', `${tipCenter - targetX}px`);
-        this.rocketTarget.classList.toggle('tooltip-beside', viewportWidth - targetX >= 280);
+        this.rocketTarget.classList.toggle(
+            'tooltip-beside',
+            viewportWidth - targetX >= this.rocketTipWidth + 40
+        );
         this.rocketTarget.hidden = time < 0.2;
         this.rocketTarget.style.transform = `translate(${targetX}px, ${targetY}px) translate(-50%, -50%)`;
         this.renderLaunchConfetti(this.rocket, time, shake * scale);

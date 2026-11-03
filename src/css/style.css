@@ -730,7 +730,8 @@ small {
     cursor: help;
 }
 .celebration-rocket-tip {
-    width: 240px;
+    width: max-content;
+    max-width: min(320px, calc(100vw - 32px));
     left: calc(50% + var(--rocket-tip-offset, 0px));
 }
 .celebration-rocket-target.tooltip-beside .celebration-rocket-tip {
