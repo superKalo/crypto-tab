@@ -27,6 +27,7 @@ window.App.Crypto = {
     repositoryStatuses: {},
     requestGeneration: 0,
     tokenPicker: null,
+    celebrationDayChange: null,
 
     async init() {
         if (this.isInitialized) {
@@ -34,10 +35,25 @@ window.App.Crypto = {
         }
 
         this.isInitialized = true;
+        const celebrationMessages = [
+            'celebration.message.toTheMoon',
+            'celebration.message.moonSoon',
+            'celebration.message.bullish',
+            'celebration.message.lfg',
+            'celebration.message.pumpIt',
+        ];
+        document.getElementById('celebration-message').textContent = App.I18n.t(
+            celebrationMessages[Math.floor(Math.random() * celebrationMessages.length)]
+        );
+        this.celebration = new App.TokenCelebration(
+            document.getElementById('price-celebration'),
+            document.getElementById('price-token-select')
+        );
         this.chart = new App.Chart(this.$chart);
         this.repositoryClient = new App.PriceRepositoryClient();
 
         const settings = await App.Settings.get();
+        this.celebrationEnabled = settings.celebrationEnabled !== false;
         this.currentCrypto = App.CryptoTokens.isSupportedToken(settings.cryptoType)
             ? settings.cryptoType
             : App.CryptoTokens.getDefaultToken();
@@ -55,6 +71,9 @@ window.App.Crypto = {
         this.updateCryptoTypeLabel();
         this.updateActivePeriod();
         this.initEvents();
+        if (new URLSearchParams(window.location.search).get('celebration') === 'preview') {
+            this.celebration.setPreview(true);
+        }
         this.unsubscribeSettings = App.Settings.subscribe((updated, changedKeys) => {
             this.applySettings(updated, changedKeys);
         });
@@ -80,14 +99,15 @@ window.App.Crypto = {
             });
         });
 
-        this.$lastUpdated.querySelectorAll('.update-trigger').forEach((trigger) => {
+        const tooltipTriggers = document.querySelectorAll('.update-trigger');
+        tooltipTriggers.forEach((trigger) => {
             const showTooltip = () => trigger.classList.remove('tooltip-dismissed');
             trigger.addEventListener('mouseenter', showTooltip);
             trigger.addEventListener('focusin', showTooltip);
         });
         this.handleTooltipEscape = (event) => {
             if (event.key === 'Escape') {
-                this.$lastUpdated.querySelectorAll('.update-trigger').forEach((trigger) => {
+                tooltipTriggers.forEach((trigger) => {
                     trigger.classList.add('tooltip-dismissed');
                 });
             }
@@ -98,19 +118,24 @@ window.App.Crypto = {
         window.addEventListener('clockformatchange', this.handleClockFormatChange);
 
         this.handleVisibilityChange = () => {
+            this.updateCelebration();
             if (!document.hidden) {
                 this.refreshActiveData();
             }
         };
         this.handlePageHide = (event) => {
+            this.celebration.setActive(false);
+            this.celebration.setPreview(false);
             // A cached page keeps its settings subscription; the browser pauses its timers.
             if (!event.persisted) {
                 this.destroy();
             }
         };
+        this.handlePageShow = () => this.updateCelebration();
 
         document.addEventListener('visibilitychange', this.handleVisibilityChange);
         window.addEventListener('pagehide', this.handlePageHide);
+        window.addEventListener('pageshow', this.handlePageShow);
     },
 
     async changePeriod(period) {
@@ -155,6 +180,10 @@ window.App.Crypto = {
     },
 
     applySettings(settings, changedKeys) {
+        if (changedKeys.includes('celebrationEnabled')) {
+            this.setCelebrationEnabled(settings.celebrationEnabled);
+        }
+
         const cryptoType = changedKeys.includes('cryptoType')
             ? App.CryptoTokens.isSupportedToken(settings.cryptoType)
                 ? settings.cryptoType
@@ -249,6 +278,8 @@ window.App.Crypto = {
     },
 
     renderCurrentPriceResult(result) {
+        this.celebrationDayChange =
+            result.ok && !result.isStale ? result.data.changePercent.dayAgo : null;
         if (result.ok) {
             this.setPriceNow(result.data.price);
             this.setPriceChange(result.data.changePercent);
@@ -262,6 +293,7 @@ window.App.Crypto = {
         // Reveal the complete first result without recentering a visible loading placeholder.
         const isFirstPriceResult = this.$priceHeading.getAttribute('aria-busy') === 'true';
         this.$priceHeading.setAttribute('aria-busy', 'false');
+        this.updateCelebration();
         if (isFirstPriceResult) {
             App.TokenPickerIntro.init();
         }
@@ -277,6 +309,8 @@ window.App.Crypto = {
     },
 
     updateCryptoTypeLabel() {
+        this.celebrationDayChange = null;
+        this.updateCelebration();
         const token = App.CryptoTokens.getToken(this.currentCrypto);
         this.$cryptoTypeLabel.textContent = token.displayName;
         document.getElementById('price-token-logo').src = token.logoPath;
@@ -291,6 +325,33 @@ window.App.Crypto = {
         this.renderPriceHeading(this.priceHeadingKey || 'price.headingLoading');
         this.tokenPicker?.renderSelected(this.currentCrypto);
         App.SettingsPanel?.renderSelectedToken(this.currentCrypto);
+    },
+
+    setCelebrationEnabled(enabled) {
+        this.celebrationEnabled = enabled !== false;
+        this.updateCelebration();
+    },
+
+    formatCelebrationGain(value) {
+        const formatter = new Intl.NumberFormat(App.I18n.locale, {
+            style: 'percent',
+            maximumFractionDigits: 2,
+        });
+        return formatter.format(value / 100).replace(/\s+%$/, '%');
+    },
+
+    updateCelebration() {
+        const dayChange = this.celebrationDayChange;
+        const qualifies = Number.isFinite(dayChange) && dayChange >= 5;
+        if (qualifies) {
+            const gain = document.getElementById('celebration-gain');
+            gain.textContent = App.I18n.t('celebration.gain', {
+                change: this.formatCelebrationGain(dayChange),
+            });
+        }
+        this.celebration?.setActive(
+            this.isInitialized && this.celebrationEnabled && !document.hidden && qualifies
+        );
     },
 
     updateActivePeriod() {
@@ -361,6 +422,7 @@ window.App.Crypto = {
         const isZero = selectedChange === 0;
         const changeElement = document.createElement('span');
         changeElement.className = isZero ? '' : selectedChange > 0 ? 'positive' : 'negative';
+        changeElement.dataset.period = this.currentPeriod;
         changeElement.textContent = App.Utils.formatPercent(selectedChange);
 
         const [before, after] = App.I18n.t(`price.change.${this.currentPeriod}`).split('{change}');
@@ -623,6 +685,9 @@ window.App.Crypto = {
     },
 
     destroy() {
+        this.isInitialized = false;
+        this.celebrationDayChange = null;
+        this.celebration?.destroy();
         if (this.refreshTimer) {
             window.clearInterval(this.refreshTimer);
             this.refreshTimer = null;
@@ -633,6 +698,9 @@ window.App.Crypto = {
         }
         if (this.handlePageHide) {
             window.removeEventListener('pagehide', this.handlePageHide);
+        }
+        if (this.handlePageShow) {
+            window.removeEventListener('pageshow', this.handlePageShow);
         }
         if (this.handleTooltipEscape) {
             document.removeEventListener('keydown', this.handleTooltipEscape);

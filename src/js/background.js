@@ -64,6 +64,7 @@ function handleSettingsUpdate(patch, sendResponse) {
             globalThis.App.LocaleConfig.normalizePreference(value) === value,
         accentColor: (value) =>
             value === null || (typeof value === 'string' && /^#[\da-f]{6}$/i.test(value)),
+        celebrationEnabled: (value) => typeof value === 'boolean',
         cryptoType: (value) => globalThis.App.CryptoTokens.isSupportedToken(value),
         period: (value) => globalThis.App.CryptoTokens.isChartPeriod(value),
         colorup: (value) => /^#[\da-f]{6}$/i.test(value),

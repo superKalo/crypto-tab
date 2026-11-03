@@ -107,6 +107,23 @@ window.App.SettingsPanel = (function () {
             window.App.Clock.updateFormat(newFormat);
         });
 
+        const celebrationToggle = document.getElementById('celebration-enabled');
+        celebrationToggle.addEventListener('change', async () => {
+            const enabled = celebrationToggle.checked;
+            celebrationToggle.disabled = true;
+            const saved = await App.Settings.set('celebrationEnabled', enabled);
+            if (saved) {
+                App.Crypto.setCelebrationEnabled(enabled);
+            }
+            celebrationToggle.checked = App.Crypto.celebrationEnabled !== false;
+            celebrationToggle.disabled = false;
+        });
+        document.getElementById('celebration-preview').addEventListener('click', () => {
+            if (App.Crypto.celebration?.setPreview(true)) {
+                hidePanel(true);
+            }
+        });
+
         const languageSelect = document.getElementById('language-select');
         const languageBrowserDefault = document.getElementById('language-browser-default');
         const languageUseBrowser = document.getElementById('language-use-browser');
@@ -179,6 +196,10 @@ window.App.SettingsPanel = (function () {
         document.addEventListener('click', handleOutsideClick);
 
         window.App.Settings.subscribe((settings, changedKeys) => {
+            if (changedKeys.includes('celebrationEnabled')) {
+                changedPreferences.add('celebrationEnabled');
+                celebrationToggle.checked = settings.celebrationEnabled !== false;
+            }
             if (changedKeys.includes('clockFormat')) {
                 changedPreferences.add('clockFormat');
                 renderClockFormat(settings.clockFormat);
@@ -279,6 +300,11 @@ window.App.SettingsPanel = (function () {
                 : window.App.CryptoTokens.getDefaultToken();
             renderSelectedToken(window.App.Crypto.currentCrypto || cryptoType);
 
+            const celebrationToggle = document.getElementById('celebration-enabled');
+            if (!changedPreferences.has('celebrationEnabled')) {
+                celebrationToggle.checked = settings.celebrationEnabled !== false;
+            }
+            celebrationToggle.disabled = false;
             if (!changedPreferences.has('clockFormat')) {
                 renderClockFormat(settings.clockFormat);
             }

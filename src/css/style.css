@@ -185,6 +185,8 @@ small {
     color: var(--text-color);
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
     text-align: left;
+    font-size: 0.8rem;
+    line-height: 1.5;
     white-space: pre-line;
     visibility: hidden;
 }
@@ -629,6 +631,11 @@ small {
 }
 
 /* Clock style */
+#clock {
+    /* Let the celebration pass behind the clock's rightmost digits. */
+    position: relative;
+    z-index: 2;
+}
 .clock-period {
     font-size: 0.3em;
     font-weight: 400;
@@ -639,6 +646,8 @@ small {
 /* Token selection beside the price */
 .price-heading {
     position: relative;
+    isolation: isolate;
+    z-index: 1;
     width: 100%;
     line-height: 1.5;
     transition: opacity 140ms ease-out;
@@ -678,6 +687,7 @@ small {
 }
 .price-token-mark {
     position: relative;
+    isolation: isolate;
     display: inline-block;
     width: 20px;
     height: 20px;
@@ -695,6 +705,52 @@ small {
     transition:
         opacity 180ms ease,
         transform 180ms cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+/* Keep the celebration behind the whole price sentence and outside its layout. */
+.price-celebration {
+    display: none;
+    position: absolute;
+    width: 100%;
+    height: 380px;
+    left: 0;
+    top: -264px;
+    pointer-events: none;
+    z-index: -1;
+}
+.is-celebrating .price-celebration {
+    display: block;
+}
+.celebration-rocket-target {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 38px;
+    height: 42px;
+    z-index: 3;
+    cursor: help;
+}
+.celebration-rocket-tip {
+    width: max-content;
+    max-width: min(320px, calc(100vw - 32px));
+    left: calc(50% + var(--rocket-tip-offset, 0px));
+}
+.celebration-rocket-target.tooltip-beside .celebration-rocket-tip {
+    bottom: auto;
+    top: 50%;
+    left: calc(100% + 10px);
+    transform: translateY(-50%);
+}
+.celebration-rocket-target.tooltip-beside .celebration-rocket-tip::after {
+    top: 0;
+    left: -12px;
+    width: 12px;
+    height: 100%;
+}
+@media (prefers-reduced-motion: reduce) {
+    .is-celebrating .price-celebration,
+    .celebration-preview {
+        display: none;
+    }
 }
 .price-token-edit {
     position: absolute;
@@ -1244,12 +1300,14 @@ small {
     opacity: 0.6;
 }
 .language-browser-default,
-.language-use-browser {
+.language-use-browser,
+.celebration-preview {
     color: var(--text-color-secondary);
     font-size: 12px;
     line-height: 1.5;
 }
-.language-use-browser {
+.language-use-browser,
+.celebration-preview {
     padding: 4px 0;
     border: 0;
     border-radius: 2px;
@@ -1261,7 +1319,8 @@ small {
     cursor: pointer;
     touch-action: manipulation;
 }
-.language-use-browser:hover {
+.language-use-browser:hover,
+.celebration-preview:hover {
     color: var(--text-color);
 }
 .settings-choice legend {
@@ -1337,7 +1396,7 @@ small {
     flex-direction: column;
     gap: 8px;
 }
-.color-row {
+.settings .color-row {
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto auto;
     align-items: center;
@@ -1372,6 +1431,74 @@ small {
     display: block;
     width: 64px;
     height: 36px;
+}
+.settings .celebration-row {
+    column-gap: 8px;
+}
+.settings .celebration-row .color-label-group {
+    display: grid;
+    gap: 2px;
+    font-weight: normal;
+    cursor: pointer;
+    touch-action: manipulation;
+}
+.celebration-description {
+    font-size: 12px;
+    line-height: 1.4;
+}
+.celebration-switch {
+    display: grid;
+    place-items: center end;
+}
+.celebration-switch input {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    opacity: 0;
+    cursor: pointer;
+}
+.celebration-switch-track {
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    width: 36px;
+    height: 22px;
+    padding: 2px;
+    border: 1px solid var(--toggle-inactive-color);
+    border-radius: 999px;
+    background: var(--toggle-bg);
+    color: var(--text-color-secondary);
+    pointer-events: none;
+}
+.celebration-switch-track::before {
+    content: '';
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: currentColor;
+}
+.celebration-switch input:checked + .celebration-switch-track {
+    justify-content: flex-end;
+    border-color: var(--accent-color);
+    background: var(--accent-color);
+    color: var(--accent-text-color);
+}
+.celebration-switch input:focus-visible + .celebration-switch-track {
+    outline: 2px solid var(--text-color);
+    outline-offset: 3px;
+}
+.celebration-switch input:disabled {
+    cursor: default;
+}
+.celebration-switch input:disabled + .celebration-switch-track {
+    opacity: 0.6;
+}
+@media (forced-colors: active) {
+    .celebration-switch-track::before {
+        background: ButtonText;
+    }
 }
 .color-control-face {
     box-sizing: border-box;
@@ -1710,6 +1837,7 @@ body.about-open {
     .token-option,
     .token-request-link,
     .language-use-browser,
+    .celebration-preview,
     .reset-color,
     .about-links a,
     .contributors a {
@@ -1759,7 +1887,7 @@ body.about-open {
     #clock-format .segmented-option span {
         min-height: 44px;
     }
-    .color-row {
+    .settings .color-row {
         column-gap: 8px;
     }
     .color-control {

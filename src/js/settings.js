@@ -7,6 +7,7 @@ window.App.Settings = {
         clockFormat: 'system',
         language: 'system',
         accentColor: null,
+        celebrationEnabled: true,
     },
     listeners: new Set(),
     changeGeneration: 0,
