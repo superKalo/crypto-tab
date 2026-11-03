@@ -257,7 +257,7 @@ window.App.TokenCelebration = class TokenCelebration {
         const moonOffset = (48 * scale) / Math.hypot(drift, rise);
         const moon = {
             x: Math.min(this.width - 22 * scale, endX + drift * moonOffset),
-            y: Math.max(22 * scale, y - rise * (1 + moonOffset)),
+            y: Math.max(22 * scale, y - rise * (1 + moonOffset) - 20 * scale),
         };
         this.rocket = {
             x,
@@ -540,7 +540,7 @@ window.App.TokenCelebration = class TokenCelebration {
         ctx.save();
         ctx.globalAlpha = opacity;
         ctx.translate(moon.x, moon.y);
-        ctx.scale(size, size);
+        ctx.scale(-size, size);
         const light = ctx.createRadialGradient(-5, -6, 1, 0, 0, 13);
         light.addColorStop(0, this.color('pearl', 1));
         light.addColorStop(0.58, this.color('pearl', 1));
@@ -551,9 +551,13 @@ window.App.TokenCelebration = class TokenCelebration {
         ctx.shadowColor = this.color('gold', 0.48);
         ctx.shadowBlur = 8;
         ctx.beginPath();
-        ctx.arc(0, 0, 13, 0, Math.PI * 2);
+        ctx.arc(0, 0, 13, Math.PI / 3, -Math.PI / 3);
+        const tipY = 13 * Math.sin(Math.PI / 3);
+        ctx.bezierCurveTo(-11, -8, -11, 8, 6.5, tipY);
+        ctx.closePath();
         ctx.fill();
         ctx.stroke();
+        ctx.clip();
         ctx.shadowBlur = 0;
         ctx.fillStyle = this.color('ink', 0.23);
         for (const [x, y, rx, ry] of [
