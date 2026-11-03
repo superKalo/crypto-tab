@@ -255,6 +255,10 @@ window.App.TokenCelebration = class TokenCelebration {
         const rise = Math.max(44 * scale, y - endY);
         const drift = endX - x;
         const moonOffset = (48 * scale) / Math.hypot(drift, rise);
+        const moon = {
+            x: Math.min(this.width - 22 * scale, endX + drift * moonOffset),
+            y: Math.max(22 * scale, y - rise * (1 + moonOffset)),
+        };
         this.rocket = {
             x,
             y,
@@ -266,10 +270,26 @@ window.App.TokenCelebration = class TokenCelebration {
                 10 * scale,
                 Math.min(rise * 0.45, y + canvasRect.top - clock.bottom)
             ),
-            moon: {
-                x: Math.min(this.width - 22 * scale, endX + drift * moonOffset),
-                y: Math.max(22 * scale, y - rise * (1 + moonOffset)),
-            },
+            moon,
+            stars: [
+                [-36, 11, 5.6, 'glint', 'lilac'],
+                [30, -5, 4.7, 'glint', 'gold'],
+                [-18, -16, 2.2, 'orb', 'gold'],
+                [45, 21, 2, 'orb', 'lilac'],
+                [-51, 39, 3.1, 'seed', 'gold'],
+                [26, 44, 3.4, 'arc', 'lilac'],
+                [-26, 56, 3.9, 'glint', 'gold'],
+                [47, 57, 1.8, 'orb', 'gold'],
+            ].map(([dx, dy, size, kind, color], index) => ({
+                x: moon.x + dx * scale,
+                y: moon.y + dy * scale,
+                size: size * scale,
+                kind,
+                color,
+                phase: index * 2.4,
+                speed: 2,
+                angle: Math.sin(index * 2.4) * 0.7,
+            })),
         };
     }
 
@@ -311,13 +331,14 @@ window.App.TokenCelebration = class TokenCelebration {
         }, 1);
     }
 
-    renderParticle(particle, angle) {
+    renderParticle(particle, angle, visibility = 1) {
         const ctx = this.context;
         const phase = angle * particle.speed + particle.phase;
         const x = particle.x + Math.sin(phase) * 3.6 + Math.cos(phase * 2) * 0.8;
         const y = particle.y + Math.sin(angle + particle.phase * 1.3) * 4.8;
         const size = particle.size * (0.94 + Math.sin(phase * 2) * 0.08);
-        const opacity = (0.58 + Math.sin(phase * 2) * 0.14) * this.clearance(x, y, size + 2);
+        const opacity =
+            visibility * (0.58 + Math.sin(phase * 2) * 0.14) * this.clearance(x, y, size + 2);
         if (opacity <= 0) {
             return;
         }
@@ -441,9 +462,52 @@ window.App.TokenCelebration = class TokenCelebration {
         });
     }
 
-    renderMoon(rocket, pose) {
-        const { scale, moon, clockTop } = rocket;
+    renderLaunchConfetti(rocket, time) {
+        const age = time / 1.25;
+        if (age >= 1) {
+            return;
+        }
+        const ctx = this.context;
+        const { x, y, scale } = rocket;
+        const spread = 1 - (1 - age) ** 3;
+        const fade = Math.min(1, time / 0.09) * (1 - age) ** 1.5;
+        const pieces = [
+            [-60, -19, 3.5],
+            [-49, -35, 4.6],
+            [-33, -22, 2.8],
+            [-25, -47, 4.1],
+            [-8, -32, 3],
+            [7, -51, 4.4],
+            [24, -35, 3.2],
+            [39, -44, 4.5],
+            [48, -24, 3.4],
+            [66, -20, 4],
+            [71, -34, 2.7],
+        ];
+        pieces.forEach(([dx, dy, length], index) => {
+            const px = x + (-22 + dx * spread) * scale;
+            const py = y + (9 + dy * spread + 12 * age ** 2) * scale;
+            const abovePrice = Math.min(1, (y + 13 * scale - py) / (9 * scale));
+            const opacity = fade * abovePrice;
+            if (opacity <= 0) {
+                return;
+            }
+            ctx.save();
+            ctx.translate(px, py);
+            ctx.rotate(index * 2.4 + age * (index % 2 ? -3 : 3));
+            ctx.fillStyle = this.color(index % 3 === 0 ? 'lilac' : 'gold', opacity);
+            ctx.fillRect((-length * scale) / 2, -scale, length * scale, 2 * scale);
+            ctx.restore();
+        });
+    }
+
+    renderMoon(rocket, pose, angle) {
+        const { scale, moon, clockTop, stars } = rocket;
         const noseY = pose.y - Math.cos(pose.angle) * 18 * scale;
+        const starlight = Math.min(1, (clockTop + 20 * scale - noseY) / (36 * scale));
+        if (starlight > 0) {
+            stars.forEach((star) => this.renderParticle(star, angle, starlight));
+        }
         const reveal = Math.max(0, Math.min(1, (clockTop - noseY) / (24 * scale)));
         if (reveal === 0) {
             return;
@@ -482,14 +546,15 @@ window.App.TokenCelebration = class TokenCelebration {
         ctx.restore();
     }
 
-    renderRocket(time) {
+    renderRocket(time, angle) {
         if (!this.rocket) {
             return;
         }
         const ctx = this.context;
         const { scale } = this.rocket;
         const pose = this.getRocketPose(this.rocket, time);
-        this.renderMoon(this.rocket, pose);
+        this.renderLaunchConfetti(this.rocket, time);
+        this.renderMoon(this.rocket, pose, angle);
         const fade = Math.min(1, time / 0.2);
         const opacity = fade * fade * (3 - 2 * fade);
         const flicker = Math.sin(time * Math.PI * 10) * 0.65 + Math.sin(time * Math.PI * 16) * 0.35;
@@ -584,7 +649,7 @@ window.App.TokenCelebration = class TokenCelebration {
         const angle = (loopTime * Math.PI * 2) / 16;
         this.particles.forEach((particle) => this.renderParticle(particle, angle));
         this.renderMeteors(loopTime);
-        this.renderRocket(time);
+        this.renderRocket(time, angle);
     }
 
     destroy() {
