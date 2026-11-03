@@ -7,9 +7,9 @@
     --light-text-color-secondary: #555;
     --light-positive-color: #428600;
     /* RGB channels let the canvas renderer vary the celebration's transparency. */
-    --light-celebration-gold: 232, 182, 98;
+    --light-celebration-gold: 163, 92, 18;
     --light-celebration-pearl: 255, 246, 226;
-    --light-celebration-lilac: 164, 112, 204;
+    --light-celebration-lilac: 116, 61, 173;
     --light-celebration-ink: 86, 73, 106;
     --light-border-color: #dddddd;
     --light-btn-background: #4f78e2;

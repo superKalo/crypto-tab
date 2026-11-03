@@ -719,7 +719,10 @@ small {
     display: block;
 }
 .celebration-demo {
-    margin-top: 8px;
+    position: fixed;
+    bottom: 12px;
+    left: 12px;
+    margin: 0;
     font-size: 12px;
     color: var(--text-color-secondary);
 }

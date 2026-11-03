@@ -47,7 +47,7 @@ window.App.Crypto = {
             this.$celebrationDemo = document.createElement('p');
             this.$celebrationDemo.className = 'celebration-demo';
             this.$celebrationDemo.textContent = 'Demo: +6% (24h)';
-            this.$priceHeading.querySelector('.chart-period').after(this.$celebrationDemo);
+            document.body.append(this.$celebrationDemo);
         }
         this.chart = new App.Chart(this.$chart);
         this.repositoryClient = new App.PriceRepositoryClient();

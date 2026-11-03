@@ -41,7 +41,7 @@ window.App.TokenCelebration = class TokenCelebration {
             }
             this.frame = window.requestAnimationFrame(this.tick);
         };
-        ['pointerenter', 'pointerleave', 'focusin', 'focusout'].forEach((event) => {
+        ['focusin', 'focusout'].forEach((event) => {
             trigger.addEventListener(event, this.handleInteraction);
         });
         this.motion.addEventListener('change', this.handleInteraction);
@@ -81,7 +81,7 @@ window.App.TokenCelebration = class TokenCelebration {
             this.context &&
             !document.hidden &&
             !this.motion.matches &&
-            !this.trigger.matches(':hover, :focus-visible, [aria-expanded="true"]')
+            !this.trigger.matches(':focus-visible, [aria-expanded="true"]')
         );
     }
 
@@ -156,7 +156,6 @@ window.App.TokenCelebration = class TokenCelebration {
         const protectedRects = [
             ...textRects,
             ...this.getTextRects(document.getElementById('clock')),
-            ...this.getTextRects(this.container.querySelector('.celebration-demo')),
             ...Array.from(document.querySelectorAll('.js-period'), (button) =>
                 button.getBoundingClientRect()
             ),
@@ -171,27 +170,27 @@ window.App.TokenCelebration = class TokenCelebration {
         // Art-directed offsets keep the centre quiet; the two sides differ in shape and timing.
         const positions = [
             [-58, -37, 5.5, 'glint'],
-            [-18, -10, 1.8, 'orb'],
+            [-18, -10, 1.8, 'confetti'],
             [12, -62, 2.7, 'arc'],
             [36, -36, 3.2, 'seed'],
             [61, -77, 4.5, 'glint'],
-            [82, -43, 1.6, 'orb'],
+            [82, -43, 1.6, 'confetti'],
             [104, -55, 2.1, 'seed'],
-            [126, -25, 1.3, 'orb'],
+            [126, -25, 1.3, 'confetti'],
             [-35, 12, 2.4, 'seed'],
             [-6, 40, 4.4, 'arc'],
-            [27, 24, 2.2, 'orb'],
+            [27, 24, 2.2, 'confetti'],
             [56, 50, 3.2, 'glint'],
             [81, 30, 1.5, 'seed'],
-            [110, 19, 1.5, 'orb'],
-            [142, -52, 1.2, 'orb'],
-            [-8, -89, 1.1, 'orb'],
+            [110, 19, 1.5, 'confetti'],
+            [142, -52, 1.2, 'confetti'],
+            [-8, -89, 1.1, 'confetti'],
             [165, -35, 2, 'arc'],
-            [155, 45, 1.2, 'orb'],
+            [155, 45, 1.2, 'confetti'],
         ];
         const compact = this.width < 420;
-        const spread = Math.min(1, (this.width - 32) / 620);
-        const kinds = ['orb', 'arc', 'seed', 'glint'];
+        const spread = Math.min(1.1, (this.width - 32) / 580);
+        const kinds = ['confetti', 'arc', 'seed', 'glint'];
         this.particles = [-1, 1].flatMap((side) =>
             positions.slice(0, compact ? 12 : positions.length).map(([x, y, size, kind], index) => {
                 const phase = (index + (side === 1 ? 19 : 0)) * 2.39996;
@@ -206,7 +205,7 @@ window.App.TokenCelebration = class TokenCelebration {
                     ),
                     y:
                         (top + bottom) / 2 +
-                        y * (side === -1 ? 1 : 0.9) +
+                        y * (side === -1 ? 1.1 : 1) +
                         (side === 1 ? Math.sin(index * 1.7) * 8 : 0),
                     size: size * (compact ? 0.95 : 1.15),
                     kind: side === -1 ? kind : kinds[(index + 2) % kinds.length],
@@ -274,12 +273,12 @@ window.App.TokenCelebration = class TokenCelebration {
             stars: [
                 [-36, 11, 5.6, 'glint', 'lilac'],
                 [30, -5, 4.7, 'glint', 'gold'],
-                [-18, -16, 2.2, 'orb', 'gold'],
-                [45, 21, 2, 'orb', 'lilac'],
+                [-18, -16, 2.2, 'confetti', 'gold'],
+                [45, 21, 2, 'confetti', 'lilac'],
                 [-51, 39, 3.1, 'seed', 'gold'],
                 [26, 44, 3.4, 'arc', 'lilac'],
                 [-26, 56, 3.9, 'glint', 'gold'],
-                [47, 57, 1.8, 'orb', 'gold'],
+                [47, 57, 1.8, 'confetti', 'gold'],
             ].map(([dx, dy, size, kind, color], index) => ({
                 x: moon.x + dx * scale,
                 y: moon.y + dy * scale,
@@ -356,18 +355,19 @@ window.App.TokenCelebration = class TokenCelebration {
         ctx.shadowColor = this.color(particle.color, opacity * 0.7);
         ctx.shadowBlur = 7;
         ctx.beginPath();
-        if (particle.kind === 'orb') {
-            const glow = ctx.createRadialGradient(0, 0, 0, 0, 0, size * 4);
-            glow.addColorStop(0, this.color(particle.color, opacity * 0.6));
-            glow.addColorStop(0.4, this.color(particle.color, opacity * 0.18));
-            glow.addColorStop(1, this.color(particle.color, 0));
-            ctx.fillStyle = glow;
-            ctx.arc(0, 0, size * 4, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.beginPath();
-            ctx.fillStyle = this.color('pearl', opacity * 0.95);
-            ctx.arc(0, 0, Math.max(0.6, size * 0.42), 0, Math.PI * 2);
-            ctx.fill();
+        if (particle.kind === 'confetti') {
+            ctx.shadowBlur = 0;
+            ctx.fillStyle = this.color(particle.color, opacity * 0.85);
+            if (Math.sin(particle.phase) > 0) {
+                ctx.moveTo(0, -size);
+                ctx.lineTo(size * 0.55, 0);
+                ctx.lineTo(0, size);
+                ctx.lineTo(-size * 0.55, 0);
+                ctx.closePath();
+                ctx.fill();
+            } else {
+                ctx.fillRect(-size, -0.5, size * 2, 1);
+            }
         } else if (particle.kind === 'glint') {
             // Unequal, slightly bent strokes avoid a repeated stock star silhouette.
             ctx.moveTo(-size, size * 0.18);
@@ -491,6 +491,9 @@ window.App.TokenCelebration = class TokenCelebration {
             [48, -24, 3.4],
             [66, -20, 4],
             [71, -34, 2.7],
+            [-42, -53, 3.5],
+            [30, -61, 3.8],
+            [58, -46, 3.1],
         ];
         const colors = ['#f8c34e', '#fa7199', '#64d5c3', '#ad85f5', '#71b9ff'];
         pieces.forEach(([dx, dy, length], index) => {
@@ -688,7 +691,7 @@ window.App.TokenCelebration = class TokenCelebration {
         this.resizeObserver.disconnect();
         this.motion.removeEventListener('change', this.handleInteraction);
         window.removeEventListener('themechange', this.handleThemeChange);
-        ['pointerenter', 'pointerleave', 'focusin', 'focusout'].forEach((event) => {
+        ['focusin', 'focusout'].forEach((event) => {
             this.trigger.removeEventListener(event, this.handleInteraction);
         });
     }
