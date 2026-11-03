@@ -248,7 +248,7 @@ window.App.TokenCelebration = class TokenCelebration {
         const y = digit.top - canvasRect.top - 13 * scale;
         const endX = Math.min(
             this.width - 24 * scale,
-            Math.max(x + 44 * scale, clock.right - canvasRect.left)
+            Math.max(x + 44 * scale, clock.right - canvasRect.left + 14 * scale)
         );
         const clockTop = clock.top - canvasRect.top;
         const endY = Math.max(22 * scale, clockTop - 28 * scale);
@@ -296,7 +296,7 @@ window.App.TokenCelebration = class TokenCelebration {
     getRocketPose(rocket, time) {
         const { x, y, scale, drift, rise, clockEntry } = rocket;
         const kickSeconds = 0.24;
-        const approachSeconds = 4;
+        const approachSeconds = 8;
         const passSeconds = 4.5;
         const kickDistance = 7 * scale;
         const approachSpeed = (clockEntry - kickDistance) / approachSeconds;
