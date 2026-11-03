@@ -298,7 +298,7 @@ window.App.TokenCelebration = class TokenCelebration {
         const kickSeconds = 0.24;
         const approachSeconds = 4;
         const passSeconds = 4.5;
-        const kickDistance = 4 * scale;
+        const kickDistance = 7 * scale;
         const approachSpeed = (clockEntry - kickDistance) / approachSeconds;
         const kick = Math.min(1, time / kickSeconds);
         const approach = Math.max(0, Math.min(1, (time - kickSeconds) / approachSeconds));
@@ -312,10 +312,15 @@ window.App.TokenCelebration = class TokenCelebration {
             (rise - clockEntry) * pass ** 2 * (3 - 2 * pass) +
             approachSpeed * passSeconds * pass * (1 - pass) ** 2;
         const progress = distance / rise;
+        const launchDrift = drift * 0.8;
+        const horizontalDistance =
+            2 * launchDrift * progress * (1 - progress) + drift * progress ** 2;
+        const horizontalSlope =
+            2 * (launchDrift * (1 - progress) + (drift - launchDrift) * progress);
         return {
-            x: x + progress * drift,
+            x: x + horizontalDistance,
             y: y - progress * rise,
-            angle: Math.atan(1.2) * (1 - progress) + Math.atan2(drift, rise) * progress,
+            angle: Math.atan2(horizontalSlope, rise),
         };
     }
 
@@ -462,13 +467,16 @@ window.App.TokenCelebration = class TokenCelebration {
         });
     }
 
-    renderLaunchConfetti(rocket, time) {
+    renderLaunchConfetti(rocket, time, shake) {
         const age = time / 1.25;
         if (age >= 1) {
             return;
         }
         const ctx = this.context;
-        const { x, y, scale } = rocket;
+        const { scale } = rocket;
+        const launch = this.getRocketPose(rocket, 0);
+        const flameX = launch.x - Math.sin(launch.angle) * 24 * scale;
+        const flameY = launch.y + Math.cos(launch.angle) * 24 * scale;
         const spread = 1 - (1 - age) ** 3;
         const fade = Math.min(1, time / 0.09) * (1 - age) ** 1.5;
         const pieces = [
@@ -484,19 +492,33 @@ window.App.TokenCelebration = class TokenCelebration {
             [66, -20, 4],
             [71, -34, 2.7],
         ];
+        const colors = ['#f8c34e', '#fa7199', '#64d5c3', '#ad85f5', '#71b9ff'];
         pieces.forEach(([dx, dy, length], index) => {
-            const px = x + (-22 + dx * spread) * scale;
-            const py = y + (9 + dy * spread + 12 * age ** 2) * scale;
-            const abovePrice = Math.min(1, (y + 13 * scale - py) / (9 * scale));
+            const px = flameX + dx * spread * scale;
+            const py = flameY + (dy * spread + 12 * age ** 2) * scale;
+            const abovePrice = Math.min(1, (launch.y + 13 * scale - py) / (9 * scale));
             const opacity = fade * abovePrice;
             if (opacity <= 0) {
                 return;
             }
             ctx.save();
-            ctx.translate(px, py);
+            ctx.translate(px + shake * (1 - age), py);
             ctx.rotate(index * 2.4 + age * (index % 2 ? -3 : 3));
-            ctx.fillStyle = this.color(index % 3 === 0 ? 'lilac' : 'gold', opacity);
-            ctx.fillRect((-length * scale) / 2, -scale, length * scale, 2 * scale);
+            ctx.globalAlpha = opacity;
+            const color = colors[index % colors.length];
+            const size = length * scale;
+            if (index % 3 === 0) {
+                ctx.strokeStyle = color;
+                ctx.lineWidth = 1.4 * scale;
+                ctx.lineCap = 'round';
+                ctx.beginPath();
+                ctx.moveTo(-size, 0);
+                ctx.bezierCurveTo(-size / 2, -size, size / 2, size, size, 0);
+                ctx.stroke();
+            } else {
+                ctx.fillStyle = color;
+                ctx.fillRect(-size / 2, -scale, size, 2 * scale);
+            }
             ctx.restore();
         });
     }
@@ -554,14 +576,15 @@ window.App.TokenCelebration = class TokenCelebration {
         const { scale } = this.rocket;
         const flightTime = time / 3;
         const pose = this.getRocketPose(this.rocket, flightTime);
-        this.renderLaunchConfetti(this.rocket, time);
+        const shake = 3.5 * Math.sin(time * Math.PI * 16) * Math.max(0, 1 - time / 0.5) ** 2;
+        this.renderLaunchConfetti(this.rocket, time, shake * scale);
         this.renderMoon(this.rocket, pose, angle);
         const fade = Math.min(1, time / 0.2);
         const opacity = fade * fade * (3 - 2 * fade);
         const flicker = Math.sin(time * Math.PI * 10) * 0.65 + Math.sin(time * Math.PI * 16) * 0.35;
         ctx.save();
         ctx.globalAlpha = opacity;
-        ctx.translate(pose.x, pose.y);
+        ctx.translate(pose.x + shake * scale, pose.y);
         ctx.scale(scale, scale);
         ctx.rotate(pose.angle);
 
