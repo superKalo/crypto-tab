@@ -629,6 +629,11 @@ small {
 }
 
 /* Clock style */
+#clock {
+    /* Let the celebration pass behind the clock's rightmost digits. */
+    position: relative;
+    z-index: 2;
+}
 .clock-period {
     font-size: 0.3em;
     font-weight: 400;
@@ -704,9 +709,9 @@ small {
     display: none;
     position: absolute;
     width: 100%;
-    height: 220px;
+    height: 380px;
     left: 0;
-    top: -104px;
+    top: -264px;
     pointer-events: none;
     z-index: -1;
 }

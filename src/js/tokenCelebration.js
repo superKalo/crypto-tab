@@ -11,7 +11,7 @@ window.App.TokenCelebration = class TokenCelebration {
         this.active = false;
         this.frame = null;
         this.lastFrame = null;
-        this.elapsed = 1;
+        this.elapsed = 0;
         this.palette = null;
         this.needsLayout = true;
         this.particles = [];
@@ -228,42 +228,75 @@ window.App.TokenCelebration = class TokenCelebration {
         if (!comparison) {
             return;
         }
-        const rects = this.getTextRects(document.getElementById('change'));
-        if (!rects.length) {
+        const text = comparison.firstChild;
+        const firstDigit = text?.textContent.match(/\p{Decimal_Number}/u);
+        if (!firstDigit) {
             return;
         }
-        const right = Math.max(...rects.map((rect) => rect.right)) - canvasRect.left;
-        const top = Math.min(...rects.map((rect) => rect.top)) - canvasRect.top;
+        const digitRange = document.createRange();
+        digitRange.setStart(text, firstDigit.index);
+        digitRange.setEnd(text, firstDigit.index + firstDigit[0].length);
+        const digit = digitRange.getBoundingClientRect();
+        if (!digit.width || !digit.height) {
+            return;
+        }
         const clock = document.getElementById('clock').getBoundingClientRect();
         const scale = this.width < 420 ? 0.76 : 1;
-        const rise = this.width < 420 ? 18 : 28;
-        const y = top - 42;
-        const candidates = [
-            right - 18,
-            right + 24,
-            clock.right - canvasRect.left + 28,
-            this.width - 28,
-        ];
-        for (const candidate of candidates) {
-            const x = Math.max(22, Math.min(this.width - 22 * scale - 4, candidate));
-            const path = {
-                left: x - 16 * scale - 4,
-                right: x + 22 * scale + 4,
-                top: y - rise - 20 * scale - 3,
-                bottom: y + 32 * scale + 3,
-            };
-            const fits = this.protectedRects.every(
-                (rect) =>
-                    path.right < rect.left - 4 ||
-                    path.left > rect.right + 4 ||
-                    path.bottom < rect.top - 4 ||
-                    path.top > rect.bottom + 4
-            );
-            if (fits && path.top >= 0) {
-                this.rocket = { x, y, scale, rise };
-                return;
-            }
-        }
+        // Align the exhaust with the first digit, just after the plus sign.
+        const origin = (digit.left + digit.right) / 2 - canvasRect.left;
+        const x = Math.max(20 * scale, Math.min(this.width - 40 * scale, origin + 22 * scale));
+        const y = digit.top - canvasRect.top - 13 * scale;
+        const endX = Math.min(
+            this.width - 24 * scale,
+            Math.max(x + 32 * scale, clock.right - canvasRect.left - 12 * scale)
+        );
+        const clockTop = clock.top - canvasRect.top;
+        const endY = Math.max(22 * scale, clockTop - 28 * scale);
+        const rise = Math.max(44 * scale, y - endY);
+        const drift = endX - x;
+        const moonOffset = (48 * scale) / Math.hypot(drift, rise);
+        this.rocket = {
+            x,
+            y,
+            scale,
+            rise,
+            drift,
+            clockTop,
+            clockEntry: Math.max(
+                10 * scale,
+                Math.min(rise * 0.45, y + canvasRect.top - clock.bottom)
+            ),
+            moon: {
+                x: Math.min(this.width - 22 * scale, endX + drift * moonOffset),
+                y: Math.max(22 * scale, y - rise * (1 + moonOffset)),
+            },
+        };
+    }
+
+    getRocketPose(rocket, time) {
+        const { x, y, scale, drift, rise, clockEntry } = rocket;
+        const kickSeconds = 0.24;
+        const approachSeconds = 4;
+        const passSeconds = 4.5;
+        const kickDistance = 4 * scale;
+        const approachSpeed = (clockEntry - kickDistance) / approachSeconds;
+        const kick = Math.min(1, time / kickSeconds);
+        const approach = Math.max(0, Math.min(1, (time - kickSeconds) / approachSeconds));
+        const pass = Math.max(0, Math.min(1, (time - kickSeconds - approachSeconds) / passSeconds));
+        // Match the speed at both joins so the brief kick blends into the slow climb and fast pass.
+        const launch =
+            kickDistance * kick + (kickDistance - approachSpeed * kickSeconds) * kick * (1 - kick);
+        const distance =
+            launch +
+            (clockEntry - kickDistance) * approach +
+            (rise - clockEntry) * pass ** 2 * (3 - 2 * pass) +
+            approachSpeed * passSeconds * pass * (1 - pass) ** 2;
+        const progress = distance / rise;
+        return {
+            x: x + progress * drift,
+            y: y - progress * rise,
+            angle: Math.atan(1.2) * (1 - progress) + Math.atan2(drift, rise) * progress,
+        };
     }
 
     color(name, opacity) {
@@ -408,23 +441,63 @@ window.App.TokenCelebration = class TokenCelebration {
         });
     }
 
+    renderMoon(rocket, pose) {
+        const { scale, moon, clockTop } = rocket;
+        const noseY = pose.y - Math.cos(pose.angle) * 18 * scale;
+        const reveal = Math.max(0, Math.min(1, (clockTop - noseY) / (24 * scale)));
+        if (reveal === 0) {
+            return;
+        }
+        const ctx = this.context;
+        const opacity = reveal * reveal * (3 - 2 * reveal);
+        const size = scale * (0.86 + opacity * 0.14);
+        ctx.save();
+        ctx.globalAlpha = opacity;
+        ctx.translate(moon.x, moon.y);
+        ctx.scale(size, size);
+        const light = ctx.createRadialGradient(-5, -6, 1, 0, 0, 13);
+        light.addColorStop(0, this.color('pearl', 1));
+        light.addColorStop(0.58, this.color('pearl', 1));
+        light.addColorStop(1, this.color('gold', 0.82));
+        ctx.fillStyle = light;
+        ctx.strokeStyle = this.color('gold', 0.72);
+        ctx.lineWidth = 0.7;
+        ctx.shadowColor = this.color('gold', 0.48);
+        ctx.shadowBlur = 8;
+        ctx.beginPath();
+        ctx.arc(0, 0, 13, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+        ctx.shadowBlur = 0;
+        ctx.fillStyle = this.color('ink', 0.23);
+        for (const [x, y, rx, ry] of [
+            [-4, -3, 2.7, 2],
+            [4, 3, 3.1, 2.3],
+            [-3, 6, 1.4, 1.1],
+        ]) {
+            ctx.beginPath();
+            ctx.ellipse(x, y, rx, ry, -0.4, 0, Math.PI * 2);
+            ctx.fill();
+        }
+        ctx.restore();
+    }
+
     renderRocket(time) {
         if (!this.rocket) {
             return;
         }
         const ctx = this.context;
-        const { x, y, scale, rise } = this.rocket;
-        const phase = time / 16;
-        const opacity = Math.min(1, phase / 0.06, (1 - phase) / 0.08);
+        const { scale } = this.rocket;
+        const pose = this.getRocketPose(this.rocket, time);
+        this.renderMoon(this.rocket, pose);
+        const fade = Math.min(1, time / 0.2);
+        const opacity = fade * fade * (3 - 2 * fade);
         const flicker = Math.sin(time * Math.PI * 10) * 0.65 + Math.sin(time * Math.PI * 16) * 0.35;
         ctx.save();
         ctx.globalAlpha = opacity;
-        ctx.translate(
-            x + (phase * 8 + Math.sin(phase * Math.PI * 2) * 1.6) * scale,
-            y - phase * rise + Math.sin(phase * Math.PI * 2) * 0.7
-        );
+        ctx.translate(pose.x, pose.y);
         ctx.scale(scale, scale);
-        ctx.rotate(0.34 + Math.sin(phase * Math.PI * 2) * 0.035);
+        ctx.rotate(pose.angle);
 
         // A quick, changing exhaust underneath a deliberately unhurried little craft.
         const exhaust = ctx.createLinearGradient(0, 12, 0, 33);
@@ -511,7 +584,7 @@ window.App.TokenCelebration = class TokenCelebration {
         const angle = (loopTime * Math.PI * 2) / 16;
         this.particles.forEach((particle) => this.renderParticle(particle, angle));
         this.renderMeteors(loopTime);
-        this.renderRocket(loopTime);
+        this.renderRocket(time);
     }
 
     destroy() {
