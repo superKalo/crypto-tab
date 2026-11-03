@@ -36,6 +36,27 @@
         <span id="clock-time">-:-</span><span id="clock-period" class="clock-period"></span>
       </h1>
 
+      <span
+        class="celebration-rocket-target update-trigger"
+        tabindex="0"
+        role="img"
+        aria-label="Celebration rocket"
+        aria-describedby="celebration-rocket-tip"
+        hidden
+      >
+        <span
+          id="celebration-rocket-tip"
+          class="update-details update-details-compact celebration-rocket-tip"
+          role="tooltip"
+        >
+          <span class="update-details-title">Celebration Mode activated</span>
+          <span class="update-details-description">
+            Up <span id="celebration-gain"></span> in 24h.
+            <span id="celebration-message"></span>
+          </span>
+        </span>
+      </span>
+
       <div id="price-token-picker" class="price-heading mb text-center" aria-busy="true">
         <canvas
           id="price-celebration"
@@ -627,6 +648,26 @@
                 </div>
               </div>
             </fieldset>
+            <label class="color-row celebration-row" for="celebration-enabled">
+              <span class="color-label-group">
+                <span id="celebration-label" class="color-label">Celebration Mode</span>
+                <span id="celebration-description" class="celebration-description">
+                  Shows a rocket when the selected token is up at least 5% over the past 24 hours.
+                </span>
+              </span>
+              <span class="color-control celebration-switch">
+                <input
+                  id="celebration-enabled"
+                  type="checkbox"
+                  role="switch"
+                  aria-labelledby="celebration-label"
+                  aria-describedby="celebration-description"
+                  checked
+                  disabled
+                />
+                <span class="celebration-switch-track" aria-hidden="true"></span>
+              </span>
+            </label>
           </section>
         </div>
       </div>

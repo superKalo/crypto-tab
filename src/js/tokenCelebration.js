@@ -5,6 +5,7 @@ window.App.TokenCelebration = class TokenCelebration {
         this.canvas = canvas;
         this.trigger = trigger;
         this.container = canvas.parentElement;
+        this.rocketTarget = document.querySelector('.celebration-rocket-target');
         this.heading = this.container.querySelector('.chart-period');
         this.context = canvas.getContext('2d');
         this.motion = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -99,6 +100,7 @@ window.App.TokenCelebration = class TokenCelebration {
                 this.frame = window.requestAnimationFrame(this.tick);
             }
         } else {
+            this.rocketTarget.hidden = true;
             window.cancelAnimationFrame(this.frame);
             this.frame = null;
             this.lastFrame = null;
@@ -577,6 +579,7 @@ window.App.TokenCelebration = class TokenCelebration {
 
     renderRocket(time, angle) {
         if (!this.rocket) {
+            this.rocketTarget.hidden = true;
             return;
         }
         const ctx = this.context;
@@ -584,6 +587,17 @@ window.App.TokenCelebration = class TokenCelebration {
         const flightTime = time / 3;
         const pose = this.getRocketPose(this.rocket, flightTime);
         const shake = 3.5 * Math.sin(time * Math.PI * 16) * Math.max(0, 1 - time / 0.5) ** 2;
+        const rocketX = pose.x + shake * scale;
+        const canvasRect = this.canvas.getBoundingClientRect();
+        const targetX = canvasRect.left + rocketX;
+        const targetY = canvasRect.top + pose.y;
+        const viewportWidth = document.documentElement.clientWidth;
+        const tipInset = Math.min(128, viewportWidth / 2);
+        const tipCenter = Math.max(tipInset, Math.min(viewportWidth - tipInset, targetX));
+        this.rocketTarget.style.setProperty('--rocket-tip-offset', `${tipCenter - targetX}px`);
+        this.rocketTarget.classList.toggle('tooltip-beside', viewportWidth - targetX >= 280);
+        this.rocketTarget.hidden = time < 0.2;
+        this.rocketTarget.style.transform = `translate(${targetX}px, ${targetY}px) translate(-50%, -50%)`;
         this.renderLaunchConfetti(this.rocket, time, shake * scale);
         this.renderMoon(this.rocket, pose, angle);
         const fade = Math.min(1, time / 0.2);
@@ -591,7 +605,7 @@ window.App.TokenCelebration = class TokenCelebration {
         const flicker = Math.sin(time * Math.PI * 10) * 0.65 + Math.sin(time * Math.PI * 16) * 0.35;
         ctx.save();
         ctx.globalAlpha = opacity;
-        ctx.translate(pose.x + shake * scale, pose.y);
+        ctx.translate(rocketX, pose.y);
         ctx.scale(scale, scale);
         ctx.rotate(pose.angle);
 

@@ -36,6 +36,9 @@ window.App.Crypto = {
         }
 
         this.isInitialized = true;
+        const celebrationMessages = ['To the moon!', 'Moon soon!', 'Bullish!', 'LFG!', 'Pump it!'];
+        document.getElementById('celebration-message').textContent =
+            celebrationMessages[Math.floor(Math.random() * celebrationMessages.length)];
         const preview = new URLSearchParams(window.location.search);
         this.celebration = new App.TokenCelebration(
             document.getElementById('price-celebration'),
@@ -53,6 +56,7 @@ window.App.Crypto = {
         this.repositoryClient = new App.PriceRepositoryClient();
 
         const settings = await App.Settings.get();
+        this.celebrationEnabled = settings.celebrationEnabled !== false;
         this.currentCrypto = App.CryptoTokens.isSupportedToken(settings.cryptoType)
             ? settings.cryptoType
             : App.CryptoTokens.getDefaultToken();
@@ -95,14 +99,15 @@ window.App.Crypto = {
             });
         });
 
-        this.$lastUpdated.querySelectorAll('.update-trigger').forEach((trigger) => {
+        const tooltipTriggers = document.querySelectorAll('.update-trigger');
+        tooltipTriggers.forEach((trigger) => {
             const showTooltip = () => trigger.classList.remove('tooltip-dismissed');
             trigger.addEventListener('mouseenter', showTooltip);
             trigger.addEventListener('focusin', showTooltip);
         });
         this.handleTooltipEscape = (event) => {
             if (event.key === 'Escape') {
-                this.$lastUpdated.querySelectorAll('.update-trigger').forEach((trigger) => {
+                tooltipTriggers.forEach((trigger) => {
                     trigger.classList.add('tooltip-dismissed');
                 });
             }
@@ -174,6 +179,10 @@ window.App.Crypto = {
     },
 
     applySettings(settings, changedKeys) {
+        if (changedKeys.includes('celebrationEnabled')) {
+            this.setCelebrationEnabled(settings.celebrationEnabled);
+        }
+
         const cryptoType = changedKeys.includes('cryptoType')
             ? App.CryptoTokens.isSupportedToken(settings.cryptoType)
                 ? settings.cryptoType
@@ -321,11 +330,22 @@ window.App.Crypto = {
         App.SettingsPanel?.renderSelectedToken(this.currentCrypto);
     },
 
+    setCelebrationEnabled(enabled) {
+        this.celebrationEnabled = enabled !== false;
+        this.updateCelebration();
+    },
+
     updateCelebration() {
-        const qualifies =
-            this.celebrationDemo ||
-            (Number.isFinite(this.celebrationDayChange) && this.celebrationDayChange >= 5);
-        this.celebration?.setActive(this.isInitialized && !document.hidden && qualifies);
+        const dayChange = this.celebrationDemo ? 6 : this.celebrationDayChange;
+        const qualifies = Number.isFinite(dayChange) && dayChange >= 5;
+        if (qualifies) {
+            document.getElementById('celebration-gain').textContent = App.Utils.formatPercent(
+                Number(dayChange.toFixed(2))
+            ).slice(1);
+        }
+        this.celebration?.setActive(
+            this.isInitialized && this.celebrationEnabled && !document.hidden && qualifies
+        );
     },
 
     updateActivePeriod() {
