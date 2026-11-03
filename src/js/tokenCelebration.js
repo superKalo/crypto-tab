@@ -248,7 +248,7 @@ window.App.TokenCelebration = class TokenCelebration {
         const y = digit.top - canvasRect.top - 13 * scale;
         const endX = Math.min(
             this.width - 24 * scale,
-            Math.max(x + 32 * scale, clock.right - canvasRect.left - 12 * scale)
+            Math.max(x + 44 * scale, clock.right - canvasRect.left)
         );
         const clockTop = clock.top - canvasRect.top;
         const endY = Math.max(22 * scale, clockTop - 28 * scale);
@@ -552,7 +552,8 @@ window.App.TokenCelebration = class TokenCelebration {
         }
         const ctx = this.context;
         const { scale } = this.rocket;
-        const pose = this.getRocketPose(this.rocket, time);
+        const flightTime = time / 3;
+        const pose = this.getRocketPose(this.rocket, flightTime);
         this.renderLaunchConfetti(this.rocket, time);
         this.renderMoon(this.rocket, pose, angle);
         const fade = Math.min(1, time / 0.2);
