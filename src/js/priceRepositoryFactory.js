@@ -150,6 +150,8 @@ globalThis.App.PriceRepositoryFactory = class PriceRepositoryFactory {
 
     mapChartData(data, period) {
         const labelFormat = this.getLabelFormat(period);
+        // Daily and monthly averages identify UTC calendar buckets, not local instants.
+        const usesUtcCalendar = !['ONE_HOUR', 'ONE_DAY'].includes(period);
 
         return data
             .map(({ timestamp, value }) => {
@@ -157,8 +159,7 @@ globalThis.App.PriceRepositoryFactory = class PriceRepositoryFactory {
 
                 return {
                     value,
-                    // ALL timestamps identify UTC calendar months, not local instants.
-                    timestamp: (period === 'ALL' ? date : date.local()).format(labelFormat),
+                    timestamp: (usesUtcCalendar ? date : date.local()).format(labelFormat),
                 };
             })
             .reverse();
