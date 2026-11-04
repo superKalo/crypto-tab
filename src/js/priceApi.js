@@ -2,6 +2,8 @@ globalThis.App = globalThis.App || {};
 
 globalThis.App.PriceApi = (function () {
     const API_BASE_URL = 'https://api.crypto-tab.com/v1';
+    // SuperRepo 2.1.4 reuses a pending request, so a stalled one would block every refresh.
+    const REQUEST_TIMEOUT = 15 * 1000;
 
     function validateRequest(period, cryptoType) {
         const endpointPath = App.CryptoTokens.getEndpointPath(cryptoType, period);
@@ -68,7 +70,12 @@ globalThis.App.PriceApi = (function () {
 
     async function getPriceData(period, cryptoType) {
         const endpointPath = validateRequest(period, cryptoType);
-        const response = await fetch(`${API_BASE_URL}/${endpointPath}`);
+        const signal =
+            typeof AbortSignal.timeout === 'function'
+                ? AbortSignal.timeout(REQUEST_TIMEOUT)
+                : undefined;
+        // The signal also bounds reading the response body.
+        const response = await fetch(`${API_BASE_URL}/${endpointPath}`, { signal });
 
         if (!response.ok) {
             throw new Error(`The price API responded with HTTP ${response.status}`);
