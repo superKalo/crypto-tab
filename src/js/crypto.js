@@ -46,9 +46,13 @@ window.App.Crypto = {
             celebrationMessages[Math.floor(Math.random() * celebrationMessages.length)]
         );
         this.celebration = new App.TokenCelebration(
-            document.getElementById('price-celebration'),
-            document.getElementById('price-token-select')
+            document.getElementById('page-celebration'),
+            document.getElementById('price-token-select'),
+            this.$priceHeading
         );
+        // The ?celebration=preview link runs the live celebration as a lasting demo.
+        this.celebrationDemo =
+            new URLSearchParams(window.location.search).get('celebration') === 'preview';
         this.chart = new App.Chart(this.$chart);
         this.repositoryClient = new App.PriceRepositoryClient();
 
@@ -71,9 +75,6 @@ window.App.Crypto = {
         this.updateCryptoTypeLabel();
         this.updateActivePeriod();
         this.initEvents();
-        if (new URLSearchParams(window.location.search).get('celebration') === 'preview') {
-            this.celebration.setPreview(true);
-        }
         this.unsubscribeSettings = App.Settings.subscribe((updated, changedKeys) => {
             this.applySettings(updated, changedKeys);
         });
@@ -343,14 +344,15 @@ window.App.Crypto = {
     updateCelebration() {
         const dayChange = this.celebrationDayChange;
         const qualifies = Number.isFinite(dayChange) && dayChange >= 5;
-        if (qualifies) {
-            const gain = document.getElementById('celebration-gain');
-            gain.textContent = App.I18n.t('celebration.gain', {
-                change: this.formatCelebrationGain(dayChange),
-            });
-        }
+        // The gain is empty during a demo, which the rocket's tooltip then labels as a preview.
+        document.getElementById('celebration-gain').textContent = qualifies
+            ? App.I18n.t('celebration.gain', { change: this.formatCelebrationGain(dayChange) })
+            : '';
+        this.celebration?.setDemo(Boolean(this.celebrationDemo) && !qualifies);
         this.celebration?.setActive(
-            this.isInitialized && this.celebrationEnabled && !document.hidden && qualifies
+            this.isInitialized &&
+                !document.hidden &&
+                ((qualifies && this.celebrationEnabled) || Boolean(this.celebrationDemo))
         );
     },
 
