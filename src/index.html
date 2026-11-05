@@ -29,6 +29,7 @@
   </head>
 
   <body class="@@bodyClass">
+    <canvas id="page-celebration" class="page-celebration" aria-hidden="true"></canvas>
     @@websiteHeader
 
     <div class="wrapper">
@@ -61,13 +62,6 @@
       </span>
 
       <div id="price-token-picker" class="price-heading mb text-center" aria-busy="true">
-        <canvas
-          id="price-celebration"
-          class="price-celebration"
-          width="1400"
-          height="440"
-          aria-hidden="true"
-        ></canvas>
         <h2 class="chart-period">
           <button
             id="price-token-select"
@@ -943,6 +937,8 @@
     @@priceRepositoryScripts
     <script defer src="js/priceRepositoryClient.js"></script>
     <script defer src="js/chart.js"></script>
+    <script defer src="js/celebrationSprites.js"></script>
+    <script defer src="js/celebrationAmbience.js"></script>
     <script defer src="js/tokenCelebration.js"></script>
     <script defer src="js/crypto.js"></script>
     <script defer src="js/script.js"></script>

@@ -1,17 +1,36 @@
 window.App = window.App || {};
 
 const CELEBRATION_FLIGHT = { kickSeconds: 0.24, approachSeconds: 8, passSeconds: 4.5 };
-const CELEBRATION_PREVIEW_SECONDS =
+const CELEBRATION_FLIGHT_SECONDS =
     CELEBRATION_FLIGHT.kickSeconds +
     CELEBRATION_FLIGHT.approachSeconds +
-    CELEBRATION_FLIGHT.passSeconds +
-    1;
+    CELEBRATION_FLIGHT.passSeconds;
+// The live celebration climbs at a third of the preview's pace.
+const CELEBRATION_LIVE_PACE = 1 / 3;
+const CELEBRATION_ARRIVAL_SECONDS = 1.6;
+const CELEBRATION_PREVIEW_SECONDS = CELEBRATION_FLIGHT_SECONDS + CELEBRATION_ARRIVAL_SECONDS + 0.8;
+// Calm motion runs at 30 fps, an even divisor of 60 and 120 Hz displays; fast moments such
+// as the launch, the sprinkle, a shooting star or the arrival run at 60 fps.
+const CELEBRATION_CALM_FRAME_MS = 1000 / 30;
+const CELEBRATION_LIVELY_FRAME_MS = 1000 / 60;
+const CELEBRATION_LAUNCH_SECONDS = 6.6;
+// Caps the full-viewport backing store, about a 1440x900 viewport at 1.75x.
+const CELEBRATION_MAX_BACKING_PIXELS = 4000000;
+// The rocket's stage keeps its original art direction: a band around the price sentence.
+const CELEBRATION_STAGE = { above: 264, height: 380 };
+// A slightly larger moon reads as the destination from the very first frame.
+const CELEBRATION_MOON_SIZE = 1.3;
 
+/**
+ * Celebration Mode: a rocket that launches from the gain towards a waiting moon, sparkles
+ * around the price, and a page-wide confetti layer. Everything draws into one viewport-sized
+ * canvas behind the content, on one frame loop, so the scene shares a single cadence.
+ */
 window.App.TokenCelebration = class TokenCelebration {
-    constructor(canvas, trigger) {
+    constructor(canvas, trigger, container) {
         this.canvas = canvas;
         this.trigger = trigger;
-        this.container = canvas.parentElement;
+        this.container = container;
         this.rocketTarget = document.querySelector('.celebration-rocket-target');
         const rocketTip = this.rocketTarget.querySelector('.celebration-rocket-tip');
         this.rocketTipTitle = rocketTip.querySelector('.update-details-title');
@@ -19,17 +38,29 @@ window.App.TokenCelebration = class TokenCelebration {
         this.rocketTipWidth = 0;
         this.heading = this.container.querySelector('.chart-period');
         this.price = document.getElementById('price-now');
-        this.context = canvas.getContext('2d');
+        this.clock = document.getElementById('clock');
+        this.context = canvas?.getContext('2d') ?? null;
+        this.ambience = new App.CelebrationAmbience();
+        this.sprites = null;
         this.motion = window.matchMedia('(prefers-reduced-motion: reduce)');
         this.active = false;
+        this.demo = false;
         this.frame = null;
+        this.frameTimer = null;
+        this.tickStartedAt = 0;
         this.lastFrame = null;
+        this.lively = true;
         this.elapsed = 0;
         this.previewElapsed = null;
         this.palette = null;
         this.needsLayout = true;
+        this.width = 0;
+        this.height = 0;
+        this.ratio = 1;
+        this.origin = { left: 0, top: 0 };
         this.particles = [];
         this.protectedRects = [];
+        this.textBounds = null;
         this.rocket = null;
         this.destroyed = false;
         this.handleInteraction = () => queueMicrotask(() => this.update());
@@ -41,34 +72,42 @@ window.App.TokenCelebration = class TokenCelebration {
             this.palette = null;
             this.handleLayoutChange();
         };
+        // The canvas is fixed to the viewport, so scrolling moves the text it works around.
+        this.handleScroll = () => {
+            this.needsLayout = true;
+        };
         this.tick = (now) => {
             this.frame = null;
+            this.tickStartedAt = performance.now();
             if (!this.canAnimate()) {
                 return;
             }
-            if (this.lastFrame === null || now - this.lastFrame >= 1000 / 24) {
-                const delta =
-                    this.lastFrame === null ? 0 : Math.min(now - this.lastFrame, 100) / 1000;
-                if (this.previewElapsed === null) {
-                    this.elapsed += delta;
-                    this.render(this.elapsed);
-                } else {
-                    this.previewElapsed += delta;
-                    if (this.previewElapsed >= CELEBRATION_PREVIEW_SECONDS) {
-                        this.setPreview(false);
-                        return;
-                    }
-                    this.render(this.previewElapsed);
-                }
-                this.lastFrame = now;
+            if (this.needsLayout) {
+                this.prepare();
             }
-            this.frame = window.requestAnimationFrame(this.tick);
+            // The timer sets the cadence; the delta keeps motion speed independent of jitter.
+            const delta = this.lastFrame === null ? 0 : Math.min(now - this.lastFrame, 100) / 1000;
+            this.lastFrame = now;
+            if (this.previewElapsed === null) {
+                this.elapsed += delta;
+                this.render(this.elapsed, CELEBRATION_LIVE_PACE);
+            } else {
+                this.previewElapsed += delta;
+                if (this.previewElapsed >= CELEBRATION_PREVIEW_SECONDS) {
+                    this.setPreview(false);
+                    return;
+                }
+                this.render(this.previewElapsed, 1);
+            }
+            this.scheduleFrame();
         };
         ['focusin', 'focusout'].forEach((event) => {
             trigger.addEventListener(event, this.handleInteraction);
         });
         this.motion.addEventListener('change', this.handleInteraction);
         window.addEventListener('themechange', this.handleThemeChange);
+        window.addEventListener('resize', this.handleLayoutChange);
+        window.addEventListener('scroll', this.handleScroll, { passive: true });
         this.observer = new MutationObserver(this.handleInteraction);
         this.observer.observe(trigger, { attributes: true, attributeFilter: ['aria-expanded'] });
         this.layoutObserver = new MutationObserver(this.handleLayoutChange);
@@ -86,12 +125,17 @@ window.App.TokenCelebration = class TokenCelebration {
         [
             this.container,
             this.heading,
-            document.getElementById('clock'),
+            this.clock,
             document.getElementById('periods'),
             rocketTip,
         ].forEach((element) => {
             this.resizeObserver.observe(element);
         });
+    }
+
+    static ease(value) {
+        const t = Math.max(0, Math.min(1, value));
+        return t * t * (3 - 2 * t);
     }
 
     setActive(active) {
@@ -100,6 +144,15 @@ window.App.TokenCelebration = class TokenCelebration {
         }
         this.active = active;
         this.update();
+    }
+
+    // A demo runs the live celebration without a qualifying gain, so it says so.
+    setDemo(demo) {
+        if (this.destroyed || this.demo === demo) {
+            return;
+        }
+        this.demo = demo;
+        this.updateTip();
     }
 
     setPreview(active) {
@@ -111,14 +164,31 @@ window.App.TokenCelebration = class TokenCelebration {
         }
 
         this.previewElapsed = active ? 0 : null;
-        this.rocketTipTitle.textContent = App.I18n.t(
-            active ? 'celebration.previewTitle' : 'celebration.activated'
-        );
-        this.rocketTipDescription.classList.toggle('hidden', active);
+        this.updateTip();
         this.needsLayout = true;
         this.lastFrame = null;
         this.update();
         return true;
+    }
+
+    updateTip() {
+        const isPreview = this.previewElapsed !== null;
+        this.rocketTipTitle.textContent = App.I18n.t(
+            isPreview || this.demo ? 'celebration.previewTitle' : 'celebration.activated'
+        );
+        this.rocketTipDescription.classList.toggle('hidden', isPreview);
+    }
+
+    scheduleFrame() {
+        // Requesting every vsync makes the browser produce a frame each time, up to 120 per
+        // second; waiting out the interval first keeps frame production at the drawn rate.
+        // Frame timestamps can trail the clock, so time the wait from when the callback ran.
+        const interval = this.lively ? CELEBRATION_LIVELY_FRAME_MS : CELEBRATION_CALM_FRAME_MS;
+        const wait = Math.max(0, interval - (performance.now() - this.tickStartedAt) - 4);
+        this.frameTimer = window.setTimeout(() => {
+            this.frameTimer = null;
+            this.frame = window.requestAnimationFrame(this.tick);
+        }, wait);
     }
 
     canAnimate() {
@@ -137,26 +207,28 @@ window.App.TokenCelebration = class TokenCelebration {
         if (this.destroyed) {
             return;
         }
-        this.container.classList.toggle(
-            'is-celebrating',
-            this.active || this.previewElapsed !== null
-        );
+        this.canvas?.classList.toggle('is-visible', this.active || this.previewElapsed !== null);
         if (this.canAnimate()) {
             this.prepare();
             if (!this.textBounds) {
                 return;
             }
-            if (this.frame === null) {
+            if (this.frame === null && this.frameTimer === null) {
                 this.lastFrame = null;
                 this.frame = window.requestAnimationFrame(this.tick);
             }
         } else {
             this.rocketTarget.hidden = true;
             window.cancelAnimationFrame(this.frame);
+            window.clearTimeout(this.frameTimer);
             this.frame = null;
+            this.frameTimer = null;
             this.lastFrame = null;
-            this.context?.setTransform(1, 0, 0, 1, 0, 0);
-            this.context?.clearRect(0, 0, this.canvas.width, this.canvas.height);
+            // Release the full-viewport backing store while nothing is drawn.
+            if (this.canvas?.width) {
+                this.canvas.width = 0;
+                this.canvas.height = 0;
+            }
         }
     }
 
@@ -178,47 +250,83 @@ window.App.TokenCelebration = class TokenCelebration {
     }
 
     prepare() {
+        if (!this.context) {
+            return;
+        }
         if (!this.palette) {
             const styles = window.getComputedStyle(this.canvas);
             this.palette = {};
             ['gold', 'lilac', 'pearl', 'ink', 'shell'].forEach((name) => {
                 this.palette[name] = styles.getPropertyValue(`--celebration-${name}`).trim();
             });
-        }
-        const ratio = Math.min(window.devicePixelRatio || 1, 2);
-        if (!this.needsLayout && this.ratio === ratio) {
-            return;
+            this.sprites = null;
         }
         const canvasRect = this.canvas.getBoundingClientRect();
-        if (!canvasRect.width) {
+        if (!canvasRect.width || !canvasRect.height) {
+            return;
+        }
+        const ratio = Math.max(
+            0.75,
+            Math.min(
+                window.devicePixelRatio || 1,
+                2,
+                Math.sqrt(CELEBRATION_MAX_BACKING_PIXELS / (canvasRect.width * canvasRect.height))
+            )
+        );
+        if (!this.needsLayout && this.sprites && this.ratio === ratio) {
             return;
         }
         this.width = canvasRect.width;
         this.height = canvasRect.height;
         this.ratio = ratio;
-        this.canvas.width = Math.round(this.width * ratio);
-        this.canvas.height = Math.round(this.height * ratio);
+        this.origin = { left: canvasRect.left, top: canvasRect.top };
+        this.rocketTargetPlacement = null;
+        if (!this.sprites || this.sprites.ratio !== ratio) {
+            this.sprites = new App.CelebrationSprites(this.palette, ratio);
+        }
+        const toCanvas = ({ left, right, top, bottom }) => ({
+            left: left - canvasRect.left,
+            right: right - canvasRect.left,
+            top: top - canvasRect.top,
+            bottom: bottom - canvasRect.top,
+        });
 
+        const container = toCanvas(this.container.getBoundingClientRect());
+        this.stage = {
+            left: container.left,
+            right: container.right,
+            top: container.top - CELEBRATION_STAGE.above,
+            width: container.right - container.left,
+        };
         const textRects = this.getTextRects(this.heading);
         textRects.push(document.getElementById('price-token-logo').getBoundingClientRect());
-        const left = Math.min(...textRects.map((rect) => rect.left)) - canvasRect.left;
-        const right = Math.max(...textRects.map((rect) => rect.right)) - canvasRect.left;
-        const top = Math.min(...textRects.map((rect) => rect.top)) - canvasRect.top;
-        const bottom = Math.max(...textRects.map((rect) => rect.bottom)) - canvasRect.top;
+        const text = textRects.map(toCanvas);
+        const left = Math.min(...text.map((rect) => rect.left));
+        const right = Math.max(...text.map((rect) => rect.right));
+        const top = Math.min(...text.map((rect) => rect.top));
+        const bottom = Math.max(...text.map((rect) => rect.bottom));
         this.textBounds = { left, right, top, bottom };
-        const protectedRects = [
-            ...textRects,
-            ...this.getTextRects(document.getElementById('clock')),
+        this.protectedRects = [
+            ...text,
+            ...this.getTextRects(this.clock).map(toCanvas),
             ...Array.from(document.querySelectorAll('.js-period'), (button) =>
-                button.getBoundingClientRect()
+                toCanvas(button.getBoundingClientRect())
             ),
         ];
-        this.protectedRects = protectedRects.map((rect) => ({
-            left: rect.left - canvasRect.left,
-            right: rect.right - canvasRect.left,
-            top: rect.top - canvasRect.top,
-            bottom: rect.bottom - canvasRect.top,
-        }));
+        this.ambience.layout({
+            width: this.width,
+            height: this.height,
+            palette: this.palette,
+            quietRects: [
+                ...this.protectedRects,
+                ...this.getTextRects(document.getElementById('last-updated')).map(toCanvas),
+                ...this.getTextRects(document.querySelector('.website-header')).map(toCanvas),
+                ...Array.from(document.querySelectorAll('.footer-action, .install__link'), (el) =>
+                    toCanvas(el.getBoundingClientRect())
+                ),
+            ],
+            dimRects: [toCanvas(document.getElementById('chart').getBoundingClientRect())],
+        });
 
         // Art-directed offsets keep the centre quiet; the two sides differ in shape and timing.
         const positions = [
@@ -241,8 +349,8 @@ window.App.TokenCelebration = class TokenCelebration {
             [165, -35, 2, 'arc'],
             [155, 45, 1.2, 'confetti'],
         ];
-        const compact = this.width < 420;
-        const spread = Math.min(1.1, (this.width - 32) / 580);
+        const compact = this.stage.width < 420;
+        const spread = Math.min(1.1, (this.stage.width - 32) / 580);
         const kinds = ['confetti', 'arc', 'seed', 'glint'];
         this.particles = [-1, 1].flatMap((side) =>
             positions.slice(0, compact ? 12 : positions.length).map(([x, y, size, kind], index) => {
@@ -250,9 +358,9 @@ window.App.TokenCelebration = class TokenCelebration {
                 const offset = side === -1 ? x : x * 0.88 + Math.sin(index * 3.1) * 9;
                 return {
                     x: Math.max(
-                        14,
+                        this.stage.left + 14,
                         Math.min(
-                            this.width - 14,
+                            this.stage.right - 14,
                             (side === -1 ? left : right) - side * offset * spread
                         )
                     ),
@@ -262,6 +370,7 @@ window.App.TokenCelebration = class TokenCelebration {
                         (side === 1 ? Math.sin(index * 1.7) * 8 : 0),
                     size: size * (compact ? 0.95 : 1.15),
                     kind: side === -1 ? kind : kinds[(index + 2) % kinds.length],
+                    variant: Math.sin(phase) > 0,
                     color:
                         index === 10 || (index + (side === 1 ? 1 : 0)) % 3 === 0 ? 'gold' : 'lilac',
                     phase,
@@ -270,7 +379,7 @@ window.App.TokenCelebration = class TokenCelebration {
                 };
             })
         );
-        this.placeRocket(canvasRect);
+        this.placeRocket(toCanvas);
         this.needsLayout = false;
     }
 
@@ -288,31 +397,34 @@ window.App.TokenCelebration = class TokenCelebration {
         return digit.width && digit.height ? digit : null;
     }
 
-    placeRocket(canvasRect) {
+    placeRocket(toCanvas) {
         this.rocket = null;
-        const anchor =
-            this.getGainAnchor() ??
-            (this.previewElapsed !== null ? this.price.getBoundingClientRect() : null);
-        if (!anchor?.width || !anchor.height) {
+        // Launch from the 24h gain when it is shown; otherwise from the price itself.
+        const anchorRect = this.getGainAnchor() ?? this.price.getBoundingClientRect();
+        if (!anchorRect.width || !anchorRect.height) {
             return;
         }
-        const clock = document.getElementById('clock').getBoundingClientRect();
-        const scale = this.width < 420 ? 0.76 : 1;
-        const origin = (anchor.left + anchor.right) / 2 - canvasRect.left;
-        const x = Math.max(20 * scale, Math.min(this.width - 40 * scale, origin + 22 * scale));
-        const y = anchor.top - canvasRect.top - 13 * scale;
-        const endX = Math.min(
-            this.width - 24 * scale,
-            Math.max(x + 44 * scale, clock.right - canvasRect.left + 14 * scale)
+        const anchor = toCanvas(anchorRect);
+        const clock = toCanvas(this.clock.getBoundingClientRect());
+        const { stage } = this;
+        const scale = stage.width < 420 ? 0.76 : 1;
+        const origin = (anchor.left + anchor.right) / 2;
+        const x = Math.max(
+            stage.left + 20 * scale,
+            Math.min(stage.right - 40 * scale, origin + 22 * scale)
         );
-        const clockTop = clock.top - canvasRect.top;
-        const endY = Math.max(22 * scale, clockTop - 28 * scale);
+        const y = anchor.top - 13 * scale;
+        const endX = Math.min(
+            stage.right - 24 * scale,
+            Math.max(x + 44 * scale, clock.right + 14 * scale)
+        );
+        const endY = Math.max(stage.top + 22 * scale, clock.top - 28 * scale);
         const rise = Math.max(44 * scale, y - endY);
         const drift = endX - x;
-        const moonOffset = (48 * scale) / Math.hypot(drift, rise);
+        const moonOffset = (56 * scale) / Math.hypot(drift, rise);
         const moon = {
-            x: Math.min(this.width - 22 * scale, endX + drift * moonOffset),
-            y: Math.max(22 * scale, y - rise * (1 + moonOffset) - 20 * scale),
+            x: Math.min(stage.right - 22 * scale, endX + drift * moonOffset),
+            y: Math.max(stage.top + 22 * scale, y - rise * (1 + moonOffset) - 20 * scale),
         };
         this.rocket = {
             x,
@@ -320,11 +432,7 @@ window.App.TokenCelebration = class TokenCelebration {
             scale,
             rise,
             drift,
-            clockTop,
-            clockEntry: Math.max(
-                10 * scale,
-                Math.min(rise * 0.45, y + canvasRect.top - clock.bottom)
-            ),
+            clockEntry: Math.max(10 * scale, Math.min(rise * 0.45, y - clock.bottom)),
             moon,
             stars: [
                 [-36, 11, 5.6, 'glint', 'lilac'],
@@ -336,10 +444,11 @@ window.App.TokenCelebration = class TokenCelebration {
                 [-26, 56, 3.9, 'glint', 'gold'],
                 [47, 57, 1.8, 'confetti', 'gold'],
             ].map(([dx, dy, size, kind, color], index) => ({
-                x: moon.x + dx * scale,
-                y: moon.y + dy * scale,
+                x: moon.x + dx * scale * 1.15,
+                y: moon.y + dy * scale * 1.15,
                 size: size * scale,
                 kind,
+                variant: Math.sin(index * 2.4) > 0,
                 color,
                 phase: index * 2.4,
                 speed: 2,
@@ -382,103 +491,47 @@ window.App.TokenCelebration = class TokenCelebration {
     }
 
     clearance(x, y, radius) {
-        return this.protectedRects.reduce((opacity, rect) => {
+        let visibility = 1;
+        for (let index = 0; index < this.protectedRects.length; index += 1) {
+            const rect = this.protectedRects[index];
             const dx = Math.max(rect.left - x, 0, x - rect.right);
             const dy = Math.max(rect.top - y, 0, y - rect.bottom);
-            return Math.min(opacity, Math.max(0, (Math.hypot(dx, dy) - radius - 5) / 9));
-        }, 1);
+            if (dx > radius + 14 || dy > radius + 14) {
+                continue;
+            }
+            visibility = Math.min(visibility, Math.max(0, (Math.hypot(dx, dy) - radius - 5) / 9));
+        }
+        return visibility;
     }
 
-    renderParticle(particle, angle, visibility = 1) {
-        const ctx = this.context;
+    renderParticle(particle, angle, visibility = 1, offsetY = 0) {
         const phase = angle * particle.speed + particle.phase;
         const x = particle.x + Math.sin(phase) * 3.6 + Math.cos(phase * 2) * 0.8;
-        const y = particle.y + Math.sin(angle + particle.phase * 1.3) * 4.8;
+        const y = particle.y + offsetY + Math.sin(angle + particle.phase * 1.3) * 4.8;
         const size = particle.size * (0.94 + Math.sin(phase * 2) * 0.08);
         const opacity =
             visibility * (0.58 + Math.sin(phase * 2) * 0.14) * this.clearance(x, y, size + 2);
-        if (opacity <= 0) {
+        if (opacity <= 0.01) {
             return;
         }
-        ctx.save();
-        ctx.translate(x, y);
-        ctx.rotate(particle.angle + Math.sin(phase) * 0.16);
-        ctx.lineWidth = 0.85;
-        ctx.lineCap = 'round';
-        ctx.strokeStyle = this.color(particle.color, opacity);
-        ctx.shadowColor = this.color(particle.color, opacity * 0.7);
-        ctx.shadowBlur = 7;
-        ctx.beginPath();
-        if (particle.kind === 'confetti') {
-            ctx.shadowBlur = 0;
-            ctx.fillStyle = this.color(particle.color, opacity * 0.85);
-            if (Math.sin(particle.phase) > 0) {
-                ctx.moveTo(0, -size);
-                ctx.lineTo(size * 0.55, 0);
-                ctx.lineTo(0, size);
-                ctx.lineTo(-size * 0.55, 0);
-                ctx.closePath();
-                ctx.fill();
-            } else {
-                ctx.fillRect(-size, -0.5, size * 2, 1);
-            }
-        } else if (particle.kind === 'glint') {
-            // Unequal, slightly bent strokes avoid a repeated stock star silhouette.
-            ctx.moveTo(-size, size * 0.18);
-            ctx.bezierCurveTo(
-                -size * 0.25,
-                size * 0.04,
-                size * 0.1,
-                -size * 0.05,
-                size * 0.8,
-                -size * 0.28
-            );
-            ctx.moveTo(-size * 0.18, -size * 0.95);
-            ctx.bezierCurveTo(
-                -size * 0.04,
-                -size * 0.2,
-                size * 0.02,
-                size * 0.12,
-                size * 0.24,
-                size * 0.65
-            );
-            ctx.stroke();
-        } else if (particle.kind === 'seed') {
-            ctx.moveTo(-size * 0.4, -size * 0.45);
-            ctx.bezierCurveTo(
-                -size * 0.95,
-                size * 0.35,
-                size * 0.1,
-                size * 0.8,
-                size * 0.65,
-                size * 0.15
-            );
-            ctx.bezierCurveTo(
-                size * 0.9,
-                -size * 0.35,
-                size * 0.3,
-                -size * 0.7,
-                -size * 0.1,
-                -size * 0.5
-            );
-            ctx.stroke();
-        } else {
-            ctx.moveTo(-size * 0.9, size * 0.2);
-            ctx.bezierCurveTo(
-                -size * 0.2,
-                -size * 0.8,
-                size * 0.7,
-                -size * 0.55,
-                size * 0.55,
-                size * 0.25
-            );
-            ctx.stroke();
-        }
-        ctx.restore();
+        const sprite = this.sprites.glyph(
+            particle.kind,
+            particle.color,
+            particle.size,
+            particle.variant
+        );
+        this.sprites.draw(
+            this.context,
+            sprite,
+            x,
+            y,
+            particle.angle + Math.sin(phase) * 0.16,
+            size / sprite.baseSize,
+            opacity
+        );
     }
 
     renderMeteors(time) {
-        const ctx = this.context;
         const { left, right, top } = this.textBounds;
         const paths = [
             { x: left - 28, y: top - 64, dx: 55, dy: 32, offset: 0.6, color: 'gold' },
@@ -493,31 +546,22 @@ window.App.TokenCelebration = class TokenCelebration {
             const phase = age / 1.35;
             const x = path.x + path.dx * phase;
             const y = path.y + path.dy * phase;
-            const visibility = Math.pow(Math.sin(phase * Math.PI), 0.7) * 0.85;
-            const length = Math.hypot(path.dx, path.dy);
-            const tailX = (path.dx / length) * 16;
-            const tailY = (path.dy / length) * 16;
-            ctx.save();
-            ctx.lineCap = 'round';
-            ctx.shadowColor = this.color(path.color, 0.4);
-            ctx.shadowBlur = 5;
-            for (let i = 1; i <= 8; i += 1) {
-                const trail = i / 8;
-                const px = x - tailX * (1 - trail);
-                const py = y - tailY * (1 - trail);
-                const opacity = visibility * trail * trail * this.clearance(px, py, 3);
-                ctx.strokeStyle = this.color(path.color, opacity);
-                ctx.lineWidth = 0.3 + trail * 0.9;
-                ctx.beginPath();
-                ctx.moveTo(x - tailX * (1 - (i - 1) / 8), y - tailY * (1 - (i - 1) / 8));
-                ctx.lineTo(px, py);
-                ctx.stroke();
+            const opacity =
+                Math.pow(Math.sin(phase * Math.PI), 0.7) * 0.85 * this.clearance(x, y, 3);
+            if (opacity > 0.01) {
+                this.sprites.drawTrail(
+                    this.context,
+                    x,
+                    y,
+                    path.dx,
+                    path.dy,
+                    16,
+                    path.color,
+                    opacity,
+                    1.1,
+                    1.3
+                );
             }
-            ctx.fillStyle = this.color(path.color, visibility * this.clearance(x, y, 3));
-            ctx.beginPath();
-            ctx.arc(x, y, 1.3, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.restore();
         });
     }
 
@@ -549,25 +593,26 @@ window.App.TokenCelebration = class TokenCelebration {
             [30, -61, 3.8],
             [58, -46, 3.1],
         ];
-        const colors = ['#f8c34e', '#fa7199', '#64d5c3', '#ad85f5', '#71b9ff'];
+        const colors = App.CelebrationAmbience.PARTY_COLORS;
+        ctx.lineCap = 'round';
         pieces.forEach(([dx, dy, length], index) => {
-            const px = flameX + dx * spread * scale;
+            const px = flameX + dx * spread * scale + shake * (1 - age);
             const py = flameY + (dy * spread + 12 * age ** 2) * scale;
             const abovePrice = Math.min(1, (launch.y + 13 * scale - py) / (9 * scale));
             const opacity = fade * abovePrice;
             if (opacity <= 0) {
                 return;
             }
-            ctx.save();
-            ctx.translate(px + shake * (1 - age), py);
-            ctx.rotate(index * 2.4 + age * (index % 2 ? -3 : 3));
-            ctx.globalAlpha = opacity;
+            const rotation = index * 2.4 + age * (index % 2 ? -3 : 3);
+            const cos = Math.cos(rotation) * this.ratio;
+            const sin = Math.sin(rotation) * this.ratio;
             const color = colors[index % colors.length];
             const size = length * scale;
+            ctx.globalAlpha = opacity;
+            ctx.setTransform(cos, sin, -sin, cos, px * this.ratio, py * this.ratio);
             if (index % 3 === 0) {
                 ctx.strokeStyle = color;
                 ctx.lineWidth = 1.4 * scale;
-                ctx.lineCap = 'round';
                 ctx.beginPath();
                 ctx.moveTo(-size, 0);
                 ctx.bezierCurveTo(-size / 2, -size, size / 2, size, size, 0);
@@ -576,73 +621,127 @@ window.App.TokenCelebration = class TokenCelebration {
                 ctx.fillStyle = color;
                 ctx.fillRect(-size / 2, -scale, size, 2 * scale);
             }
-            ctx.restore();
         });
     }
 
-    renderMoon(rocket, pose, angle) {
-        const { scale, moon, clockTop, stars } = rocket;
-        const noseY = pose.y - Math.cos(pose.angle) * 18 * scale;
-        const starlight = Math.min(1, (clockTop + 20 * scale - noseY) / (36 * scale));
-        if (starlight > 0) {
-            stars.forEach((star) => this.renderParticle(star, angle, starlight));
-        }
-        const reveal = Math.max(0, Math.min(1, (clockTop - noseY) / (24 * scale)));
-        if (reveal === 0) {
+    renderMoon(rocket, time, angle, progress, sinceArrival) {
+        // The moon waits from the first moments, so the rocket visibly has somewhere to go.
+        const intro = TokenCelebration.ease((time - 0.3) / 1.2);
+        if (intro <= 0) {
             return;
         }
-        const ctx = this.context;
-        const opacity = reveal * reveal * (3 - 2 * reveal);
-        const size = scale * (0.86 + opacity * 0.14);
-        ctx.save();
-        ctx.globalAlpha = opacity;
-        ctx.translate(moon.x, moon.y);
-        ctx.scale(-size, size);
-        const light = ctx.createRadialGradient(-5, -6, 1, 0, 0, 13);
-        light.addColorStop(0, this.color('pearl', 1));
-        light.addColorStop(0.58, this.color('pearl', 1));
-        light.addColorStop(1, this.color('gold', 0.82));
-        ctx.fillStyle = light;
-        ctx.strokeStyle = this.color('gold', 0.72);
-        ctx.lineWidth = 0.7;
-        ctx.shadowColor = this.color('gold', 0.48);
-        ctx.shadowBlur = 8;
-        ctx.beginPath();
-        ctx.arc(0, 0, 13, Math.PI / 3, -Math.PI / 3);
-        const tipY = 13 * Math.sin(Math.PI / 3);
-        ctx.bezierCurveTo(-11, -8, -11, 8, 6.5, tipY);
-        ctx.closePath();
-        ctx.fill();
-        ctx.stroke();
-        ctx.clip();
-        ctx.shadowBlur = 0;
-        ctx.fillStyle = this.color('ink', 0.23);
-        for (const [x, y, rx, ry] of [
-            [-4, -3, 2.7, 2],
-            [4, 3, 3.1, 2.3],
-            [-3, 6, 1.4, 1.1],
-        ]) {
-            ctx.beginPath();
-            ctx.ellipse(x, y, rx, ry, -0.4, 0, Math.PI * 2);
-            ctx.fill();
-        }
-        ctx.restore();
+        const { scale, moon, stars } = rocket;
+        const float = Math.sin(time * 0.75) * 1.5 * scale;
+        // Its stars brighten as the rocket closes in, and fully on arrival.
+        const starlight = intro * (0.4 + 0.6 * TokenCelebration.ease((progress - 0.55) / 0.45));
+        stars.forEach((star) => this.renderParticle(star, angle, starlight, float));
+        const pulse =
+            sinceArrival > 0 && sinceArrival < 1.2 ? Math.sin((sinceArrival / 1.2) * Math.PI) : 0;
+        this.sprites.draw(
+            this.context,
+            this.sprites.moon(scale * CELEBRATION_MOON_SIZE),
+            moon.x,
+            moon.y + float,
+            0,
+            (0.9 + 0.1 * intro) * (1 + 0.07 * pulse),
+            intro
+        );
     }
 
-    renderRocket(time, angle) {
-        if (!this.rocket) {
-            this.rocketTarget.hidden = true;
+    // A brief ring of sparkles marks the moment the rocket reaches the moon.
+    renderArrivalBurst(rocket, time, sinceArrival) {
+        if (sinceArrival <= 0 || sinceArrival >= CELEBRATION_ARRIVAL_SECONDS) {
             return;
         }
+        const { scale, moon } = rocket;
+        const progress = sinceArrival / CELEBRATION_ARRIVAL_SECONDS;
+        const spread = 1 - (1 - progress) ** 3;
+        const fade = Math.min(1, progress / 0.08) * (1 - progress) ** 1.6;
+        const centerY = moon.y + Math.sin(time * 0.75) * 1.5 * scale;
+        for (let index = 0; index < 10; index += 1) {
+            const direction = (index / 10) * Math.PI * 2 + 0.35;
+            const distance = (18 + (index % 2 ? 20 : 30) * spread) * scale;
+            const x = moon.x + Math.cos(direction) * distance;
+            const y = centerY + Math.sin(direction) * distance;
+            const isConfetti = index % 3 === 0;
+            const size = (isConfetti ? 2.6 : 4.2) * scale;
+            const opacity = fade * 0.95 * this.clearance(x, y, size);
+            if (opacity <= 0.01) {
+                continue;
+            }
+            const sprite = this.sprites.glyph(
+                isConfetti ? 'confetti' : 'glint',
+                index % 2 ? 'lilac' : 'gold',
+                size,
+                true
+            );
+            this.sprites.draw(
+                this.context,
+                sprite,
+                x,
+                y,
+                direction + progress * 1.5,
+                size / sprite.baseSize,
+                opacity
+            );
+        }
+    }
+
+    renderExhaust(flicker, flame) {
         const ctx = this.context;
-        const { scale } = this.rocket;
-        const flightTime = this.previewElapsed === null ? time / 3 : time;
-        const pose = this.getRocketPose(this.rocket, flightTime);
-        const shake = 3.5 * Math.sin(time * Math.PI * 16) * Math.max(0, 1 - time / 0.5) ** 2;
-        const rocketX = pose.x + shake * scale;
-        const canvasRect = this.canvas.getBoundingClientRect();
-        const targetX = canvasRect.left + rocketX;
-        const targetY = canvasRect.top + pose.y;
+        // Flame points extend from the nozzle at y = 11 and shrink once the rocket hovers.
+        const fy = (value) => 11 + (value - 11) * flame;
+        const outer = () => {
+            ctx.beginPath();
+            ctx.moveTo(-3, 11);
+            ctx.bezierCurveTo(-4.8, fy(17), -2.5, fy(21), flicker * 1.5, fy(29 + flicker * 4));
+            ctx.bezierCurveTo(1.4, fy(22), 5, fy(17 + flicker), 3, 11);
+            ctx.closePath();
+        };
+        const exhaust = ctx.createLinearGradient(0, 12, 0, fy(33));
+        exhaust.addColorStop(0, this.color('pearl', 0.95));
+        exhaust.addColorStop(0.35, this.color('gold', 0.9));
+        exhaust.addColorStop(1, this.color('gold', 0));
+        // A wider, faint copy stands in for a blurred glow at a fraction of the cost.
+        const base = ctx.getTransform();
+        const sx = 1.7;
+        const sy = 1.2;
+        ctx.setTransform(
+            base.a * sx,
+            base.b * sx,
+            base.c * sy,
+            base.d * sy,
+            base.e + base.c * 11 * (1 - sy),
+            base.f + base.d * 11 * (1 - sy)
+        );
+        ctx.fillStyle = this.color('gold', 0.22);
+        outer();
+        ctx.fill();
+        ctx.setTransform(base);
+        ctx.fillStyle = exhaust;
+        outer();
+        ctx.fill();
+        ctx.fillStyle = this.color('pearl', 0.95);
+        ctx.beginPath();
+        ctx.moveTo(-1.6, 11);
+        ctx.quadraticCurveTo(-2, fy(17), flicker * 0.6, fy(23 + flicker * 2));
+        ctx.quadraticCurveTo(2.4, fy(17), 1.6, 11);
+        ctx.fill();
+    }
+
+    // The invisible hover target follows the rocket. Style writes trigger a style and layout
+    // pass, so it moves in whole pixels and only when its position actually changes.
+    placeRocketTarget(x, y, hidden) {
+        if (this.rocketTarget.hidden !== hidden) {
+            this.rocketTarget.hidden = hidden;
+        }
+        const targetX = Math.round(this.origin.left + x);
+        const targetY = Math.round(this.origin.top + y);
+        const placement = `${targetX},${targetY},${this.rocketTipWidth}`;
+        if (hidden || placement === this.rocketTargetPlacement) {
+            return;
+        }
+        this.rocketTargetPlacement = placement;
         const viewportWidth = document.documentElement.clientWidth;
         const tipInset = Math.min(this.rocketTipWidth / 2 + 8, viewportWidth / 2);
         const tipCenter = Math.max(tipInset, Math.min(viewportWidth - tipInset, targetX));
@@ -651,106 +750,97 @@ window.App.TokenCelebration = class TokenCelebration {
             'tooltip-beside',
             viewportWidth - targetX >= this.rocketTipWidth + 40
         );
-        this.rocketTarget.hidden = time < 0.2;
         this.rocketTarget.style.transform = `translate(${targetX}px, ${targetY}px) translate(-50%, -50%)`;
-        this.renderLaunchConfetti(this.rocket, time, shake * scale);
-        this.renderMoon(this.rocket, pose, angle);
-        const fade = Math.min(1, time / 0.2);
-        const opacity = fade * fade * (3 - 2 * fade);
-        const flicker = Math.sin(time * Math.PI * 10) * 0.65 + Math.sin(time * Math.PI * 16) * 0.35;
-        ctx.save();
-        ctx.globalAlpha = opacity;
-        ctx.translate(rocketX, pose.y);
-        ctx.scale(scale, scale);
-        ctx.rotate(pose.angle);
-
-        // A quick, changing exhaust underneath a deliberately unhurried little craft.
-        const exhaust = ctx.createLinearGradient(0, 12, 0, 33);
-        exhaust.addColorStop(0, this.color('pearl', 0.95));
-        exhaust.addColorStop(0.35, this.color('gold', 0.9));
-        exhaust.addColorStop(1, this.color('gold', 0));
-        ctx.fillStyle = exhaust;
-        ctx.shadowColor = this.color('gold', 0.55);
-        ctx.shadowBlur = 7;
-        ctx.beginPath();
-        ctx.moveTo(-3, 11);
-        ctx.bezierCurveTo(-4.8, 17, -2.5, 21, flicker * 1.5, 29 + flicker * 4);
-        ctx.bezierCurveTo(1.4, 22, 5, 17 + flicker, 3, 11);
-        ctx.closePath();
-        ctx.fill();
-        ctx.shadowBlur = 0;
-        ctx.fillStyle = this.color('pearl', 0.95);
-        ctx.beginPath();
-        ctx.moveTo(-1.6, 11);
-        ctx.quadraticCurveTo(-2, 17, flicker * 0.6, 23 + flicker * 2);
-        ctx.quadraticCurveTo(2.4, 17, 1.6, 11);
-        ctx.fill();
-
-        // Unequal swept fins and an offset oval window give this capsule its own silhouette.
-        ctx.lineWidth = 0.8;
-        ctx.lineJoin = 'round';
-        ctx.strokeStyle = this.color('ink', 0.7);
-        ctx.fillStyle = this.color('lilac', 0.85);
-        ctx.beginPath();
-        ctx.moveTo(-6, -1);
-        ctx.bezierCurveTo(-10, 2, -14.5, 8, -13, 12);
-        ctx.quadraticCurveTo(-8, 8, -4, 8);
-        ctx.closePath();
-        ctx.fill();
-        ctx.stroke();
-        ctx.beginPath();
-        ctx.moveTo(6, 3);
-        ctx.quadraticCurveTo(12.5, 6, 9, 12.5);
-        ctx.lineTo(3.5, 9);
-        ctx.closePath();
-        ctx.fill();
-        ctx.stroke();
-        const shell = ctx.createLinearGradient(-8, 0, 8, 0);
-        shell.addColorStop(0, this.color('gold', 0.75));
-        shell.addColorStop(0.38, this.color('shell', 1));
-        shell.addColorStop(1, this.color('shell', 1));
-        ctx.fillStyle = shell;
-        ctx.beginPath();
-        ctx.moveTo(0, -18);
-        ctx.bezierCurveTo(5, -15, 9, -8, 8, 0);
-        ctx.bezierCurveTo(7.5, 8, 3.5, 13, -1.5, 12);
-        ctx.bezierCurveTo(-6, 11, -8, 6, -7, -1);
-        ctx.bezierCurveTo(-6, -8, -4, -14, 0, -18);
-        ctx.closePath();
-        ctx.fill();
-        ctx.stroke();
-        ctx.strokeStyle = this.color('gold', 0.58);
-        ctx.lineWidth = 0.6;
-        ctx.beginPath();
-        ctx.moveTo(-4.7, -10.4);
-        ctx.quadraticCurveTo(0.9, -12, 6.5, -10.4);
-        ctx.stroke();
-        ctx.fillStyle = this.color('ink', 0.95);
-        ctx.beginPath();
-        ctx.ellipse(1.4, -2.7, 2.8, 3.8, -0.15, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.fillStyle = this.color('pearl', 0.85);
-        ctx.beginPath();
-        ctx.ellipse(0.7, -4.1, 0.8, 1.3, -0.3, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.strokeStyle = this.color('ink', 0.55);
-        ctx.lineWidth = 1.5;
-        ctx.beginPath();
-        ctx.moveTo(-3, 10.6);
-        ctx.quadraticCurveTo(0, 12, 3.2, 10.2);
-        ctx.stroke();
-        ctx.restore();
     }
 
-    render(time) {
+    renderRocket(time, angle, pace) {
+        const rocket = this.rocket;
+        if (!rocket) {
+            this.rocketTarget.hidden = true;
+            return;
+        }
         const ctx = this.context;
-        ctx.setTransform(this.ratio, 0, 0, this.ratio, 0, 0);
-        ctx.clearRect(0, 0, this.width, this.height);
+        const { scale } = rocket;
+        const flightTime = time * pace;
+        const progress = Math.min(1, flightTime / CELEBRATION_FLIGHT_SECONDS);
+        // Real seconds since arrival, whatever the flight's pace.
+        const sinceArrival = (flightTime - CELEBRATION_FLIGHT_SECONDS) / pace;
+        const settle = TokenCelebration.ease(sinceArrival / 1.2);
+        const pose = this.getRocketPose(rocket, flightTime);
+        // Once it arrives, the rocket hovers beside the moon instead of freezing in place.
+        pose.y += Math.sin(sinceArrival * 1.7) * 1.8 * scale * settle;
+        pose.angle += Math.sin(sinceArrival * 1.1) * 0.05 * settle;
+        const shake = 3.5 * Math.sin(time * Math.PI * 16) * Math.max(0, 1 - time / 0.5) ** 2;
+        const rocketX = pose.x + shake * scale;
+
+        this.placeRocketTarget(rocketX, pose.y, time < 0.2);
+
+        this.renderMoon(rocket, time, angle, progress, sinceArrival);
+        this.renderLaunchConfetti(rocket, time, shake * scale);
+        this.renderArrivalBurst(rocket, time, sinceArrival);
+
+        const fade = Math.min(1, time / 0.2);
+        const flicker = Math.sin(time * Math.PI * 10) * 0.65 + Math.sin(time * Math.PI * 16) * 0.35;
+        const cos = Math.cos(pose.angle);
+        const sin = Math.sin(pose.angle);
+        ctx.globalAlpha = fade * fade * (3 - 2 * fade);
+        const unit = scale * this.ratio;
+        ctx.setTransform(
+            cos * unit,
+            sin * unit,
+            -sin * unit,
+            cos * unit,
+            rocketX * this.ratio,
+            pose.y * this.ratio
+        );
+        // A quick, changing exhaust underneath a deliberately unhurried little craft.
+        this.renderExhaust(flicker, 1 - 0.4 * settle);
+        const body = this.sprites.rocketBody(scale);
+        ctx.setTransform(cos, sin, -sin, cos, rocketX * this.ratio, pose.y * this.ratio);
+        ctx.drawImage(body, -body.width / 2, -body.height / 2);
+    }
+
+    // Fast motion gets 60 fps; everything else is smooth at 30.
+    isLively(time, pace) {
+        if (time < CELEBRATION_LAUNCH_SECONDS) {
+            return true;
+        }
+        const flightTime = time * pace;
+        const passStart = CELEBRATION_FLIGHT.kickSeconds + CELEBRATION_FLIGHT.approachSeconds;
+        if (pace === 1 && flightTime > passStart && flightTime < CELEBRATION_FLIGHT_SECONDS) {
+            return true;
+        }
+        const sinceArrival = (flightTime - CELEBRATION_FLIGHT_SECONDS) / pace;
+        if (sinceArrival > -0.1 && sinceArrival < CELEBRATION_ARRIVAL_SECONDS + 0.1) {
+            return true;
+        }
+        return this.ambience.isLively(time);
+    }
+
+    render(time, pace) {
+        const ctx = this.context;
+        if (!ctx || !this.textBounds || !this.sprites) {
+            return;
+        }
+        const width = Math.round(this.width * this.ratio);
+        const height = Math.round(this.height * this.ratio);
+        if (this.canvas.width !== width || this.canvas.height !== height) {
+            this.canvas.width = width;
+            this.canvas.height = height;
+        }
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+        ctx.globalAlpha = 1;
+        ctx.clearRect(0, 0, width, height);
+
+        // Back to front: the page-wide layer, the sparkles around the price, then the flight.
+        this.ambience.render(ctx, this.ratio, time, this.sprites);
         const loopTime = time % 16;
         const angle = (loopTime * Math.PI * 2) / 16;
         this.particles.forEach((particle) => this.renderParticle(particle, angle));
         this.renderMeteors(loopTime);
-        this.renderRocket(time, angle);
+        this.renderRocket(time, angle, pace);
+        ctx.globalAlpha = 1;
+        this.lively = this.isLively(time, pace);
     }
 
     destroy() {
@@ -762,6 +852,8 @@ window.App.TokenCelebration = class TokenCelebration {
         this.resizeObserver.disconnect();
         this.motion.removeEventListener('change', this.handleInteraction);
         window.removeEventListener('themechange', this.handleThemeChange);
+        window.removeEventListener('resize', this.handleLayoutChange);
+        window.removeEventListener('scroll', this.handleScroll);
         ['focusin', 'focusout'].forEach((event) => {
             this.trigger.removeEventListener(event, this.handleInteraction);
         });
