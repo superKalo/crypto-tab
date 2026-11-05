@@ -91,6 +91,10 @@ For the website, serve `dist/website/` with a local static web server.
 
 Edit files in `src/`; the generated `dist/` directories are replaced on each build.
 
+The product version comes from `package.json`. Use `npm version <version> --no-git-tag-version`
+to update it and keep `package-lock.json` in sync. Builds apply the version to the extension
+manifest and About panel, and add `?v=<version>` to the website's local CSS and JavaScript URLs.
+
 ## License
 
 Code and documentation are released under the [GPL-3.0 License](LICENSE).

@@ -2,7 +2,6 @@ const fs = require("node:fs");
 const gulp = require("gulp");
 const rename = require("gulp-rename");
 const replace = require("gulp-replace-task");
-const { version: productVersion } = require("./package.json");
 
 const { ENV } = process.env;
 const distPath = `./dist/${ENV}/`;
@@ -12,6 +11,11 @@ const socialPreviewImage =
   "https://crypto-tab.com/mockups/social/crypto-tab-social-preview.jpg";
 const socialPreviewAlt =
   "Crypto Tab showing cryptocurrency prices and a chart on a laptop in a sunlit workspace.";
+
+// Read on each build so watch mode picks up version changes too.
+function readProductVersion() {
+  return JSON.parse(fs.readFileSync("./package.json", "utf8")).version;
+}
 
 function readLocaleCatalogs() {
   const catalogs = {};
@@ -135,7 +139,7 @@ gulp.task("preprocess-index", function () {
           },
           {
             match: "version",
-            replacement: productVersion,
+            replacement: readProductVersion(),
           },
           {
             match: "favicons",
@@ -201,6 +205,10 @@ gulp.task("preprocess-manifest", function () {
       replace({
         patterns: [
           {
+            match: "version",
+            replacement: readProductVersion(),
+          },
+          {
             match: "background",
             // Firefox doesn't yet support service workers, but they have a concept
             // for background scripts that can be used in a similar way.
@@ -219,6 +227,24 @@ gulp.task("preprocess-manifest", function () {
                   "js/background.js"
                 ]
               }
+          },
+        ],
+      })
+    )
+    .pipe(gulp.dest(distPath));
+});
+
+// Version local CSS and scripts after all website HTML and template fragments are generated.
+gulp.task("version-website-assets", function () {
+  const productVersion = readProductVersion();
+  return gulp
+    .src(`${distPath}/**/*.html`, { base: distPath })
+    .pipe(
+      replace({
+        patterns: [
+          {
+            match: /(\b(?:src|href)=["'])(?![a-z][a-z\d+.-]*:|\/\/)([^"'?#]+\.(?:css|js))(["'])/gi,
+            replacement: `$1$2?v=${productVersion}$3`,
           },
         ],
       })
@@ -266,7 +292,9 @@ const buildTasks = gulp.series(
   "clean",
   gulp.parallel("copy-files", "preprocess-index", "copy-npm-dependencies", "set-env", "build-locales"),
   ENV.includes("extension") ? "preprocess-manifest" : (done) => done(),
-  ENV === "website" ? gulp.parallel("copy-favicons", "build-privacy") : (done) => done()
+  ENV === "website"
+    ? gulp.series(gulp.parallel("copy-favicons", "build-privacy"), "version-website-assets")
+    : (done) => done()
 );
 
 // Main build task to run all necessary tasks in sequence and parallel as needed
@@ -276,7 +304,7 @@ gulp.task("build", buildTasks);
 gulp.task(
   "build:watch",
   gulp.series("build", function watchFiles() {
-    const watchPaths = ["./src/**/*"];
+    const watchPaths = ["./src/**/*", "./package.json"];
     if (ENV === "website") {
       watchPaths.push("./PRIVACY.md");
     }
